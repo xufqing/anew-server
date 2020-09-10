@@ -27,16 +27,16 @@ mysql:
   # 字符集(utf8mb4_general_ci速度比utf8mb4_unicode_ci快些)
   collation: utf8mb4_general_ci
 
-  logs:
-    # 日志等级(-1:Debug, 0:Info, -1<=level<=5, 参照zap.level源码)
-    level: -1
-    # 日志路径
-    path: logs
-    # 文件最大大小, M
-    max-size: 50
-    # 备份数
-    max-backups: 100
-    # 存放时间, 天
-    max-age: 30
-    # 是否压缩
-    compress: false
+logs:
+  # 日志等级(-1:Debug, 0:Info, -1<=level<=5, 参照zap.level源码)
+  level: -1
+  # 日志路径
+  path: logs
+  # 文件最大大小, M
+  max-size: 50
+  # 备份数
+  max-backups: 100
+  # 存放时间, 天
+  max-age: 30
+  # 是否压缩
+  compress: false

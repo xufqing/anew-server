@@ -7,7 +7,7 @@ import (
 
 // 全局变量
 var (
-	// 系统配置
+	// 配置信息
 	Conf Configuration
 	// packr盒子用于打包配置文件到golang编译后的二进制程序中
 	ConfBox *packr.Box
