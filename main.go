@@ -12,14 +12,22 @@ import (
 	"time"
 )
 
-func main()  {
+func main() {
 	// 初始化配置
 	initialize.InitConfig()
 	// 初始化日志
 	initialize.Logger()
 	// 初始化路由
 	r := initialize.Routers()
+	//初始化数据库
+	initialize.Mysql()
 
+	//是否初始化数据(慎用) $anew-server init
+	if len(os.Args) > 1 {
+		if os.Args[1] == "init" {
+			initialize.InitData()
+		}
+	}
 	// 启动服务器
 	host := "0.0.0.0"
 	port := common.Conf.System.Port

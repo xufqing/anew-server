@@ -1,5 +1,7 @@
 # development
 system:
+  # url前缀
+  url-path-prefix: api
   # gin模式 debug|release
   app-mode: debug
   # 程序监听端口
@@ -18,7 +20,7 @@ mysql:
   port: 3306
   # 连接字符串查询参数
   query: charset=utf8&parseTime=True&loc=Local&timeout=10000ms
-  # 是否打印日志
+  # 是否打印SQL日志
   log-mode: true
   # 数据库表前缀
   table-prefix: tb_

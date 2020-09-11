@@ -13,10 +13,10 @@ const (
 	configBoxName = "anew-conf-box"
 	configType    = "yml"
 	// 配置文件目录, packr.Box基于当前包目录, 文件名需要写完整, 即使viper可以自动获取
-	configPath        = "../conf"
-	devConfig = "config-dev.yml"
-	testConfig     = "config-test.yml"
-	prodConfig  = "config-prod.yml"
+	configPath = "../conf"
+	devConfig  = "config-dev.yml"
+	testConfig = "config-test.yml"
+	prodConfig = "config-prod.yml"
 )
 
 // 初始化配置文件

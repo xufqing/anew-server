@@ -2,6 +2,7 @@ package common
 
 import (
 	"github.com/gobuffalo/packr/v2"
+	"github.com/jinzhu/gorm"
 	"go.uber.org/zap"
 )
 
@@ -13,12 +14,14 @@ var (
 	ConfBox *packr.Box
 	// zap日志
 	Log *zap.SugaredLogger
+	// Mysql实例
+	Mysql *gorm.DB
 )
 
 // 全局常量
 const (
 	// 本地时间格式
 	MsecLocalTimeFormat = "2006-01-02 15:04:05.000"
-	SecLocalTimeFormat = "2006-01-02 15:04:05"
+	SecLocalTimeFormat  = "2006-01-02 15:04:05"
 	DateLocalTimeFormat = "2006-01-02"
 )

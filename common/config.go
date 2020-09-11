@@ -11,8 +11,9 @@ type Configuration struct {
 }
 
 type SystemConfiguration struct {
+	UrlPathPrefix   string `mapstructure:"url-path-prefix" json:"urlPathPrefix"`
 	AppMode string `mapstructure:"app-mode" json:"appMode"`
-	Port    int `mapstructure:"port" json:"port"`
+	Port    int    `mapstructure:"port" json:"port"`
 }
 
 type LogsConfiguration struct {
