@@ -4,6 +4,8 @@ system:
   url-path-prefix: api
   # gin模式 debug|release
   app-mode: debug
+  # 开启全局事务管理器
+  transaction: true
   # 程序监听端口
   port: 8000
 
@@ -42,3 +44,14 @@ logs:
   max-age: 30
   # 是否压缩
   compress: false
+
+# jwt配置
+jwt:
+  # jwt标识
+  realm: anew
+  # 服务端密钥
+  key: vFr3RRkxlBG0ggRYLG
+  # token过期时间, 小时
+  timeout: 24
+  # token更新时间, 小时
+  max-refresh: 24

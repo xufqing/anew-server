@@ -21,6 +21,7 @@ func (Model) TableName(name string) string {
 	return fmt.Sprintf("%s%s", common.Conf.Mysql.TablePrefix, name)
 }
 
+
 // 本地时间
 type LocalTime struct {
 	time.Time

@@ -8,11 +8,13 @@ type Configuration struct {
 	System SystemConfiguration `mapstructure:"system" json:"system"`
 	Logs   LogsConfiguration   `mapstructure:"logs" json:"logs"`
 	Mysql  MysqlConfiguration  `mapstructure:"mysql" json:"mysql"`
+	Jwt       JwtConfiguration       `mapstructure:"jwt" json:"jwt"`
 }
 
 type SystemConfiguration struct {
 	UrlPathPrefix   string `mapstructure:"url-path-prefix" json:"urlPathPrefix"`
 	AppMode string `mapstructure:"app-mode" json:"appMode"`
+	Transaction     bool   `mapstructure:"transaction" json:"transaction"`
 	Port    int    `mapstructure:"port" json:"port"`
 }
 
@@ -36,4 +38,11 @@ type MysqlConfiguration struct {
 	TablePrefix string `mapstructure:"table-prefix" json:"tablePrefix"`
 	Charset     string `mapstructure:"charset" json:"charset"`
 	Collation   string `mapstructure:"collation" json:"collation"`
+}
+
+type JwtConfiguration struct {
+	Realm      string `mapstructure:"realm" json:"realm"`
+	Key        string `mapstructure:"key" json:"key"`
+	Timeout    int    `mapstructure:"timeout" json:"timeout"`
+	MaxRefresh int    `mapstructure:"max-refresh" json:"maxRefresh"`
 }
