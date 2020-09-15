@@ -63,7 +63,7 @@ func (s *MysqlService) CreateUser(req *request.CreateUserReq) (err error) {
 	}
 	utils.Struct2StructByJson(req, &user)
 	// 将初始密码转为密文
-	user.Password = utils.GenPwd(req.InitPassword)
+	user.Password = utils.GenPwd(req.Password)
 	// 创建数据
 	err = s.tx.Create(&user).Error
 	return

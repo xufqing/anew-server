@@ -65,7 +65,7 @@ func FailWithMsg(msg string) {
 }
 
 func GetFailWithMsg(msg string) RespInfo {
-	return GetMsgResult(NotOk, msg,map[string]interface{}{})
+	return GetMsgResult(NotOk, msg, map[string]interface{}{})
 }
 
 func FailWithCode(code int) {

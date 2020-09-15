@@ -8,8 +8,8 @@ type RegisterAndLoginReq struct {
 
 // 修改密码结构体
 type ChangePwdReq struct {
-	OldPassword string `json:"oldPassword" form:"oldPassword"`
-	NewPassword string `json:"newPassword" form:"newPassword"`
+	OldPassword string `json:"oldPassword" form:"oldPassword" validate:"required"`
+	NewPassword string `json:"newPassword" form:"newPassword" validate:"required"`
 }
 
 // 获取用户列表结构体
@@ -28,13 +28,30 @@ type UserListReq struct {
 
 // 创建用户结构体
 type CreateUserReq struct {
-	Username     string `json:"username" binding:"required"`
-	InitPassword string `json:"initPassword" binding:"required"` // 不使用SysUser的Password字段, 避免请求劫持绕过系统校验
-	Mobile       string `json:"mobile" binding:"len=11"`
-	Avatar       string `json:"avatar"`
-	Name         string `json:"name" binding:"required"`
-	Email        string `json:"mail"`
-	Status       *bool  `json:"status"`
-	RoleId       uint   `json:"roleId" binding:"required"`
-	Creator      string `json:"creator"`
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"` // 不使用SysUser的Password字段, 避免请求劫持绕过系统校验
+	Mobile   string `json:"mobile" validate:"len=11"`
+	Avatar   string `json:"avatar"`
+	Name     string `json:"name" validate:"required"`
+	Email    string `json:"mail"`
+	Status   *bool  `json:"status"`
+	RoleId   uint   `json:"roleId" validate:"required"`
+	Creator  string `json:"creator"`
+}
+
+// 翻译需要校验的字段名称
+func (s CreateUserReq) FieldTrans() map[string]string {
+	m := make(map[string]string, 0)
+	m["Username"] = "用户名"
+	m["Password"] = "用户密码"
+	m["Mobile"] = "手机号码"
+	m["Name"] = "姓名"
+	m["RoleId"] = "角色ID"
+	return m
+}
+func (s ChangePwdReq) FieldTrans() map[string]string {
+	m := make(map[string]string, 0)
+	m["OldPassword"] = "旧密码"
+	m["NewPassword"] = "新密码"
+	return m
 }

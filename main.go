@@ -21,6 +21,8 @@ func main() {
 	r := initialize.Routers()
 	//初始化数据库
 	initialize.Mysql()
+	// 初始校验器
+	initialize.Validate()
 
 	//是否初始化数据(慎用) $anew-server init
 	if len(os.Args) > 1 {

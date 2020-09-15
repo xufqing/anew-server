@@ -1,13 +1,13 @@
 package middleware
 
 import (
-	"fmt"
-	"anew-server/models"
-	"anew-server/dto/service"
 	"anew-server/common"
 	"anew-server/dto/request"
 	"anew-server/dto/response"
+	"anew-server/dto/service"
+	"anew-server/models"
 	"anew-server/utils"
+	"fmt"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"time"
@@ -26,7 +26,7 @@ func InitAuth() (*jwt.GinJWTMiddleware, error) {
 		Unauthorized:    unauthorized,                                          // 用户登录校验失败处理
 		LoginResponse:   loginResponse,                                         // 登录成功后的响应
 		LogoutResponse:  logoutResponse,                                        // 登出后的响应
-		TokenLookup:     "header: Authorization, query: token, cookie: jwt",    // 自动在这几个地方寻找请求中的token
+		TokenLookup:     "header: Authorization, query: token",                 // 自动在这几个地方寻找请求中的token
 		TokenHeadName:   "Bearer",                                              // header名称
 		TimeFunc:        time.Now,
 	})
@@ -58,7 +58,6 @@ func login(c *gin.Context) (interface{}, error) {
 	var req request.RegisterAndLoginReq
 	// 请求json绑定
 	_ = c.ShouldBindJSON(&req)
-
 
 	u := &models.SysUser{
 		Username: req.Username,
@@ -101,7 +100,7 @@ func unauthorized(c *gin.Context, code int, message string) {
 
 func loginResponse(c *gin.Context, code int, token string, expires time.Time) {
 	response.SuccessWithData(map[string]interface{}{
-		"token":   token,
+		"token": token,
 		"expires": models.LocalTime{
 			Time: expires,
 		},

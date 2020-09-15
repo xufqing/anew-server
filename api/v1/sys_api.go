@@ -9,53 +9,50 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// 查询当前用户菜单树
-func GetMenuTree(c *gin.Context) {
-	user := GetCurrentUser(c)
+// 获取接口列表
+func GetApis(c *gin.Context) {
+	// 绑定参数
+	var req request.ApiListReq
+	err := c.Bind(&req)
+	if err != nil {
+		response.FailWithMsg("参数绑定失败, 请检查数据类型")
+		return
+	}
+
 	// 创建服务
 	s := service.New(c)
-	menus, err := s.GetMenuTree(user.RoleId)
+	apis, err := s.GetApis(&req)
 	if err != nil {
 		response.FailWithMsg(err.Error())
 		return
 	}
-	// 转为MenuTreeResponseStruct
-	var resp []response.MenuTreeResp
-	utils.Struct2StructByJson(menus, &resp)
-	response.SuccessWithData(resp)
+	// 转为ResponseStruct, 隐藏部分字段
+	var respStruct []response.ApiListResp
+	utils.Struct2StructByJson(apis, &respStruct)
+	response.SuccessWithData(respStruct)
 }
 
-// 查询指定角色的菜单树
-func GetAllMenuByRoleId(c *gin.Context) {
+// 查询指定角色的接口(以分类分组)
+func GetAllApiGroupByCategoryByRoleId(c *gin.Context) {
 	// 创建服务
 	s := service.New(c)
-	menus, ids, err := s.GetAllMenuByRoleId(utils.Str2Uint(c.Param("roleId")))
+	// 绑定参数
+	apis, ids, err := s.GetAllApiGroupByCategoryByRoleId(utils.Str2Uint(c.Param("roleId")))
 	if err != nil {
 		response.FailWithMsg(err.Error())
 		return
 	}
-	var resp response.MenuTreeWithAccessResp
+	var resp response.ApiTreeWithAccessResponseStruct
 	resp.AccessIds = ids
-	utils.Struct2StructByJson(menus, &resp.List)
+	utils.Struct2StructByJson(apis, &resp.List)
 	response.SuccessWithData(resp)
 }
 
-// 查询所有菜单
-func GetMenus(c *gin.Context) {
-	// 创建服务
-	s := service.New(c)
-	menus := s.GetMenus()
-	// 转为MenuTreeResponseStruct
-	var resp []response.MenuTreeResp
-	utils.Struct2StructByJson(menus, &resp)
-	response.SuccessWithData(resp)
-}
-
-// 创建菜单
-func CreateMenu(c *gin.Context) {
+// 创建接口
+func CreateApi(c *gin.Context) {
 	user := GetCurrentUser(c)
 	// 绑定参数
-	var req request.CreateMenuReq
+	var req request.CreateApiReq
 	err := c.Bind(&req)
 	if err != nil {
 		response.FailWithMsg("参数绑定失败, 请检查数据类型")
@@ -72,7 +69,7 @@ func CreateMenu(c *gin.Context) {
 	req.Creator = user.Name
 	// 创建服务
 	s := service.New(c)
-	err = s.CreateMenu(&req)
+	err = s.CreateApi(&req)
 	if err != nil {
 		response.FailWithMsg(err.Error())
 		return
@@ -80,8 +77,8 @@ func CreateMenu(c *gin.Context) {
 	response.Success()
 }
 
-// 更新菜单
-func UpdateMenuById(c *gin.Context) {
+// 更新接口
+func UpdateApiById(c *gin.Context) {
 	// 绑定参数
 	var req gin.H
 	err := c.Bind(&req)
@@ -90,16 +87,16 @@ func UpdateMenuById(c *gin.Context) {
 		return
 	}
 
-	// 获取path中的menuId
-	menuId := utils.Str2Uint(c.Param("menuId"))
-	if menuId == 0 {
-		response.FailWithMsg("菜单编号不正确")
+	// 获取path中的apiId
+	apiId := utils.Str2Uint(c.Param("apiId"))
+	if apiId == 0 {
+		response.FailWithMsg("接口编号不正确")
 		return
 	}
 	// 创建服务
 	s := service.New(c)
 	// 更新数据
-	err = s.UpdateMenuById(menuId, req)
+	err = s.UpdateApiById(apiId, req)
 	if err != nil {
 		response.FailWithMsg(err.Error())
 		return
@@ -107,8 +104,8 @@ func UpdateMenuById(c *gin.Context) {
 	response.Success()
 }
 
-// 批量删除菜单
-func BatchDeleteMenuByIds(c *gin.Context) {
+// 批量删除接口
+func BatchDeleteApiByIds(c *gin.Context) {
 	var req request.Req
 	err := c.Bind(&req)
 	if err != nil {
@@ -119,7 +116,7 @@ func BatchDeleteMenuByIds(c *gin.Context) {
 	// 创建服务
 	s := service.New(c)
 	// 删除数据
-	err = s.DeleteMenuByIds(req.GetUintIds())
+	err = s.DeleteApiByIds(req.GetUintIds())
 	if err != nil {
 		response.FailWithMsg(err.Error())
 		return
