@@ -16,7 +16,7 @@ func GetRoles(c *gin.Context) {
 	var req request.RoleListReq
 	err := c.Bind(&req)
 	if err != nil {
-		response.FailWithMsg("参数绑定失败, 请检查数据类型")
+		response.FailWithCode(response.ParmError)
 		return
 	}
 
@@ -40,7 +40,7 @@ func CreateRole(c *gin.Context) {
 	var req request.CreateRoleReq
 	err := c.Bind(&req)
 	if err != nil {
-		response.FailWithMsg("参数绑定失败, 请检查数据类型")
+		response.FailWithCode(response.ParmError)
 		return
 	}
 
@@ -68,7 +68,7 @@ func UpdateRoleById(c *gin.Context) {
 	var req gin.H
 	err := c.Bind(&req)
 	if err != nil {
-		response.FailWithMsg("参数绑定失败, 请检查数据类型")
+		response.FailWithCode(response.ParmError)
 		return
 	}
 
@@ -146,7 +146,7 @@ func BatchDeleteRoleByIds(c *gin.Context) {
 	var req request.Req
 	err := c.Bind(&req)
 	if err != nil {
-		response.FailWithMsg("参数绑定失败, 请检查数据类型")
+		response.FailWithCode(response.ParmError)
 		return
 	}
 

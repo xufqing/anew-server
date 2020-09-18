@@ -58,7 +58,7 @@ func CreateMenu(c *gin.Context) {
 	var req request.CreateMenuReq
 	err := c.Bind(&req)
 	if err != nil {
-		response.FailWithMsg("参数绑定失败, 请检查数据类型")
+		response.FailWithCode(response.ParmError)
 		return
 	}
 
@@ -86,7 +86,7 @@ func UpdateMenuById(c *gin.Context) {
 	var req gin.H
 	err := c.Bind(&req)
 	if err != nil {
-		response.FailWithMsg("参数绑定失败, 请检查数据类型")
+		response.FailWithCode(response.ParmError)
 		return
 	}
 
@@ -112,7 +112,7 @@ func BatchDeleteMenuByIds(c *gin.Context) {
 	var req request.Req
 	err := c.Bind(&req)
 	if err != nil {
-		response.FailWithMsg("参数绑定失败, 请检查数据类型")
+		response.FailWithCode(response.ParmError)
 		return
 	}
 

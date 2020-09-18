@@ -23,6 +23,8 @@ func Routers() *gin.Engine {
 	r.Use(middleware.Exception)
 	// 添加全局事务处理中间件
 	r.Use(middleware.Transaction)
+	// 添加跨域中间件, 让请求支持跨域-生产勿用
+	r.Use(middleware.Cors())
 	// 初始化jwt auth中间件
 	authMiddleware, err := middleware.InitAuth()
 

@@ -110,7 +110,7 @@ func OperationLog(c *gin.Context) {
 		cache := service.New(c)
 		apis, err := cache.GetApis(&request.ApiListReq{
 			Method: log.Method,
-			PageInfo: request.PageInfo{
+			PageInfo: response.PageInfo{
 				All: true,
 			},
 		})

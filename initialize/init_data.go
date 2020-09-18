@@ -12,7 +12,7 @@ func InitData() {
 	// 1. 初始化角色
 	creator := "系统自动创建"
 	status := true
-	visible := true
+	hidden := true
 	roles := []models.SysRole{
 		{
 			Model: models.Model{
@@ -44,54 +44,33 @@ func InitData() {
 	}
 
 	// 2. 初始化菜单
-	noBreadcrumb := false
 	menus := []models.SysMenu{
 		{
 			Model: models.Model{
 				Id: 1,
 			},
-			Name:       "Root", // 对于想让子菜单显示在上层不显示的父级菜单不设置名字
-			Title:      "根",
-			Icon:       "dashboard",
-			Path:       "/",
-			Component:  "", // 如果包含子菜单, Component为空
-			Sort:       0,
-			Status:     &status,
-			Visible:    &visible,
-			Breadcrumb: &noBreadcrumb, // 面包屑不可见
-			ParentId:   0,
-			Creator:    creator,
-			Roles:      roles,
-		},
-		{
-			Model: models.Model{
-				Id: 2,
-			},
-			Name:      "Index",
-			Title:     "首页",
-			Icon:      "dashboard",
+			Name:      "仪表盘",
+			Title:     "仪表盘",
+			Icon:      "DashboardOutlined",
 			Path:      "index",
-			Component: "/Index/index",
 			Sort:      0,
 			Status:    &status,
-			Visible:   &visible,
-			ParentId:  1,
+			Hidden:   &hidden,
+			ParentId:  0,
 			Creator:   creator,
 			Roles:     roles,
 		},
 		{
 			Model: models.Model{
-				Id: 3,
+				Id: 2,
 			},
-			Name:       "systemRoot",
-			Title:      "系统设置根目录",
-			Icon:       "component",
-			Path:       "/system",
-			Component:  "",
+			Name:       "系统设置",
+			Title:      "系统设置",
+			Icon:       "equalizer",
+			Path:       "system",
 			Sort:       1,
 			Status:     &status,
-			Visible:    &visible,
-			Breadcrumb: &noBreadcrumb, // 面包屑不可见
+			Hidden:    &hidden,
 			ParentId:   0,
 			Creator:    creator,
 			Roles: []models.SysRole{
@@ -100,17 +79,33 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 4,
+				Id: 3,
 			},
-			Name:      "menu",
+			Name:      "菜单管理",
 			Title:     "菜单管理",
 			Icon:      "tree-table",
-			Path:      "menu", // 子菜单不用全路径, 自动继承
-			Component: "/system/menu",
+			Path:      "system/menu", // 子菜单不用全路径, 自动继承
 			Sort:      0,
 			Status:    &status,
-			Visible:   &visible,
-			ParentId:  3,
+			Hidden:    &hidden,
+			ParentId:  2,
+			Creator:   creator,
+			Roles: []models.SysRole{
+				roles[0],
+			},
+		},
+		{
+			Model: models.Model{
+				Id: 4,
+			},
+			Name:      "角色管理",
+			Title:     "角色管理",
+			Icon:      "mine-o",
+			Path:      "system/role",
+			Sort:      1,
+			Status:    &status,
+			Hidden:    &hidden,
+			ParentId:  2,
 			Creator:   creator,
 			Roles: []models.SysRole{
 				roles[0],
@@ -120,15 +115,14 @@ func InitData() {
 			Model: models.Model{
 				Id: 5,
 			},
-			Name:      "role",
-			Title:     "角色管理",
-			Icon:      "peoples",
-			Path:      "role",
-			Component: "/system/role",
-			Sort:      1,
+			Name:      "用户管理",
+			Title:     "用户管理",
+			Icon:      "users",
+			Path:      "system/user",
+			Sort:      2,
 			Status:    &status,
-			Visible:   &visible,
-			ParentId:  3,
+			Hidden:    &hidden,
+			ParentId:  2,
 			Creator:   creator,
 			Roles: []models.SysRole{
 				roles[0],
@@ -138,15 +132,14 @@ func InitData() {
 			Model: models.Model{
 				Id: 6,
 			},
-			Name:      "user",
-			Title:     "用户管理",
-			Icon:      "user",
-			Path:      "user",
-			Component: "/system/user",
+			Name:      "接口管理",
+			Title:     "接口管理",
+			Icon:      "sync",
+			Path:      "system/api",
 			Sort:      2,
 			Status:    &status,
-			Visible:   &visible,
-			ParentId:  3,
+			Hidden:    &hidden,
+			ParentId:  2,
 			Creator:   creator,
 			Roles: []models.SysRole{
 				roles[0],
@@ -156,33 +149,14 @@ func InitData() {
 			Model: models.Model{
 				Id: 7,
 			},
-			Name:      "api",
-			Title:     "接口管理",
-			Icon:      "tree",
-			Path:      "api",
-			Component: "/system/api",
-			Sort:      3,
-			Status:    &status,
-			Visible:   &visible,
-			ParentId:  3,
-			Creator:   creator,
-			Roles: []models.SysRole{
-				roles[0],
-			},
-		},
-		{
-			Model: models.Model{
-				Id: 8,
-			},
-			Name:      "operlog",
+			Name:      "操作日志",
 			Title:     "操作日志",
-			Icon:      "example",
-			Path:      "log",
-			Component: "/system/operlog",
+			Icon:      "info-circle-o",
+			Path:      "system/log",
 			Sort:      4,
 			Status:    &status,
-			Visible:   &visible,
-			ParentId:  3,
+			Hidden:    &hidden,
+			ParentId:  2,
 			Creator:   creator,
 			Roles: []models.SysRole{
 				roles[0],
@@ -237,7 +211,7 @@ func InitData() {
 			Method:   "POST",
 			Path:     "/auth/login",
 			Category: "auth",
-			Desc:     "用户登录",
+			Desc:     "获取用户信息和token",
 			Creator:  creator,
 		},
 		{
@@ -264,16 +238,6 @@ func InitData() {
 			Model: models.Model{
 				Id: 4,
 			},
-			Method:   "POST",
-			Path:     "/v1/user/info",
-			Category: "user",
-			Desc:     "获取当前登录用户信息",
-			Creator:  creator,
-		},
-		{
-			Model: models.Model{
-				Id: 5,
-			},
 			Method:   "GET",
 			Path:     "/v1/user/list",
 			Category: "user",
@@ -282,7 +246,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 6,
+				Id: 5,
 			},
 			Method:   "PUT",
 			Path:     "/v1/user/changePwd",
@@ -292,7 +256,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 7,
+				Id: 6,
 			},
 			Method:   "POST",
 			Path:     "/v1/user/create",
@@ -302,7 +266,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 8,
+				Id: 7,
 			},
 			Method:   "PATCH",
 			Path:     "/v1/user/update/:userId",
@@ -312,7 +276,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 9,
+				Id: 8,
 			},
 			Method:   "DELETE",
 			Path:     "/v1/user/delete",
@@ -322,7 +286,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 10,
+				Id: 9,
 			},
 			Method:   "GET",
 			Path:     "/v1/menu/tree",
@@ -332,7 +296,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 11,
+				Id: 10,
 			},
 			Method:   "GET",
 			Path:     "/v1/menu/list",
@@ -342,7 +306,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 12,
+				Id: 11,
 			},
 			Method:   "POST",
 			Path:     "/v1/menu/create",
@@ -352,7 +316,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 13,
+				Id: 12,
 			},
 			Method:   "PATCH",
 			Path:     "/v1/menu/update/:menuId",
@@ -362,7 +326,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 14,
+				Id: 13,
 			},
 			Method:   "DELETE",
 			Path:     "/v1/menu/delete",
@@ -372,7 +336,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 15,
+				Id: 14,
 			},
 			Method:   "GET",
 			Path:     "/v1/role/list",
@@ -382,7 +346,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 16,
+				Id: 15,
 			},
 			Method:   "POST",
 			Path:     "/v1/role/create",
@@ -392,7 +356,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 17,
+				Id: 16,
 			},
 			Method:   "PATCH",
 			Path:     "/v1/role/update/:roleId",
@@ -402,7 +366,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 18,
+				Id: 17,
 			},
 			Method:   "DELETE",
 			Path:     "/v1/role/delete",
@@ -412,7 +376,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 19,
+				Id: 18,
 			},
 			Method:   "GET",
 			Path:     "/v1/api/list",
@@ -422,7 +386,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 20,
+				Id: 19,
 			},
 			Method:   "POST",
 			Path:     "/v1/api/create",
@@ -432,7 +396,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 21,
+				Id: 20,
 			},
 			Method:   "PATCH",
 			Path:     "/v1/api/update/:roleId",
@@ -442,7 +406,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 22,
+				Id: 21,
 			},
 			Method:   "DELETE",
 			Path:     "/v1/api/delete",
@@ -452,7 +416,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 23,
+				Id: 22,
 			},
 			Method:   "GET",
 			Path:     "/v1/menu/all/:roleId",
@@ -462,7 +426,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 24,
+				Id: 23,
 			},
 			Method:   "GET",
 			Path:     "/v1/api/all/category/:roleId",
@@ -472,7 +436,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 25,
+				Id: 24,
 			},
 			Method:   "PATCH",
 			Path:     "/v1/role/menus/update/:roleId",
@@ -482,7 +446,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 26,
+				Id: 25,
 			},
 			Method:   "PATCH",
 			Path:     "/v1/role/apis/update/:roleId",
@@ -492,7 +456,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 27,
+				Id: 26,
 			},
 			Method:   "GET",
 			Path:     "/v1/operlog/list",
@@ -502,7 +466,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 28,
+				Id: 27,
 			},
 			Method:   "DELETE",
 			Path:     "/v1/operlog/delete",

@@ -1,6 +1,7 @@
 package request
 
 import (
+	"anew-server/dto/response"
 	"time"
 )
 
@@ -11,7 +12,7 @@ type OperationLogListReq struct {
 	Username          string `json:"username" form:"username"`
 	Ip                string `json:"ip" form:"ip"`
 	Status            string `json:"status" form:"status"`
-	PageInfo        // 分页参数
+	response.PageInfo        // 分页参数
 }
 
 // 翻译需要校验的字段名称

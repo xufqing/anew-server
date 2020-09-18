@@ -1,5 +1,9 @@
 package request
 
+import (
+	"anew-server/dto/response"
+)
+
 // User login structure
 type RegisterAndLoginReq struct {
 	Username string `json:"username"`
@@ -8,6 +12,7 @@ type RegisterAndLoginReq struct {
 
 // 修改密码结构体
 type ChangePwdReq struct {
+	Req
 	OldPassword string `json:"oldPassword" form:"oldPassword" validate:"required"`
 	NewPassword string `json:"newPassword" form:"newPassword" validate:"required"`
 }
@@ -17,19 +22,19 @@ type UserListReq struct {
 	Id       uint   `json:"id" form:"id"`
 	Username string `json:"username" form:"username"`
 	Mobile   string `json:"mobile" form:"mobile"`
-	Avatar   string `json:"avatar" form:"avatar"`
+	Avatar   string `json:"avatar"`
 	Name     string `json:"name" form:"name"`
 	Email    string `json:"mail" form:"mail"`
 	Status   *bool  `json:"status" form:"status"`
 	RoleId   uint   `json:"roleId" form:"roleId"`
 	Creator  string `json:"creator" form:"creator"`
-	PageInfo        // 分页参数
+	response.PageInfo        // 分页参数
 }
 
 // 创建用户结构体
 type CreateUserReq struct {
 	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"` // 不使用SysUser的Password字段, 避免请求劫持绕过系统校验
+	Password string `json:"password" validate:"required"`
 	Mobile   string `json:"mobile" validate:"len=11"`
 	Avatar   string `json:"avatar"`
 	Name     string `json:"name" validate:"required"`
@@ -37,6 +42,16 @@ type CreateUserReq struct {
 	Status   *bool  `json:"status"`
 	RoleId   uint   `json:"roleId" validate:"required"`
 	Creator  string `json:"creator"`
+}
+
+// 修改用户结构体
+type UpdateUserReq struct {
+	Username string `json:"username" validate:"required"`
+	Mobile   string `json:"mobile" validate:"len=11"`
+	Name     string `json:"name" validate:"required"`
+	Email    string `json:"mail"`
+	Password string `json:"password"`
+	Status   *bool  `json:"status"`
 }
 
 // 翻译需要校验的字段名称
@@ -53,5 +68,13 @@ func (s ChangePwdReq) FieldTrans() map[string]string {
 	m := make(map[string]string, 0)
 	m["OldPassword"] = "旧密码"
 	m["NewPassword"] = "新密码"
+	return m
+}
+
+func (s UpdateUserReq) FieldTrans() map[string]string {
+	m := make(map[string]string, 0)
+	m["Username"] = "用户名"
+	m["Mobile"] = "手机号码"
+	m["Name"] = "姓名"
 	return m
 }

@@ -10,20 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// 获取当前用户信息
-func GetUserInfo(c *gin.Context) {
-	user := GetCurrentUser(c)
-	// 转为UserInfoResponseStruct, 隐藏部分字段
-	var resp response.UserInfoResp
-	utils.Struct2StructByJson(user, &resp)
-	resp.Roles = []string{
-		"admin",
-	}
-	resp.Permissions = []string{
-		"***",
-	}
-	response.SuccessWithData(resp)
-}
 
 // 获取当前请求用户信息
 func GetCurrentUser(c *gin.Context) models.SysUser {
@@ -73,7 +59,7 @@ func GetUsers(c *gin.Context) {
 	var req request.UserListReq
 	err := c.Bind(&req)
 	if err != nil {
-		response.FailWithMsg("参数绑定失败, 请检查数据类型")
+		response.FailWithCode(response.ParmError)
 		return
 	}
 
@@ -84,25 +70,34 @@ func GetUsers(c *gin.Context) {
 		response.FailWithMsg(err.Error())
 		return
 	}
+
 	// 转为ResponseStruct, 隐藏部分字段
 	var respStruct []response.UserListResp
 	utils.Struct2StructByJson(users, &respStruct)
-	response.SuccessWithData(respStruct)
+	// 返回分页数据
+	var resp response.PageData
+	// 设置分页参数
+	resp.PageInfo = req.PageInfo
+	// 设置数据列表
+	resp.DataList = respStruct
+	response.SuccessWithData(resp)
 }
 
 // 更新用户
 func UpdateUserById(c *gin.Context) {
 	// 绑定参数
-	var req gin.H
-	var pwd request.ChangePwdReq
+	var req request.UpdateUserReq
 	err := c.Bind(&req)
 	if err != nil {
-		response.FailWithMsg("参数绑定失败, 请检查数据类型")
+		response.FailWithCode(response.ParmError)
 		return
 	}
-
-	// 将部分参数转为pwd, 如果值不为空, 可能会用到
-	utils.Struct2StructByJson(req, &pwd)
+	// 参数校验
+	err = common.NewValidatorError(common.Validate.Struct(req), req.FieldTrans())
+	if err != nil {
+		response.FailWithMsg(err.Error())
+		return
+	}
 	// 获取url path中的userId
 	userId := utils.Str2Uint(c.Param("userId"))
 	if userId == 0 {
@@ -112,7 +107,7 @@ func UpdateUserById(c *gin.Context) {
 	// 创建服务
 	s := service.New(c)
 	// 更新数据
-	err = s.UpdateUserById(userId, pwd.NewPassword, req)
+	err = s.UpdateUserById(userId, req)
 	if err != nil {
 		response.FailWithMsg(err.Error())
 		return
@@ -163,7 +158,7 @@ func DeleteUserByIds(c *gin.Context) {
 	var req request.Req
 	err := c.Bind(&req)
 	if err != nil {
-		response.FailWithMsg("参数绑定失败, 请检查数据类型")
+		response.FailWithCode(response.ParmError)
 		return
 	}
 

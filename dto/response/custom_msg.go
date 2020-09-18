@@ -7,6 +7,7 @@ const (
 	NotOk               = 400
 	Unauthorized        = 401
 	Forbidden           = 403
+	ParmError           = 406
 	InternalServerError = 500
 	AuthError           = 1000
 )
@@ -18,6 +19,7 @@ const (
 	LoginCheckErrorMsg     = "用户名或密码错误"
 	ForbiddenMsg           = "无权访问该资源"
 	InternalServerErrorMsg = "服务器内部错误"
+	ParmErrorMsg           = "参数绑定失败, 请检查数据类型"
 )
 
 var CustomError = map[int]string{
@@ -27,4 +29,5 @@ var CustomError = map[int]string{
 	Forbidden:           ForbiddenMsg,
 	InternalServerError: InternalServerErrorMsg,
 	AuthError:           LoginCheckErrorMsg,
+	ParmError:           ParmErrorMsg,
 }

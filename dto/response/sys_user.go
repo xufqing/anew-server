@@ -1,12 +1,13 @@
 package response
 
-import "anew-server/models"
+import (
+	"anew-server/models"
+)
 
 // User login response structure
 type LoginResp struct {
-	Username  string `json:"username"`  // 登录用户名
 	Token     string `json:"token"`     // jwt令牌
-	ExpiresAt int64  `json:"expiresAt"` // 过期时间, 秒
+	Expires models.LocalTime `json:"expires"` // 过期时间, 秒
 }
 
 // 用户信息响应
@@ -17,8 +18,7 @@ type UserInfoResp struct {
 	Avatar      string   `json:"avatar"`
 	Name        string   `json:"name"`
 	Email       string   `json:"mail"`
-	Roles       []string `json:"roles"`
-	Permissions []string `json:"permissions"`
+	LoginResp
 }
 
 // 用户列表信息响应, 字段含义见models.SysUser

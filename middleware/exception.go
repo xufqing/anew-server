@@ -18,10 +18,10 @@ func Exception(c *gin.Context) {
 			resp := response.RespInfo{
 				Code: response.InternalServerError,
 				Data: map[string]interface{}{},
-				Msg:  response.CustomError[response.InternalServerError],
+				Message:  response.CustomError[response.InternalServerError],
 			}
 			// 以json方式写入响应
-			response.JSON(c, resp.Code, resp)
+			response.JSON(c, response.Ok, resp)
 			c.Abort()
 			return
 		}

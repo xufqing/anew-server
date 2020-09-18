@@ -70,7 +70,7 @@ func (s *MysqlService) CreateUser(req *request.CreateUserReq) (err error) {
 }
 
 // 更新用户
-func (s *MysqlService) UpdateUserById(id uint, newPassword string, req gin.H) (err error) {
+func (s *MysqlService) UpdateUserById(id uint, req request.UpdateUserReq) (err error) {
 	var oldUser models.SysUser
 	query := s.tx.Table(oldUser.TableName()).Where("id = ?", id).First(&oldUser)
 	if query.RecordNotFound() {
@@ -78,13 +78,13 @@ func (s *MysqlService) UpdateUserById(id uint, newPassword string, req gin.H) (e
 	}
 	password := ""
 	// 填写了新密码
-	if strings.TrimSpace(newPassword) != "" {
-		password = utils.GenPwd(newPassword)
+	if strings.TrimSpace(req.Password) != "" {
+		password = utils.GenPwd(req.Password)
 	}
 	// 比对增量字段
 	m := make(gin.H, 0)
 	utils.CompareDifferenceStructByJson(oldUser, req, &m)
-
+	delete(m,"password")
 	if password != "" {
 		// 更新密码以及其他指定列
 		err = query.Update("password", password).Updates(m).Error
@@ -100,6 +100,7 @@ func (s *MysqlService) GetUsers(req *request.UserListReq) ([]models.SysUser, err
 	var err error
 	list := make([]models.SysUser, 0)
 	db := common.Mysql
+
 	username := strings.TrimSpace(req.Username)
 	if username != "" {
 		db = db.Where("username LIKE ?", fmt.Sprintf("%%%s%%", username))
@@ -116,23 +117,26 @@ func (s *MysqlService) GetUsers(req *request.UserListReq) ([]models.SysUser, err
 	if creator != "" {
 		db = db.Where("creator LIKE ?", fmt.Sprintf("%%%s%%", creator))
 	}
-	if req.Status != nil {
-		if *req.Status {
+	status := req.Status
+	if status != nil {
+		if *status {
 			db = db.Where("status = ?", 1)
 		} else {
 			db = db.Where("status = ?", 0)
 		}
 	}
-
-	if req.PageInfo.All {
-		// 不使用分页
-		err = db.Find(&list).Error
-	} else {
-		// 获取分页参数
-		limit, offset := req.GetLimit()
-		err = db.Limit(limit).Offset(offset).Find(&list).Error
+	// 查询条数
+	err = db.Find(&list).Count(&req.PageInfo.Total).Error
+	if err == nil {
+		if req.PageInfo.All {
+			// 不使用分页
+			err = db.Find(&list).Error
+		} else {
+			// 获取分页参数
+			limit, offset := req.GetLimit()
+			err = db.Limit(limit).Offset(offset).Find(&list).Error
+		}
 	}
-
 	return list, err
 }
 
