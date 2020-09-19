@@ -35,7 +35,7 @@ func GetRoles(c *gin.Context) {
 
 // 创建角色
 func CreateRole(c *gin.Context) {
-	user := GetCurrentUser(c)
+	user,_:= GetCurrentUser(c)
 	// 绑定参数
 	var req request.CreateRoleReq
 	err := c.Bind(&req)

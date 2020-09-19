@@ -9,9 +9,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// 获取权限菜单树
-func (s *MysqlService) GetMenuTree(roleId uint) ([]models.SysMenu, error) {
-	tree := make([]models.SysMenu, 0)
+// 获取用户菜单的切片
+func (s *MysqlService) GetMenuList(roleId uint) ([]models.SysMenu, error) {
+	//tree := make([]models.SysMenu, 0)
 	var role models.SysRole
 	err := s.tx.Table(new(models.SysRole).TableName()).Preload("Menus").Where("id = ?", roleId).Find(&role).Error
 	menus := make([]models.SysMenu, 0)
@@ -19,8 +19,8 @@ func (s *MysqlService) GetMenuTree(roleId uint) ([]models.SysMenu, error) {
 		return menus, err
 	}
 	// 生成菜单树
-	tree = GenMenuTree(nil, role.Menus)
-	return tree, nil
+	//tree = GenMenuTree(nil, role.Menus)
+	return role.Menus, nil
 }
 
 // 获取所有菜单
@@ -109,7 +109,7 @@ func (s *MysqlService) DeleteMenuByIds(ids []uint) (err error) {
 // 获取权限菜单, 非菜单树
 func (s *MysqlService) getRoleMenus(roleId uint) []models.SysMenu {
 	var role models.SysRole
-	// 根据权限编号获取菜单
+	// 根据角色ID获取菜单
 	err := s.tx.Preload("Menus").Where("id = ?", roleId).First(&role).Error
 	common.Log.Warn("[getRoleMenu]", err)
 	return role.Menus

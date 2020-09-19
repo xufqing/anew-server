@@ -5,23 +5,45 @@ import (
 	"anew-server/dto/request"
 	"anew-server/dto/response"
 	"anew-server/dto/service"
+	"anew-server/models"
 	"anew-server/utils"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 )
 
 // 查询当前用户菜单树
 func GetMenuTree(c *gin.Context) {
-	user := GetCurrentUser(c)
-	// 创建服务
-	s := service.New(c)
-	menus, err := s.GetMenuTree(user.RoleId)
-	if err != nil {
-		response.FailWithMsg(err.Error())
-		return
+	_, roleIds := GetCurrentUser(c)
+	menuList := make([]models.SysMenu, 0)
+	for _, roleId := range roleIds {
+		// 创建服务
+		s := service.New(c)
+		menus, err := s.GetMenuList(roleId)
+		if err != nil {
+			response.FailWithMsg(err.Error())
+			return
+		}
+		for _, menu := range menus {
+			menuList = append(menuList, menu)
+		}
 	}
+	// menuList结构体切片去重
+	resultMap := map[string]bool{}
+	for _, v := range menuList {
+		data, _ := json.Marshal(v)
+		resultMap[string(data)] = true
+	}
+	menusResult := []models.SysMenu{}
+	for k := range resultMap {
+		var t models.SysMenu
+		json.Unmarshal([]byte(k), &t)
+		menusResult = append(menusResult, t)
+	}
+	// 转换成树结构
+	menusResult = service.GenMenuTree(nil, menusResult)
 	// 转为MenuTreeResponseStruct
 	var resp []response.MenuTreeResp
-	utils.Struct2StructByJson(menus, &resp)
+	utils.Struct2StructByJson(menusResult, &resp)
 	response.SuccessWithData(resp)
 }
 
@@ -53,7 +75,7 @@ func GetMenus(c *gin.Context) {
 
 // 创建菜单
 func CreateMenu(c *gin.Context) {
-	user := GetCurrentUser(c)
+	user, _ := GetCurrentUser(c)
 	// 绑定参数
 	var req request.CreateMenuReq
 	err := c.Bind(&req)

@@ -181,7 +181,7 @@ func InitData() {
 			Mobile:   "18888888888",
 			Avatar:   avatar,
 			Name:     "管理员",
-			RoleId:   1,
+			//RoleId:   1,
 			Creator:  creator,
 		},
 		{
@@ -190,7 +190,7 @@ func InitData() {
 			Mobile:   "15888888888",
 			Avatar:   avatar,
 			Name:     "来宾",
-			RoleId:   2,
+			//RoleId:   2,
 			Creator:  creator,
 		},
 	}

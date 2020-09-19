@@ -16,7 +16,7 @@ import (
 func (s *MysqlService) LoginCheck(user *models.SysUser) (*models.SysUser, error) {
 	var u models.SysUser
 	// 查询用户及其角色
-	err := s.tx.Preload("Role").Where("username = ?", user.Username).First(&u).Error
+	err := s.tx.Preload("Roles").Where("username = ?", user.Username).First(&u).Error
 	if err != nil {
 		return nil, errors.New(response.LoginCheckErrorMsg)
 	}
@@ -31,7 +31,7 @@ func (s *MysqlService) LoginCheck(user *models.SysUser) (*models.SysUser, error)
 func (s *MysqlService) GetUserById(id uint) (models.SysUser, error) {
 	var user models.SysUser
 	var err error
-	err = s.tx.Preload("Role").Where("id = ?", id).First(&user).Error
+	err = s.tx.Preload("Roles").Where("id = ?", id).First(&user).Error
 	return user, err
 }
 
@@ -39,7 +39,7 @@ func (s *MysqlService) GetUserById(id uint) (models.SysUser, error) {
 func (s *MysqlService) GetUsersByIds(ids []uint) ([]models.SysUser, error) {
 	var users []models.SysUser
 	var err error
-	err = s.tx.Preload("Role").Where("id IN (?)", ids).Find(&users).Error
+	err = s.tx.Preload("Roles").Where("id IN (?)", ids).Find(&users).Error
 	return users, err
 }
 
@@ -72,7 +72,8 @@ func (s *MysqlService) CreateUser(req *request.CreateUserReq) (err error) {
 // 更新用户
 func (s *MysqlService) UpdateUserById(id uint, req request.UpdateUserReq) (err error) {
 	var oldUser models.SysUser
-	query := s.tx.Table(oldUser.TableName()).Where("id = ?", id).First(&oldUser)
+	query := s.tx.Table(oldUser.TableName()).Preload("Roles").Where("id = ?", id).First(&oldUser)
+
 	if query.RecordNotFound() {
 		return errors.New("记录不存在")
 	}
@@ -93,6 +94,12 @@ func (s *MysqlService) UpdateUserById(id uint, req request.UpdateUserReq) (err e
 		err = query.Updates(m).Error
 	}
 	return
+}
+// 根据角色ID获取角色
+func (s *MysqlService) GetRoleById(id uint) models.SysRole {
+	var role models.SysRole
+	s.tx.Where("id = ?", role).First(&role)
+	return role
 }
 
 // 获取用户
@@ -130,11 +137,11 @@ func (s *MysqlService) GetUsers(req *request.UserListReq) ([]models.SysUser, err
 	if err == nil {
 		if req.PageInfo.All {
 			// 不使用分页
-			err = db.Find(&list).Error
+			err = db.Preload("Roles").Find(&list).Error
 		} else {
 			// 获取分页参数
 			limit, offset := req.GetLimit()
-			err = db.Limit(limit).Offset(offset).Find(&list).Error
+			err = db.Preload("Roles").Limit(limit).Offset(offset).Find(&list).Error
 		}
 	}
 	return list, err

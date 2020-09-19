@@ -76,9 +76,10 @@ func login(c *gin.Context) (interface{}, error) {
 	}
 	// 将用户以json格式写入, payloadFunc/authorizator会使用到
 	utils.Struct2StructByJson(user, &userInfo)
-	return map[string]interface{}{
+	ma := map[string]interface{}{
 		"user": utils.Struct2Json(user),
-	}, nil
+	}
+	return ma, nil
 }
 
 func authorizator(data interface{}, c *gin.Context) bool {

@@ -50,7 +50,7 @@ func GetAllApiGroupByCategoryByRoleId(c *gin.Context) {
 
 // 创建接口
 func CreateApi(c *gin.Context) {
-	user := GetCurrentUser(c)
+	user,_:= GetCurrentUser(c)
 	// 绑定参数
 	var req request.CreateApiReq
 	err := c.Bind(&req)

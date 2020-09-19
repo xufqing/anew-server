@@ -12,22 +12,27 @@ import (
 
 
 // 获取当前请求用户信息
-func GetCurrentUser(c *gin.Context) models.SysUser {
+func GetCurrentUser(c *gin.Context) (models.SysUser, []uint){
 	user, exists := c.Get("user")
 	var newUser models.SysUser
 	if !exists {
-		return newUser
+		return newUser, []uint{}
 	}
 	u, _ := user.(models.SysUser)
 	// 创建服务
 	s := service.New(c)
 	newUser, _ = s.GetUserById(u.Id)
-	return newUser
+	// 返回roles的id格式化
+	roleIds := make([]uint, 0)
+	for _, role := range newUser.Roles {
+		roleIds = append(roleIds, role.Id)
+	}
+	return newUser, roleIds
 }
 
 // 创建用户
 func CreateUser(c *gin.Context) {
-	user := GetCurrentUser(c)
+	user,_ := GetCurrentUser(c)
 	// 绑定参数
 	var req request.CreateUserReq
 	err := c.Bind(&req)
@@ -128,7 +133,7 @@ func ChangePwd(c *gin.Context) {
 		return
 	}
 	// 获取当前用户
-	user := GetCurrentUser(c)
+	user,_ := GetCurrentUser(c)
 	query := common.Mysql.Where("username = ?", user.Username).First(&user)
 	// 查询用户
 	err = query.Error

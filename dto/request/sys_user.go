@@ -26,7 +26,6 @@ type UserListReq struct {
 	Name     string `json:"name" form:"name"`
 	Email    string `json:"mail" form:"mail"`
 	Status   *bool  `json:"status" form:"status"`
-	RoleId   uint   `json:"roleId" form:"roleId"`
 	Creator  string `json:"creator" form:"creator"`
 	response.PageInfo        // 分页参数
 }
@@ -40,7 +39,7 @@ type CreateUserReq struct {
 	Name     string `json:"name" validate:"required"`
 	Email    string `json:"mail"`
 	Status   *bool  `json:"status"`
-	RoleId   uint   `json:"roleId" validate:"required"`
+	Roles  []uint `json:"roles" validate:"required"` // 可绑定多个角色
 	Creator  string `json:"creator"`
 }
 
@@ -51,6 +50,7 @@ type UpdateUserReq struct {
 	Name     string `json:"name" validate:"required"`
 	Email    string `json:"mail"`
 	Password string `json:"password"`
+	Roles  []uint `json:"roles"` // 可绑定多个角色
 	Status   *bool  `json:"status"`
 }
 
@@ -61,7 +61,7 @@ func (s CreateUserReq) FieldTrans() map[string]string {
 	m["Password"] = "用户密码"
 	m["Mobile"] = "手机号码"
 	m["Name"] = "姓名"
-	m["RoleId"] = "角色ID"
+	m["RoleIds"] = "角色ID"
 	return m
 }
 func (s ChangePwdReq) FieldTrans() map[string]string {

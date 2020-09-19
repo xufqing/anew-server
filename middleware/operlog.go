@@ -95,12 +95,12 @@ func OperationLog(c *gin.Context) {
 		// 清理事务
 		c.Set("tx", "")
 		// 获取当前登录用户
-		user := v1.GetCurrentUser(c)
+		user ,_:= v1.GetCurrentUser(c)
 
 		// 用户名
 		if user.Id > 0 {
 			log.Username = user.Username
-			log.RoleName = user.Role.Name
+			//log.RoleName = user.Role.Name
 		} else {
 			log.Username = "未登录"
 			log.RoleName = "未登录"
