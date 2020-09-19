@@ -82,10 +82,22 @@ func (s *MysqlService) UpdateUserById(id uint, req request.UpdateUserReq) (err e
 	if strings.TrimSpace(req.Password) != "" {
 		password = utils.GenPwd(req.Password)
 	}
+	var newRoles []models.SysRole
 	// 比对增量字段
+	err = s.tx.Where("id in (?)", req.Roles).Find(&newRoles).Error
+	if err != nil {
+		return
+	}
+	// 替换角色
+	err = s.tx.Where("id = ?", id).First(&models.SysUser{}).Association("Roles").Replace(&newRoles).Error
+	if err != nil {
+		return
+	}
 	m := make(gin.H, 0)
+	oldUser.Roles = nil // roles赋值为空，否则报错
 	utils.CompareDifferenceStructByJson(oldUser, req, &m)
 	delete(m,"password")
+	delete(m,"roles")
 	if password != "" {
 		// 更新密码以及其他指定列
 		err = query.Update("password", password).Updates(m).Error
