@@ -7,6 +7,7 @@ import (
 	"anew-server/utils"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"sort"
 )
 
 // 获取用户菜单的切片
@@ -34,7 +35,7 @@ func (s *MysqlService) GetMenus() []models.SysMenu {
 
 // 生成菜单树
 func GenMenuTree(parent *models.SysMenu, menus []models.SysMenu) []models.SysMenu {
-	tree := make([]models.SysMenu, 0)
+	tree := make(models.SysMenuTree, 0)
 	// parentId默认为0, 表示根菜单
 	var parentId uint
 	if parent != nil {
@@ -50,6 +51,8 @@ func GenMenuTree(parent *models.SysMenu, menus []models.SysMenu) []models.SysMen
 			tree = append(tree, menu)
 		}
 	}
+	// 排序
+	sort.Sort(tree)
 	return tree
 }
 

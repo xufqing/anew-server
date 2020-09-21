@@ -131,7 +131,7 @@ func UpdateMenuById(c *gin.Context) {
 
 // 批量删除菜单
 func BatchDeleteMenuByIds(c *gin.Context) {
-	var req request.Req
+	var req request.IdsReq
 	err := c.Bind(&req)
 	if err != nil {
 		response.FailWithCode(response.ParmError)
@@ -141,7 +141,7 @@ func BatchDeleteMenuByIds(c *gin.Context) {
 	// 创建服务
 	s := service.New(c)
 	// 删除数据
-	err = s.DeleteMenuByIds(req.GetUintIds())
+	err = s.DeleteMenuByIds(req.Ids)
 	if err != nil {
 		response.FailWithMsg(err.Error())
 		return

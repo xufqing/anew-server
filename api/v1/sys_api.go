@@ -106,7 +106,7 @@ func UpdateApiById(c *gin.Context) {
 
 // 批量删除接口
 func BatchDeleteApiByIds(c *gin.Context) {
-	var req request.Req
+	var req request.IdsReq
 	err := c.Bind(&req)
 	if err != nil {
 		response.FailWithCode(response.ParmError)
@@ -116,7 +116,7 @@ func BatchDeleteApiByIds(c *gin.Context) {
 	// 创建服务
 	s := service.New(c)
 	// 删除数据
-	err = s.DeleteApiByIds(req.GetUintIds())
+	err = s.DeleteApiByIds(req.Ids)
 	if err != nil {
 		response.FailWithMsg(err.Error())
 		return

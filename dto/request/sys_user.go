@@ -12,7 +12,6 @@ type RegisterAndLoginReq struct {
 
 // 修改密码结构体
 type ChangePwdReq struct {
-	Req
 	OldPassword string `json:"oldPassword" form:"oldPassword" validate:"required"`
 	NewPassword string `json:"newPassword" form:"newPassword" validate:"required"`
 }
@@ -24,7 +23,7 @@ type UserListReq struct {
 	Mobile   string `json:"mobile" form:"mobile"`
 	Avatar   string `json:"avatar"`
 	Name     string `json:"name" form:"name"`
-	Email    string `json:"mail" form:"mail"`
+	Email    string `json:"email" form:"email"`
 	Status   *bool  `json:"status" form:"status"`
 	Creator  string `json:"creator" form:"creator"`
 	response.PageInfo        // 分页参数
@@ -34,10 +33,10 @@ type UserListReq struct {
 type CreateUserReq struct {
 	Username string `json:"username" validate:"required"`
 	Password string `json:"password" validate:"required"`
-	Mobile   string `json:"mobile" validate:"len=11"`
+	Mobile   string `json:"mobile"`
 	Avatar   string `json:"avatar"`
 	Name     string `json:"name" validate:"required"`
-	Email    string `json:"mail"`
+	Email    string `json:"email"`
 	Status   *bool  `json:"status"`
 	Roles  []uint `json:"roles" validate:"required"` // 可绑定多个角色
 	Creator  string `json:"creator"`
@@ -46,9 +45,9 @@ type CreateUserReq struct {
 // 修改用户结构体
 type UpdateUserReq struct {
 	Username string `json:"username" validate:"required"`
-	Mobile   string `json:"mobile" validate:"len=11"`
+	Mobile   string `json:"mobile"`
 	Name     string `json:"name" validate:"required"`
-	Email    string `json:"mail"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 	Roles  []uint `json:"roles"` // 可绑定多个角色
 	Status   *bool  `json:"status"`
@@ -59,7 +58,6 @@ func (s CreateUserReq) FieldTrans() map[string]string {
 	m := make(map[string]string, 0)
 	m["Username"] = "用户名"
 	m["Password"] = "用户密码"
-	m["Mobile"] = "手机号码"
 	m["Name"] = "姓名"
 	m["RoleIds"] = "角色ID"
 	return m
@@ -74,7 +72,6 @@ func (s ChangePwdReq) FieldTrans() map[string]string {
 func (s UpdateUserReq) FieldTrans() map[string]string {
 	m := make(map[string]string, 0)
 	m["Username"] = "用户名"
-	m["Mobile"] = "手机号码"
 	m["Name"] = "姓名"
 	return m
 }

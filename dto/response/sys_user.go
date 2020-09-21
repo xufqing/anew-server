@@ -26,7 +26,7 @@ type UserInfoResp struct {
 	Mobile   string      `json:"mobile"`
 	Avatar   string      `json:"avatar"`
 	Name     string      `json:"name"`
-	Email    string      `json:"mail"`
+	Email    string      `json:"email"`
 	Roles    []UserRolesResp `json:"roles"`
 	LoginResp
 }
@@ -38,7 +38,7 @@ type UserListResp struct {
 	Mobile    string           `json:"mobile"`
 	Avatar    string           `json:"avatar"`
 	Name      string           `json:"name"`
-	Email     string           `json:"mail"`
+	Email     string           `json:"email"`
 	Status    *bool            `json:"status"`
 	Roles    []UserRolesResp `json:"roles"`
 	Creator   string           `json:"creator"`

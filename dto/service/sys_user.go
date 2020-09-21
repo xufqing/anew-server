@@ -64,6 +64,13 @@ func (s *MysqlService) CreateUser(req *request.CreateUserReq) (err error) {
 	utils.Struct2StructByJson(req, &user)
 	// 将初始密码转为密文
 	user.Password = utils.GenPwd(req.Password)
+	// 处理角色数据
+	var newRoles []models.SysRole
+	err = s.tx.Where("id in (?)", req.Roles).Find(&newRoles).Error
+	if err != nil {
+		return
+	}
+	user.Roles = newRoles
 	// 创建数据
 	err = s.tx.Create(&user).Error
 	return
@@ -83,7 +90,6 @@ func (s *MysqlService) UpdateUserById(id uint, req request.UpdateUserReq) (err e
 		password = utils.GenPwd(req.Password)
 	}
 	var newRoles []models.SysRole
-	// 比对增量字段
 	err = s.tx.Where("id in (?)", req.Roles).Find(&newRoles).Error
 	if err != nil {
 		return
@@ -106,12 +112,6 @@ func (s *MysqlService) UpdateUserById(id uint, req request.UpdateUserReq) (err e
 		err = query.Updates(m).Error
 	}
 	return
-}
-// 根据角色ID获取角色
-func (s *MysqlService) GetRoleById(id uint) models.SysRole {
-	var role models.SysRole
-	s.tx.Where("id = ?", role).First(&role)
-	return role
 }
 
 // 获取用户

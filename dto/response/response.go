@@ -1,6 +1,7 @@
 package response
 
 import (
+	"anew-server/common"
 	"github.com/gin-gonic/gin"
 )
 
@@ -96,8 +97,13 @@ func Success() {
 func SuccessWithData(data interface{}) {
 	Result(Ok, true, data)
 }
-func SuccessWithPageData(data interface{}) {
-	Result(Ok, true, data)
+func SuccessWithMsg(msg string) {
+	MsgResult(Ok, true, msg, map[string]interface{}{})
+}
+
+func SuccessWithCode(code int) {
+	// 查找给定的错误码存在对应的错误信息, 默认使用NotOk
+	Result(code, true, map[string]interface{}{})
 }
 
 func FailWithMsg(msg string) {
@@ -114,5 +120,5 @@ func JSON(c *gin.Context, code int, resp interface{}) {
 	// 调用gin写入json
 	c.JSON(code, resp)
 	// 保存响应对象到context, Operation Log会读取到
-	//c.Set(global.Conf.System.OperationLogKey, resp)
+	c.Set(common.Conf.System.OperationLogKey, resp)
 }

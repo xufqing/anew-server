@@ -33,7 +33,7 @@ func GetOperationLogs(c *gin.Context) {
 
 // 批量删除操作日志
 func BatchDeleteOperationLogByIds(c *gin.Context) {
-	var req request.Req
+	var req request.IdsReq
 	err := c.Bind(&req)
 	if err != nil {
 		response.FailWithCode(response.ParmError)
@@ -43,7 +43,7 @@ func BatchDeleteOperationLogByIds(c *gin.Context) {
 	// 创建服务
 	s := service.New(c)
 	// 删除数据
-	err = s.DeleteOperationLogByIds(req.GetUintIds())
+	err = s.DeleteOperationLogByIds(req.Ids)
 	if err != nil {
 		response.FailWithMsg(err.Error())
 		return

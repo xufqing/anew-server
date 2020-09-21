@@ -5,14 +5,9 @@ import (
 	"anew-server/utils"
 )
 
-// 适用于大多数场景的请求参数绑定
-type Req struct {
-	Ids string `json:"ids" form:"ids"` // 传多个id
-}
-
-// 获取
-func (s *Req) GetUintIds() []uint {
-	return utils.Str2UintArr(s.Ids)
+// 适用于前端传过来的
+type IdsReq struct {
+	Ids []uint `json:"ids" form:"ids"` // 传多个id
 }
 
 // 增量更新id集合结构体

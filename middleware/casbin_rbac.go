@@ -15,7 +15,11 @@ func CasbinMiddleware(c *gin.Context) {
 	user ,_:= v1.GetCurrentUser(c)
 	// 当前登录用户的角色关键字作为casbin访问实体sub
 	//sub := user.Role.Keyword
-	sub := user.Username
+	roles := make([]string,0)
+	for _,role := range user.Roles{
+		roles = append(roles,role.Keyword)
+	}
+	sub := roles
 	// 请求URL路径作为casbin访问资源obj(需先清除path前缀)
 	obj := strings.Replace(c.Request.URL.Path, "/"+common.Conf.System.UrlPathPrefix, "", 1)
 	// 请求方式作为casbin访问动作act
@@ -29,7 +33,14 @@ func CasbinMiddleware(c *gin.Context) {
 		return
 	}
 	// 检查策略
-	pass, _ := e.Enforce(sub, obj, act)
+	pass := false
+	for _,prms := range sub{
+		ok, _ := e.Enforce(prms, obj, act)
+		if ok {
+			pass = true
+			break
+		}
+	}
 	if !pass {
 		response.FailWithCode(response.Forbidden)
 	}

@@ -21,6 +21,20 @@ func (m SysMenu) TableName() string {
 	return m.Model.TableName("sys_menu")
 }
 
+type SysMenuTree []SysMenu
+
+func (hs SysMenuTree) Len() int {
+	return len(hs)
+}
+func (hs SysMenuTree) Less(i, j int) bool {
+	return hs[i].Sort < hs[j].Sort      // 按Sort从小到大排序
+}
+
+func (hs SysMenuTree) Swap(i, j int) {
+	hs[i], hs[j] = hs[j], hs[i]
+}
+
+
 // 获取选中列表
 func GetCheckedMenuIds(list []uint, allMenu []SysMenu) []uint {
 	checked := make([]uint, 0)
