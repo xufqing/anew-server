@@ -35,16 +35,18 @@ func (s *MysqlService) GetRoles(req *request.RoleListReq) ([]models.SysRole, err
 			db = db.Where("status = ?", 0)
 		}
 	}
-
-	if req.PageInfo.All {
-		// 不使用分页
-		err = db.Find(&list).Error
-	} else {
-		// 获取分页参数
-		limit, offset := req.GetLimit()
-		err = db.Limit(limit).Offset(offset).Find(&list).Error
+	// 查询条数
+	err = db.Find(&list).Count(&req.PageInfo.Total).Error
+	if err == nil {
+		if req.PageInfo.All {
+			// 不使用分页
+			err = db.Preload("Menus").Find(&list).Error
+		} else {
+			// 获取分页参数
+			limit, offset := req.GetLimit()
+			err = db.Preload("Menus").Limit(limit).Offset(offset).Find(&list).Error
+		}
 	}
-
 	return list, err
 }
 
@@ -75,26 +77,14 @@ func (s *MysqlService) UpdateRoleById(id uint, req gin.H) (err error) {
 }
 
 // 更新角色的权限菜单
-func (s *MysqlService) UpdateRoleMenusById(id uint, req request.UpdateIncrementalIdsReq) (err error) {
-	// 查询全部菜单
-	allMenu := s.getAllMenu()
-	// 查询角色拥有菜单
-	roleMenus := s.getRoleMenus(id)
-	// 获取当前菜单编号集合
-	menuIds := make([]uint, 0)
-	for _, menu := range roleMenus {
-		menuIds = append(menuIds, menu.Id)
-	}
-	// 获取菜单增量
-	incremental := req.GetIncremental(menuIds, allMenu)
-	// 查询所有菜单
-	var incrementalMenus []models.SysMenu
-	err = s.tx.Where("id in (?)", incremental).Find(&incrementalMenus).Error
+func (s *MysqlService) UpdateRoleMenusById(id uint, req []uint) (err error) {
+	var menus []models.SysMenu
+	err = s.tx.Where("id in (?)", req).Find(&menus).Error
 	if err != nil {
 		return
 	}
 	// 替换菜单
-	err = s.tx.Where("id = ?", id).First(&models.SysRole{}).Association("Menus").Replace(&incrementalMenus).Error
+	err = s.tx.Where("id = ?", id).First(&models.SysRole{}).Association("Menus").Replace(&menus).Error
 	return
 }
 

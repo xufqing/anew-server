@@ -27,10 +27,23 @@ func GetRoles(c *gin.Context) {
 		response.FailWithMsg(err.Error())
 		return
 	}
+
+	// 返回树结构
+	//for _,menu := range roles{
+	//	menu.Menus = service.GenMenuTree(nil,menu.Menus)
+	//}
+
 	// 转为ResponseStruct, 隐藏部分字段
 	var respStruct []response.RoleListResp
 	utils.Struct2StructByJson(roles, &respStruct)
-	response.SuccessWithData(respStruct)
+
+	// 返回分页数据
+	var resp response.PageData
+	// 设置分页参数
+	resp.PageInfo = req.PageInfo
+	// 设置数据列表
+	resp.DataList = respStruct
+	response.SuccessWithData(resp)
 }
 
 // 创建角色
@@ -92,7 +105,7 @@ func UpdateRoleById(c *gin.Context) {
 // 更新角色的权限菜单
 func UpdateRoleMenusById(c *gin.Context) {
 	// 绑定参数
-	var req request.UpdateIncrementalIdsReq
+	var req request.IdsReq
 	err := c.Bind(&req)
 	if err != nil {
 		response.FailWithMsg(fmt.Sprintf("参数绑定失败, %v", err))
@@ -107,7 +120,7 @@ func UpdateRoleMenusById(c *gin.Context) {
 	// 创建服务
 	s := service.New(c)
 	// 更新数据
-	err = s.UpdateRoleMenusById(roleId, req)
+	err = s.UpdateRoleMenusById(roleId, req.Ids)
 	if err != nil {
 		response.FailWithMsg(err.Error())
 		return

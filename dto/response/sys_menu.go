@@ -17,6 +17,6 @@ type MenuTreeResp struct {
 
 // 菜单树信息响应, 包含有权限访问的id列表
 type MenuTreeWithAccessResp struct {
-	List      []MenuTreeResp `json:"list"`
+	DataList      []MenuTreeResp `json:"dataList"`
 	AccessIds []uint         `json:"accessIds"`
 }

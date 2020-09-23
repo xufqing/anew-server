@@ -58,7 +58,7 @@ func GetAllMenuByRoleId(c *gin.Context) {
 	}
 	var resp response.MenuTreeWithAccessResp
 	resp.AccessIds = ids
-	utils.Struct2StructByJson(menus, &resp.List)
+	utils.Struct2StructByJson(menus, &resp.DataList)
 	response.SuccessWithData(resp)
 }
 
