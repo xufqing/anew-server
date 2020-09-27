@@ -14,6 +14,8 @@ type LoginResp struct {
 type UserRolesResp struct {
 	Id      uint   `json:"id"`
 	Name    string `json:"name"`
+	Key     string `json:"key"`
+	Title   string `json:"title"`
 	Desc    string `json:"desc"`
 	Keyword string `json:"keyword"`
 	Status  *bool  `json:"status"`
@@ -21,12 +23,12 @@ type UserRolesResp struct {
 
 // 用户信息响应
 type UserInfoResp struct {
-	Id       uint        `json:"id"`
-	Username string      `json:"username"`
-	Mobile   string      `json:"mobile"`
-	Avatar   string      `json:"avatar"`
-	Name     string      `json:"name"`
-	Email    string      `json:"email"`
+	Id       uint            `json:"id"`
+	Username string          `json:"username"`
+	Mobile   string          `json:"mobile"`
+	Avatar   string          `json:"avatar"`
+	Name     string          `json:"name"`
+	Email    string          `json:"email"`
 	Roles    []UserRolesResp `json:"roles"`
 	LoginResp
 }
@@ -40,7 +42,7 @@ type UserListResp struct {
 	Name      string           `json:"name"`
 	Email     string           `json:"email"`
 	Status    *bool            `json:"status"`
-	Roles    []UserRolesResp `json:"roles"`
+	Roles     []UserRolesResp  `json:"roles"`
 	Creator   string           `json:"creator"`
 	CreatedAt models.LocalTime `json:"createdAt"`
 	UpdatedAt models.LocalTime `json:"updatedAt"`

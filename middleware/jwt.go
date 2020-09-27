@@ -99,7 +99,11 @@ func unauthorized(c *gin.Context, code int, message string) {
 	if message == response.LoginCheckErrorMsg {
 		response.FailWithMsg(response.LoginCheckErrorMsg)
 		return
+	} else if message == response.UserForbiddenMsg {
+		response.FailWithCode(response.UserForbidden)
+		return
 	}
+
 	response.FailWithCode(response.Unauthorized)
 }
 

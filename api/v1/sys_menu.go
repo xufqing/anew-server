@@ -14,6 +14,7 @@ import (
 // 查询当前用户菜单树
 func GetMenuTree(c *gin.Context) {
 	_, roleIds := GetCurrentUser(c)
+
 	menuList := make([]models.SysMenu, 0)
 	for _, roleId := range roleIds {
 		// 创建服务
@@ -39,11 +40,9 @@ func GetMenuTree(c *gin.Context) {
 		json.Unmarshal([]byte(k), &t)
 		menusResult = append(menusResult, t)
 	}
-	// 转换成树结构
-	menusResult = service.GenMenuTree(nil, menusResult)
-	// 转为MenuTreeResponseStruct
 	var resp []response.MenuTreeResp
-	utils.Struct2StructByJson(menusResult, &resp)
+	// 转换成树结构
+	resp = service.GenMenuTree(nil, menusResult)
 	response.SuccessWithData(resp)
 }
 
@@ -67,9 +66,8 @@ func GetMenus(c *gin.Context) {
 	// 创建服务
 	s := service.New(c)
 	menus := s.GetMenus()
-	// 转为MenuTreeResponseStruct
 	var resp []response.MenuTreeResp
-	utils.Struct2StructByJson(menus, &resp)
+	resp = service.GenMenuTree(nil,menus)
 	response.SuccessWithData(resp)
 }
 

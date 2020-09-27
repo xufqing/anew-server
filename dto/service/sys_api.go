@@ -1,8 +1,8 @@
 package service
 
 import (
+	"anew-server/common"
 	"anew-server/dto/request"
-	"anew-server/dto/response"
 	"anew-server/models"
 	"anew-server/utils"
 	"errors"
@@ -50,71 +50,6 @@ func (s *MysqlService) GetApis(req *request.ApiListReq) ([]models.SysApi, error)
 	}
 
 	return list, err
-}
-
-// 根据权限编号获取以api分类分组的权限接口
-func (s *MysqlService) GetAllApiGroupByCategoryByRoleId(roleId uint) ([]response.ApiGroupByCategoryResp, []uint, error) {
-	// 接口树
-	tree := make([]response.ApiGroupByCategoryResp, 0)
-	// 有权限访问的id列表
-	accessIds := make([]uint, 0)
-	allApi := make([]models.SysApi, 0)
-	// 查询全部api
-	err := s.tx.Find(&allApi).Error
-	if err != nil {
-		return tree, accessIds, err
-	}
-	// 查询当前角色拥有api访问权限的casbin规则
-	casbins, err := s.GetCasbinListByRoleId(roleId)
-	if err != nil {
-		return tree, accessIds, err
-	}
-
-	// 通过分类进行分组归纳
-	for _, api := range allApi {
-		category := api.Category
-		path := api.Path
-		method := api.Method
-		access := false
-		for _, casbin := range casbins {
-			// 该api有权限
-			if path == casbin.V1 && method == casbin.V2 {
-				access = true
-				break
-			}
-		}
-		// 加入权限集合
-		if access {
-			accessIds = append(accessIds, api.Id)
-		}
-		// 生成接口树
-		existIndex := -1
-		children := make([]response.ApiListResp, 0)
-		for index, leaf := range tree {
-			if leaf.Category == category {
-				children = leaf.Children
-				existIndex = index
-				break
-			}
-		}
-		// api结构转换
-		var item response.ApiListResp
-		utils.Struct2StructByJson(api, &item)
-		item.Title = fmt.Sprintf("%s %s[%s]", item.Desc, item.Path, item.Method)
-		children = append(children, item)
-		if existIndex != -1 {
-			// 更新元素
-			tree[existIndex].Children = children
-		} else {
-			// 新增元素
-			tree = append(tree, response.ApiGroupByCategoryResp{
-				Title:    category + "分组",
-				Category: category,
-				Children: children,
-			})
-		}
-	}
-	return tree, accessIds, err
 }
 
 // 创建接口
@@ -215,4 +150,14 @@ func (s *MysqlService) DeleteApiByIds(ids []uint) (err error) {
 	// 删除所有规则
 	s.BatchDeleteRoleCasbins(casbins)
 	return query.Delete(models.SysApi{}).Error
+}
+
+
+// 获取全部API
+func (s *MysqlService) GetAllApi() []models.SysApi {
+	apis := make([]models.SysApi, 0)
+	// 查询所有菜单
+	err := s.tx.Find(&apis).Error
+	common.Log.Warn("[getAllApi]", err)
+	return apis
 }

@@ -91,17 +91,12 @@ func (s *MysqlService) BatchDeleteRoleCasbins(cs []models.SysRoleCasbin) (bool, 
 	return e.RemovePolicies(rules)
 }
 
-// 根据权限编号读取casbin规则
-func (s *MysqlService) GetCasbinListByRoleId(roleId uint) ([]models.SysCasbin, error) {
+// 根据角色keyword读取casbin规则
+func (s *MysqlService) GetCasbinListByKeyWord(keyword string) []models.SysCasbin {
 	casbins := make([]models.SysCasbin, 0)
-	var role models.SysRole
-	err := s.tx.Where("id = ?", roleId).First(&role).Error
-	if err != nil {
-		return casbins, err
-	}
 	e, _ := s.Casbin()
 	// 查询符合字段v0=role.Keyword所有casbin规则
-	list := e.GetFilteredPolicy(0, role.Keyword)
+	list := e.GetFilteredPolicy(0, keyword)
 	for _, v := range list {
 		casbins = append(casbins, models.SysCasbin{
 			PType: "p",
@@ -110,5 +105,5 @@ func (s *MysqlService) GetCasbinListByRoleId(roleId uint) ([]models.SysCasbin, e
 			V2:    v[2],
 		})
 	}
-	return casbins, nil
+	return casbins
 }

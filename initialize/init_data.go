@@ -49,8 +49,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 1,
 			},
-			Name:      "仪表盘",
-			Title:     "仪表盘",
+			Name:     "仪表盘",
 			Icon:      "DashboardOutlined",
 			Path:      "index",
 			Sort:      0,
@@ -64,8 +63,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 2,
 			},
-			Name:       "系统设置",
-			Title:      "系统设置",
+			Name:      "系统设置",
 			Icon:       "equalizer",
 			Path:       "system",
 			Sort:       1,
@@ -81,8 +79,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 3,
 			},
-			Name:      "菜单管理",
-			Title:     "菜单管理",
+			Name:     "菜单管理",
 			Icon:      "tree-table",
 			Path:      "system/menu", // 子菜单不用全路径, 自动继承
 			Sort:      0,
@@ -98,8 +95,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 4,
 			},
-			Name:      "角色管理",
-			Title:     "角色管理",
+			Name:     "角色管理",
 			Icon:      "mine-o",
 			Path:      "system/role",
 			Sort:      1,
@@ -115,8 +111,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 5,
 			},
-			Name:      "用户管理",
-			Title:     "用户管理",
+			Name:     "用户管理",
 			Icon:      "users",
 			Path:      "system/user",
 			Sort:      2,
@@ -132,8 +127,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 6,
 			},
-			Name:      "接口管理",
-			Title:     "接口管理",
+			Name:     "接口管理",
 			Icon:      "sync",
 			Path:      "system/api",
 			Sort:      2,
@@ -149,8 +143,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 7,
 			},
-			Name:      "操作日志",
-			Title:     "操作日志",
+			Name:     "操作日志",
 			Icon:      "info-circle-o",
 			Path:      "system/log",
 			Sort:      4,
@@ -174,6 +167,11 @@ func InitData() {
 	// 3. 初始化用户
 	// 默认头像
 	avatar := "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif"
+	var adminRole []models.SysRole
+	common.Mysql.Where("keyword = 'admin'").First(&adminRole).RecordNotFound()
+	var guestRole []models.SysRole
+	common.Mysql.Where("keyword = 'guest'").First(&guestRole).RecordNotFound()
+
 	users := []models.SysUser{
 		{
 			Username: "admin",
@@ -181,7 +179,7 @@ func InitData() {
 			Mobile:   "18888888888",
 			Avatar:   avatar,
 			Name:     "管理员",
-			//RoleId:   1,
+			Roles:   adminRole,
 			Creator:  creator,
 		},
 		{
@@ -190,7 +188,7 @@ func InitData() {
 			Mobile:   "15888888888",
 			Avatar:   avatar,
 			Name:     "来宾",
-			//RoleId:   2,
+			Roles: guestRole,
 			Creator:  creator,
 		},
 	}
@@ -199,6 +197,7 @@ func InitData() {
 		notFound := common.Mysql.Where("username = ?", user.Username).First(&oldUser).RecordNotFound()
 		if notFound {
 			common.Mysql.Create(&user)
+			// 替换角色
 		}
 	}
 
@@ -213,6 +212,7 @@ func InitData() {
 			Category: "auth",
 			Desc:     "获取用户信息和token",
 			Creator:  creator,
+			Permission: "auth_info",
 		},
 		{
 			Model: models.Model{
@@ -223,6 +223,7 @@ func InitData() {
 			Category: "auth",
 			Desc:     "用户登出",
 			Creator:  creator,
+			Permission: "auth_logout",
 		},
 		{
 			Model: models.Model{
@@ -233,6 +234,7 @@ func InitData() {
 			Category: "auth",
 			Desc:     "刷新JWT令牌",
 			Creator:  creator,
+			Permission: "auth_refresh",
 		},
 		{
 			Model: models.Model{
@@ -243,6 +245,7 @@ func InitData() {
 			Category: "user",
 			Desc:     "获取用户列表",
 			Creator:  creator,
+			Permission: "user_list",
 		},
 		{
 			Model: models.Model{
@@ -253,6 +256,7 @@ func InitData() {
 			Category: "user",
 			Desc:     "修改用户登录密码",
 			Creator:  creator,
+			Permission: "user_changePwd",
 		},
 		{
 			Model: models.Model{
@@ -263,6 +267,7 @@ func InitData() {
 			Category: "user",
 			Desc:     "创建用户",
 			Creator:  creator,
+			Permission: "user_creator",
 		},
 		{
 			Model: models.Model{
@@ -273,6 +278,7 @@ func InitData() {
 			Category: "user",
 			Desc:     "更新用户",
 			Creator:  creator,
+			Permission: "user_update",
 		},
 		{
 			Model: models.Model{
@@ -283,6 +289,7 @@ func InitData() {
 			Category: "user",
 			Desc:     "批量删除用户",
 			Creator:  creator,
+			Permission: "user_delete",
 		},
 		{
 			Model: models.Model{
@@ -293,6 +300,7 @@ func InitData() {
 			Category: "menu",
 			Desc:     "获取权限菜单",
 			Creator:  creator,
+			Permission: "menu_tree",
 		},
 		{
 			Model: models.Model{
@@ -303,6 +311,7 @@ func InitData() {
 			Category: "menu",
 			Desc:     "获取菜单列表",
 			Creator:  creator,
+			Permission: "menu_list",
 		},
 		{
 			Model: models.Model{
@@ -313,6 +322,7 @@ func InitData() {
 			Category: "menu",
 			Desc:     "创建菜单",
 			Creator:  creator,
+			Permission: "menu_create",
 		},
 		{
 			Model: models.Model{
@@ -323,6 +333,7 @@ func InitData() {
 			Category: "menu",
 			Desc:     "更新菜单",
 			Creator:  creator,
+			Permission: "menu_update",
 		},
 		{
 			Model: models.Model{
@@ -333,6 +344,7 @@ func InitData() {
 			Category: "menu",
 			Desc:     "批量删除菜单",
 			Creator:  creator,
+			Permission: "menu_delete",
 		},
 		{
 			Model: models.Model{
@@ -343,6 +355,7 @@ func InitData() {
 			Category: "role",
 			Desc:     "获取角色列表",
 			Creator:  creator,
+			Permission: "role_list",
 		},
 		{
 			Model: models.Model{
@@ -353,6 +366,7 @@ func InitData() {
 			Category: "role",
 			Desc:     "创建角色",
 			Creator:  creator,
+			Permission: "role_create",
 		},
 		{
 			Model: models.Model{
@@ -363,6 +377,7 @@ func InitData() {
 			Category: "role",
 			Desc:     "更新角色",
 			Creator:  creator,
+			Permission: "role_update",
 		},
 		{
 			Model: models.Model{
@@ -373,6 +388,7 @@ func InitData() {
 			Category: "role",
 			Desc:     "批量删除角色",
 			Creator:  creator,
+			Permission: "role_detele",
 		},
 		{
 			Model: models.Model{
@@ -383,6 +399,7 @@ func InitData() {
 			Category: "api",
 			Desc:     "获取接口列表",
 			Creator:  creator,
+			Permission: "api_list",
 		},
 		{
 			Model: models.Model{
@@ -393,6 +410,7 @@ func InitData() {
 			Category: "api",
 			Desc:     "创建接口",
 			Creator:  creator,
+			Permission: "api_create",
 		},
 		{
 			Model: models.Model{
@@ -403,6 +421,7 @@ func InitData() {
 			Category: "api",
 			Desc:     "更新接口",
 			Creator:  creator,
+			Permission: "api_update",
 		},
 		{
 			Model: models.Model{
@@ -413,56 +432,40 @@ func InitData() {
 			Category: "api",
 			Desc:     "批量删除接口",
 			Creator:  creator,
+			Permission: "api_delete",
 		},
 		{
 			Model: models.Model{
 				Id: 22,
-			},
-			Method:   "GET",
-			Path:     "/v1/menu/all/:roleId",
-			Category: "menu",
-			Desc:     "查询指定角色的菜单树",
-			Creator:  creator,
-		},
-		{
-			Model: models.Model{
-				Id: 23,
-			},
-			Method:   "GET",
-			Path:     "/v1/api/all/category/:roleId",
-			Category: "api",
-			Desc:     "查询指定角色的接口(以分类分组)",
-			Creator:  creator,
-		},
-		{
-			Model: models.Model{
-				Id: 24,
 			},
 			Method:   "PATCH",
 			Path:     "/v1/role/menus/update/:roleId",
 			Category: "role",
 			Desc:     "更新角色的权限菜单",
 			Creator:  creator,
+			Permission: "role_menus_update",
 		},
 		{
 			Model: models.Model{
-				Id: 25,
+				Id: 23,
 			},
 			Method:   "PATCH",
 			Path:     "/v1/role/apis/update/:roleId",
 			Category: "role",
 			Desc:     "更新角色的权限接口",
 			Creator:  creator,
+			Permission: "role_apis_update",
 		},
 		{
 			Model: models.Model{
-				Id: 26,
+				Id: 24,
 			},
 			Method:   "GET",
 			Path:     "/v1/operlog/list",
 			Category: "operation-log",
 			Desc:     "获取操作日志列表",
 			Creator:  creator,
+			Permission: "operlog_list",
 		},
 		{
 			Model: models.Model{
@@ -473,6 +476,7 @@ func InitData() {
 			Category: "operation-log",
 			Desc:     "批量删除操作日志",
 			Creator:  creator,
+			Permission: "operlog_delete",
 		},
 	}
 	for _, api := range apis {
@@ -487,9 +491,10 @@ func InitData() {
 				Keyword: roles[0].Keyword,
 				Path:    api.Path,
 				Method:  api.Method,
+
 			})
 			// 其他人暂时只有登录/获取用户信息的权限
-			if api.Id < 5 || api.Id == 10 {
+			if api.Id < 5 || api.Id == 9 {
 				s.CreateRoleCasbin(models.SysRoleCasbin{
 					Keyword: roles[1].Keyword,
 					Path:    api.Path,

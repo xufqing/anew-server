@@ -4,11 +4,12 @@ import "anew-server/dto/response"
 
 // 获取接口列表结构体
 type ApiListReq struct {
-	Method   string `json:"method" form:"method"`
-	Path     string `json:"path" form:"path"`
-	Category string `json:"category" form:"category"`
-	Creator  string `json:"creator" form:"creator"`
-	response.PageInfo       // 分页参数
+	Method            string `json:"method" form:"method"`
+	Path              string `json:"path" form:"path"`
+	Category          string `json:"category" form:"category"`
+	Creator           string `json:"creator" form:"creator"`
+	Tree              bool   `json:"tree" form:"tree"`
+	response.PageInfo        // 分页参数
 }
 
 // 创建接口结构体

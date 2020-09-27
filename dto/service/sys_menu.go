@@ -3,18 +3,20 @@ package service
 import (
 	"anew-server/common"
 	"anew-server/dto/request"
+	"anew-server/dto/response"
 	"anew-server/models"
 	"anew-server/utils"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"sort"
+	"fmt"
 )
 
 // 获取用户菜单的切片
 func (s *MysqlService) GetMenuList(roleId uint) ([]models.SysMenu, error) {
 	//tree := make([]models.SysMenu, 0)
 	var role models.SysRole
-	err := s.tx.Table(new(models.SysRole).TableName()).Preload("Menus").Where("id = ?", roleId).Find(&role).Error
+	err := s.tx.Table(new(models.SysRole).TableName()).Preload("Menus", "status = ?", true).Where("id = ?", roleId).Find(&role).Error
 	menus := make([]models.SysMenu, 0)
 	if err != nil {
 		return menus, err
@@ -26,23 +28,29 @@ func (s *MysqlService) GetMenuList(roleId uint) ([]models.SysMenu, error) {
 
 // 获取所有菜单
 func (s *MysqlService) GetMenus() []models.SysMenu {
-	tree := make([]models.SysMenu, 0)
+	//tree := make([]models.SysMenu, 0)
 	menus := s.getAllMenu()
 	// 生成菜单树
-	tree = GenMenuTree(nil, menus)
-	return tree
+	//tree = GenMenuTree(nil, menus)
+	return menus
 }
 
+
 // 生成菜单树
-func GenMenuTree(parent *models.SysMenu, menus []models.SysMenu) []models.SysMenu {
-	tree := make(models.SysMenuTree, 0)
+func GenMenuTree(parent *response.MenuTreeResp, menus []models.SysMenu) []response.MenuTreeResp {
+	tree := make(response.MenuTreeRespList, 0)
+	// 转为MenuTreeResponseStruct
+	var resp []response.MenuTreeResp
+	utils.Struct2StructByJson(menus, &resp)
 	// parentId默认为0, 表示根菜单
 	var parentId uint
 	if parent != nil {
 		parentId = parent.Id
 	}
-
-	for _, menu := range menus {
+	for _, menu := range resp {
+		// 增加key值
+		menu.Key = fmt.Sprintf("%d",menu.Id)
+		menu.Title = menu.Name
 		// 父菜单编号一致
 		if menu.ParentId == parentId {
 			// 递归获取子菜单
@@ -57,15 +65,16 @@ func GenMenuTree(parent *models.SysMenu, menus []models.SysMenu) []models.SysMen
 }
 
 // 根据权限编号获取全部菜单
-func (s *MysqlService) GetAllMenuByRoleId(roleId uint) ([]models.SysMenu, []uint, error) {
+func (s *MysqlService) GetAllMenuByRoleId(roleId uint) ([]response.MenuTreeResp, []uint, error) {
 	// 菜单树
-	tree := make([]models.SysMenu, 0)
+	tree := make([]response.MenuTreeResp, 0)
 	// 有权限访问的id列表
 	accessIds := make([]uint, 0)
 	// 查询全部菜单
 	allMenu := s.getAllMenu()
 	// 查询角色拥有菜单
 	roleMenus := s.getRoleMenus(roleId)
+
 	// 生成菜单树
 	tree = GenMenuTree(nil, allMenu)
 	// 获取id列表

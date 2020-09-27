@@ -27,16 +27,28 @@ func GetRoles(c *gin.Context) {
 		response.FailWithMsg(err.Error())
 		return
 	}
-
-	// 返回树结构
-	//for _,menu := range roles{
-	//	menu.Menus = service.GenMenuTree(nil,menu.Menus)
-	//}
-
-	// 转为ResponseStruct, 隐藏部分字段
+	// 增加key，title, apis ,隐藏部分字段
 	var respStruct []response.RoleListResp
-	utils.Struct2StructByJson(roles, &respStruct)
+	allApi := s.GetAllApi()
+	for _,role := range roles{
+		var item response.RoleListResp
+		utils.Struct2StructByJson(role, &item)
+		item.Key = fmt.Sprintf("%d",role.Id)
+		item.Title = role.Name
+		// 处理角色关联的权限，因数据库没有关联关系，只能这样，，fuck
+		item.Apis = append(item.Apis,item.Keyword)
+		casbins := s.GetCasbinListByKeyWord(role.Keyword)
+		for _,api :=range allApi{
+			for _,casbin := range casbins {
+				if api.Path == casbin.V1 && api.Method == casbin.V2{
+					item.Apis = append(item.Apis,fmt.Sprintf("%d",api.Id))
+					break
+				}
+			}
+		}
 
+		respStruct = append(respStruct,item)
+	}
 	// 返回分页数据
 	var resp response.PageData
 	// 设置分页参数
@@ -45,6 +57,7 @@ func GetRoles(c *gin.Context) {
 	resp.DataList = respStruct
 	response.SuccessWithData(resp)
 }
+
 
 // 创建角色
 func CreateRole(c *gin.Context) {

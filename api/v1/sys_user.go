@@ -8,6 +8,7 @@ import (
 	"anew-server/models"
 	"anew-server/utils"
 	"github.com/gin-gonic/gin"
+	"fmt"
 )
 
 
@@ -75,10 +76,20 @@ func GetUsers(c *gin.Context) {
 		response.FailWithMsg(err.Error())
 		return
 	}
-
-	// 转为ResponseStruct, 隐藏部分字段
 	var respStruct []response.UserListResp
-	utils.Struct2StructByJson(users, &respStruct)
+	for _,user := range users{
+		// 把新增的key和title赋值
+		var item response.UserListResp
+		utils.Struct2StructByJson(user, &item)
+		newRole := make([]response.UserRolesResp,0)
+		for _,r := range item.Roles {
+			r.Key = fmt.Sprintf("%d",r.Id)
+			r.Title = r.Name
+			newRole = append(newRole,r)
+		}
+		item.Roles = newRole
+		respStruct = append(respStruct,item)
+	}
 	// 返回分页数据
 	var resp response.PageData
 	// 设置分页参数

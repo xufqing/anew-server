@@ -16,9 +16,12 @@ import (
 func (s *MysqlService) LoginCheck(user *models.SysUser) (*models.SysUser, error) {
 	var u models.SysUser
 	// 查询用户及其角色
-	err := s.tx.Preload("Roles").Where("username = ?", user.Username).First(&u).Error
+	err := s.tx.Preload("Roles", "status = ?", true).Where("username = ?", user.Username).First(&u).Error
 	if err != nil {
 		return nil, errors.New(response.LoginCheckErrorMsg)
+	}
+	if !*u.Status {
+		return nil, errors.New(response.UserForbiddenMsg)
 	}
 	// 校验密码
 	if ok := utils.ComparePwd(user.Password, u.Password); !ok {
@@ -31,17 +34,10 @@ func (s *MysqlService) LoginCheck(user *models.SysUser) (*models.SysUser, error)
 func (s *MysqlService) GetUserById(id uint) (models.SysUser, error) {
 	var user models.SysUser
 	var err error
-	err = s.tx.Preload("Roles").Where("id = ?", id).First(&user).Error
+	err = s.tx.Preload("Roles", "status = ?", true).Where("id = ?", id).First(&user).Error
 	return user, err
 }
 
-// 获取多个用户
-func (s *MysqlService) GetUsersByIds(ids []uint) ([]models.SysUser, error) {
-	var users []models.SysUser
-	var err error
-	err = s.tx.Preload("Roles").Where("id IN (?)", ids).Find(&users).Error
-	return users, err
-}
 
 // 检查用户是否已存在
 func (s *MysqlService) CheckUser(username string) error {
@@ -119,7 +115,6 @@ func (s *MysqlService) GetUsers(req *request.UserListReq) ([]models.SysUser, err
 	var err error
 	list := make([]models.SysUser, 0)
 	db := common.Mysql
-
 	username := strings.TrimSpace(req.Username)
 	if username != "" {
 		db = db.Where("username LIKE ?", fmt.Sprintf("%%%s%%", username))

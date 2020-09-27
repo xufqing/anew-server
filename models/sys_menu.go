@@ -3,11 +3,9 @@ package models
 // 系统菜单表
 type SysMenu struct {
 	Model
-	Name       string    `gorm:"comment:'菜单名称';size:128" json:"name"`
-	Title      string    `gorm:"comment:'菜单标题';size:128" json:"title"`
+	Name      string    `gorm:"comment:'菜单名称';size:128" json:"name"`
 	Icon       string    `gorm:"comment:'菜单图标';size:128" json:"icon"`
 	Path       string    `gorm:"comment:'菜单访问路径';size:255" json:"path"`
-	Component  string    `gorm:"comment:'前端组件路径';size:255" json:"component"`
 	Sort       int       `gorm:"type:int(3);comment:'菜单顺序(同级菜单, 从0开始, 越小显示越靠前)'" json:"sort"`
 	Status     *bool     `gorm:"type:tinyint(1);default:1;comment:'菜单状态(正常/禁用, 默认正常)'" json:"status"` // 由于设置了默认值, 这里使用ptr, 可避免赋值失败
 	Hidden    *bool     `gorm:"type:tinyint(1);default:1;comment:'菜单可见性(可见/隐藏, 默认可见)'" json:"hidden"`
@@ -19,19 +17,6 @@ type SysMenu struct {
 
 func (m SysMenu) TableName() string {
 	return m.Model.TableName("sys_menu")
-}
-
-type SysMenuTree []SysMenu
-
-func (hs SysMenuTree) Len() int {
-	return len(hs)
-}
-func (hs SysMenuTree) Less(i, j int) bool {
-	return hs[i].Sort < hs[j].Sort      // 按Sort从小到大排序
-}
-
-func (hs SysMenuTree) Swap(i, j int) {
-	hs[i], hs[j] = hs[j], hs[i]
 }
 
 

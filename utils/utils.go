@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// 字符串转uint
+// 字符串转int
 func Str2Int(str string) int {
 	num, err := strconv.Atoi(str)
 	if err != nil {

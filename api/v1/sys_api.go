@@ -6,6 +6,7 @@ import (
 	"anew-server/dto/response"
 	"anew-server/dto/service"
 	"anew-server/utils"
+	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,24 +30,45 @@ func GetApis(c *gin.Context) {
 	// 转为ResponseStruct, 隐藏部分字段
 	var respStruct []response.ApiListResp
 	utils.Struct2StructByJson(apis, &respStruct)
+	if req.Tree {
+		// 转换成树结构
+		tree := make([]response.ApiTreeResp, 0)
+		for _,api := range respStruct{
+			existIndex := -1
+			children := make([]response.ApiListResp, 0)
+			for index, leaf := range tree {
+				if leaf.Category == api.Category {
+					children = leaf.Children
+					existIndex = index
+					break
+				}
+			}
+			// api结构转换
+			var item response.ApiListResp
+			utils.Struct2StructByJson(api, &item)
+			item.Title = fmt.Sprintf("[%s] [%s] %s", item.Method, item.Desc, item.Path )
+			item.Key = fmt.Sprintf("%d",item.Id)
+			children = append(children, item)
+			if existIndex != -1 {
+				// 更新元素
+				tree[existIndex].Children = children
+			} else {
+				// 新增元素
+				tree = append(tree, response.ApiTreeResp{
+					Key: api.Category,
+					Title:    api.Category + " [分组]",
+					Category: api.Category,
+					Children: children,
+				})
+			}
+		}
+
+		response.SuccessWithData(tree)
+		return
+	}
 	response.SuccessWithData(respStruct)
 }
 
-// 查询指定角色的接口(以分类分组)
-func GetAllApiGroupByCategoryByRoleId(c *gin.Context) {
-	// 创建服务
-	s := service.New(c)
-	// 绑定参数
-	apis, ids, err := s.GetAllApiGroupByCategoryByRoleId(utils.Str2Uint(c.Param("roleId")))
-	if err != nil {
-		response.FailWithMsg(err.Error())
-		return
-	}
-	var resp response.ApiTreeWithAccessResponseStruct
-	resp.AccessIds = ids
-	utils.Struct2StructByJson(apis, &resp.List)
-	response.SuccessWithData(resp)
-}
 
 // 创建接口
 func CreateApi(c *gin.Context) {
