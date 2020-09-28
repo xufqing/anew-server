@@ -39,7 +39,6 @@ func autoMigrate() {
 		new(models.SysRole),
 		new(models.SysMenu),
 		new(models.SysApi),
-		new(models.SysCasbin),
 		new(models.SysOperationLog),
 	)
 }

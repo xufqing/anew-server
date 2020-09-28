@@ -58,11 +58,6 @@ jwt:
   # token更新时间, 小时
   max-refresh: 24
 
-# casbin配置
-casbin:
-  # 模型配置文件, 默认以conf目录为根目录
-  model-path: 'rbac_model.conf'
-
 # 上传配置
 upload:
   # 上传文件保存路径

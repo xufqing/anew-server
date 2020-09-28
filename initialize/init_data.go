@@ -2,7 +2,6 @@ package initialize
 
 import (
 	"anew-server/common"
-	"anew-server/dto/service"
 	"anew-server/models"
 	"anew-server/utils"
 )
@@ -383,6 +382,17 @@ func InitData() {
 			Model: models.Model{
 				Id: 17,
 			},
+			Method:   "PATCH",
+			Path:     "/v1/role/perms/update/:roleId",
+			Category: "role",
+			Desc:     "更新角色的权限",
+			Creator:  creator,
+			Permission: "role_perms_update",
+		},
+		{
+			Model: models.Model{
+				Id: 18,
+			},
 			Method:   "DELETE",
 			Path:     "/v1/role/delete",
 			Category: "role",
@@ -392,7 +402,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 18,
+				Id: 19,
 			},
 			Method:   "GET",
 			Path:     "/v1/api/list",
@@ -403,7 +413,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 19,
+				Id: 20,
 			},
 			Method:   "POST",
 			Path:     "/v1/api/create",
@@ -414,7 +424,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 20,
+				Id: 21,
 			},
 			Method:   "PATCH",
 			Path:     "/v1/api/update/:roleId",
@@ -425,7 +435,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 21,
+				Id: 22,
 			},
 			Method:   "DELETE",
 			Path:     "/v1/api/delete",
@@ -436,7 +446,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 22,
+				Id: 23,
 			},
 			Method:   "PATCH",
 			Path:     "/v1/role/menus/update/:roleId",
@@ -447,7 +457,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 23,
+				Id: 24,
 			},
 			Method:   "PATCH",
 			Path:     "/v1/role/apis/update/:roleId",
@@ -458,49 +468,44 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 24,
+				Id: 25,
 			},
 			Method:   "GET",
 			Path:     "/v1/operlog/list",
-			Category: "operation-log",
+			Category: "operLog",
 			Desc:     "获取操作日志列表",
 			Creator:  creator,
 			Permission: "operlog_list",
 		},
 		{
 			Model: models.Model{
-				Id: 27,
+				Id: 26,
 			},
 			Method:   "DELETE",
 			Path:     "/v1/operlog/delete",
-			Category: "operation-log",
+			Category: "operLog",
 			Desc:     "批量删除操作日志",
 			Creator:  creator,
 			Permission: "operlog_delete",
 		},
+
 	}
 	for _, api := range apis {
 		oldApi := models.SysApi{}
 		notFound := common.Mysql.Where("id = ?", api.Id).First(&oldApi).RecordNotFound()
 		if notFound {
 			common.Mysql.Create(&api)
-			// 创建服务
-			s := service.New(nil)
-			// 管理员拥有所有API权限role[1]
-			s.CreateRoleCasbin(models.SysRoleCasbin{
-				Keyword: roles[0].Keyword,
-				Path:    api.Path,
-				Method:  api.Method,
-
-			})
-			// 其他人暂时只有登录/获取用户信息的权限
-			if api.Id < 5 || api.Id == 9 {
-				s.CreateRoleCasbin(models.SysRoleCasbin{
-					Keyword: roles[1].Keyword,
-					Path:    api.Path,
-					Method:  api.Method,
-				})
-			}
 		}
 	}
+	// 角色添加权限
+	guestApiList := []int{1,2,3,9}
+	var adminApi []models.SysApi
+	common.Mysql.Find(&adminApi)
+	var guestApi []models.SysApi
+	common.Mysql.Where("id IN (?)",guestApiList).Find(&guestApi)
+	// 角色权限
+	var role1 models.SysRole
+	var role2 models.SysRole
+	common.Mysql.Where("keyword = 'admin'").First(&role1).Association("Apis").Append(&adminApi)
+	common.Mysql.Where("keyword = 'guest'").First(&role2).Association("Apis").Append(&guestApi)
 }

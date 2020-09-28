@@ -9,7 +9,6 @@ type Configuration struct {
 	Logs   LogsConfiguration   `mapstructure:"logs" json:"logs"`
 	Mysql  MysqlConfiguration  `mapstructure:"mysql" json:"mysql"`
 	Jwt    JwtConfiguration    `mapstructure:"jwt" json:"jwt"`
-	Casbin CasbinConfiguration `mapstructure:"casbin" json:"casbin"`
 	Upload    UploadConfiguration    `mapstructure:"upload" json:"upload"`
 }
 
@@ -50,9 +49,6 @@ type JwtConfiguration struct {
 	MaxRefresh int    `mapstructure:"max-refresh" json:"maxRefresh"`
 }
 
-type CasbinConfiguration struct {
-	ModelPath string `mapstructure:"model-path" json:"modelPath"`
-}
 
 type UploadConfiguration struct {
 	SaveDir                      string `mapstructure:"save-dir" json:"saveDir"`

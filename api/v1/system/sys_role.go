@@ -1,4 +1,4 @@
-package v1
+package system
 
 import (
 	"anew-server/common"
@@ -29,25 +29,36 @@ func GetRoles(c *gin.Context) {
 	}
 	// 增加key，title, apis ,隐藏部分字段
 	var respStruct []response.RoleListResp
-	allApi := s.GetAllApi()
-	for _,role := range roles{
+	for _, role := range roles {
 		var item response.RoleListResp
-		utils.Struct2StructByJson(role, &item)
-		item.Key = fmt.Sprintf("%d",role.Id)
+		item.Id = role.Id
+		item.Key = fmt.Sprintf("%d", role.Id)
 		item.Title = role.Name
-		// 处理角色关联的权限，因数据库没有关联关系，只能这样，，fuck
-		item.Apis = append(item.Apis,item.Keyword)
-		casbins := s.GetCasbinListByKeyWord(role.Keyword)
-		for _,api :=range allApi{
-			for _,casbin := range casbins {
-				if api.Path == casbin.V1 && api.Method == casbin.V2{
-					item.Apis = append(item.Apis,fmt.Sprintf("%d",api.Id))
-					break
-				}
+		item.Name = role.Name
+		item.Keyword = role.Keyword
+		item.Desc = role.Desc
+		item.Status = role.Status
+		item.Creator = role.Creator
+		item.CreatedAt = role.CreatedAt
+		for _,menu := range role.Menus {
+			item.Menus = append(item.Menus,fmt.Sprintf("%d",menu.Id))
+		}
+		for _,api := range role.Apis {
+			item.Apis = append(item.Apis,fmt.Sprintf("%d",api.Id))
+			item.Apis = append(item.Apis,api.Category)
+		}
+		// api去重，得到唯一分类名
+		result := []string{}
+		tempMap := map[string]byte{}
+		for _, e := range item.Apis {
+			l := len(tempMap)
+			tempMap[e] = 0
+			if len(tempMap) != l {
+				result = append(result, e)
 			}
 		}
-
-		respStruct = append(respStruct,item)
+		item.Apis = result
+		respStruct = append(respStruct, item)
 	}
 	// 返回分页数据
 	var resp response.PageData
@@ -58,10 +69,9 @@ func GetRoles(c *gin.Context) {
 	response.SuccessWithData(resp)
 }
 
-
 // 创建角色
 func CreateRole(c *gin.Context) {
-	user,_:= GetCurrentUser(c)
+	user, _ := GetCurrentUser(c)
 	// 绑定参数
 	var req request.CreateRoleReq
 	err := c.Bind(&req)
@@ -116,9 +126,9 @@ func UpdateRoleById(c *gin.Context) {
 }
 
 // 更新角色的权限菜单
-func UpdateRoleMenusById(c *gin.Context) {
+func UpdateRolePermsById(c *gin.Context) {
 	// 绑定参数
-	var req request.IdsReq
+	var req request.UpdateRolePermsReq
 	err := c.Bind(&req)
 	if err != nil {
 		response.FailWithMsg(fmt.Sprintf("参数绑定失败, %v", err))
@@ -132,34 +142,12 @@ func UpdateRoleMenusById(c *gin.Context) {
 	}
 	// 创建服务
 	s := service.New(c)
-	// 更新数据
-	err = s.UpdateRoleMenusById(roleId, req.Ids)
-	if err != nil {
-		response.FailWithMsg(err.Error())
-		return
+	if req.Type == "menu" {
+		// 更新数据
+		err = s.UpdateRoleMenusById(roleId, req.Ids)
+	} else {
+		err = s.UpdateRoleApisById(roleId, req.Ids)
 	}
-	response.Success()
-}
-
-// 更新角色的权限接口
-func UpdateRoleApisById(c *gin.Context) {
-	// 绑定参数
-	var req request.UpdateIncrementalIdsReq
-	err := c.Bind(&req)
-	if err != nil {
-		response.FailWithMsg(fmt.Sprintf("参数绑定失败, %v", err))
-		return
-	}
-	// 获取path中的roleId
-	roleId := utils.Str2Uint(c.Param("roleId"))
-	if roleId == 0 {
-		response.FailWithMsg("角色编号不正确")
-		return
-	}
-	// 创建服务
-	s := service.New(c)
-	// 更新数据
-	err = s.UpdateRoleApisById(roleId, req)
 	if err != nil {
 		response.FailWithMsg(err.Error())
 		return

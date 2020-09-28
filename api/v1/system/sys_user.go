@@ -1,4 +1,4 @@
-package v1
+package system
 
 import (
 	"anew-server/common"
@@ -7,8 +7,8 @@ import (
 	"anew-server/dto/service"
 	"anew-server/models"
 	"anew-server/utils"
-	"github.com/gin-gonic/gin"
 	"fmt"
+	"github.com/gin-gonic/gin"
 )
 
 

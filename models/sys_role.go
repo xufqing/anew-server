@@ -10,6 +10,7 @@ type SysRole struct {
 	Creator string    `gorm:"comment:'创建人';size:128" json:"creator"`
 	Menus   []SysMenu `gorm:"many2many:relation_role_menu;" json:"menus"` // 角色菜单多对多关系
 	Users   []SysUser `gorm:"many2many:relation_user_role;" json:"users"` // 用户角色多对多关系
+	Apis    []SysApi  `gorm:"many2many:relation_role_api;" json:"apis"`   // 角色接口多对多关系
 }
 
 func (m SysRole) TableName() string {

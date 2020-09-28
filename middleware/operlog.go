@@ -1,14 +1,14 @@
 package middleware
 
 import (
-	"anew-server/dto/response"
-	"bytes"
-	v1 "anew-server/api/v1"
-	"anew-server/models"
+	"anew-server/api/v1/system"
 	"anew-server/common"
 	"anew-server/dto/request"
+	"anew-server/dto/response"
 	"anew-server/dto/service"
+	"anew-server/models"
 	"anew-server/utils"
+	"bytes"
 	"github.com/casbin/casbin/v2/util"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
@@ -95,7 +95,7 @@ func OperationLog(c *gin.Context) {
 		// 清理事务
 		c.Set("tx", "")
 		// 获取当前登录用户
-		user ,_:= v1.GetCurrentUser(c)
+		user ,_:= system.GetCurrentUser(c)
 
 		// 用户名
 		if user.Id > 0 {

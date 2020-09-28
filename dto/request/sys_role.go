@@ -4,11 +4,17 @@ import "anew-server/dto/response"
 
 // 获取角色列表结构体
 type RoleListReq struct {
-	Name     string `json:"name" form:"name"`
-	Keyword  string `json:"keyword" form:"keyword"`
-	Status   *bool  `json:"status" form:"status"`
-	Creator  string `json:"creator" form:"creator"`
+	Name              string `json:"name" form:"name"`
+	Keyword           string `json:"keyword" form:"keyword"`
+	Status            *bool  `json:"status" form:"status"`
+	Creator           string `json:"creator" form:"creator"`
 	response.PageInfo        // 分页参数
+}
+
+// 更新角色权限的结构体
+type UpdateRolePermsReq struct {
+	IdsReq
+	Type string `json:"type"`
 }
 
 // 创建角色结构体

@@ -1,7 +1,7 @@
 package routers
 
 import (
-	v1 "anew-server/api/v1"
+	"anew-server/api/v1/system"
 	"anew-server/middleware"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
@@ -9,12 +9,12 @@ import (
 
 // 接口路由
 func InitApiRouter(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) (R gin.IRoutes) {
-	router := r.Group("api").Use(authMiddleware.MiddlewareFunc()).Use(middleware.CasbinMiddleware)
+	router := r.Group("api").Use(authMiddleware.MiddlewareFunc()).Use(middleware.PermsMiddleware)
 	{
-		router.GET("/list", v1.GetApis)
-		router.POST("/create", v1.CreateApi)
-		router.PATCH("/update/:apiId", v1.UpdateApiById)
-		router.DELETE("/delete", v1.BatchDeleteApiByIds)
+		router.GET("/list", system.GetApis)
+		router.POST("/create", system.CreateApi)
+		router.PATCH("/update/:apiId", system.UpdateApiById)
+		router.DELETE("/delete", system.BatchDeleteApiByIds)
 	}
 	return router
 }

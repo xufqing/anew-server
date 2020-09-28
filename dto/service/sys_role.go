@@ -3,6 +3,7 @@ package service
 import (
 	"anew-server/common"
 	"anew-server/dto/request"
+	"anew-server/dto/response"
 	"anew-server/models"
 	"anew-server/utils"
 	"errors"
@@ -40,15 +41,32 @@ func (s *MysqlService) GetRoles(req *request.RoleListReq) ([]models.SysRole, err
 	if err == nil {
 		if req.PageInfo.All {
 			// 不使用分页
-			err = db.Preload("Menus").Find(&list).Error
+			err = db.Preload("Menus", "status = ?", true).Preload("Apis").Find(&list).Error
 		} else {
 			// 获取分页参数
 			limit, offset := req.GetLimit()
-			err = db.Preload("Menus").Limit(limit).Offset(offset).Find(&list).Error
+			err = db.Preload("Menus", "status = ?", true).Preload("Apis").Limit(limit).Offset(offset).Find(&list).Error
 		}
 	}
 	return list, err
 }
+
+// 根据角色ID获取权限：菜单和接口
+func (s *MysqlService) GetPermsByRoleId(roleId uint) (response.RolePermsResp, error) {
+	var role models.SysRole
+	//var apis []models.SysApi
+	var resp response.RolePermsResp
+	err := s.tx.Preload("Menus", "status = ?", true).Preload("Apis").Where("id = ?", roleId).First(&role).Error
+	if err != nil {
+		return resp, err
+	}
+	resp.Id = role.Id
+	resp.Name = role.Name
+	resp.Menus = role.Menus
+	resp.Apis = role.Apis
+	return resp, err
+}
+
 
 // 创建角色
 func (s *MysqlService) CreateRole(req *request.CreateRoleReq) (err error) {
@@ -88,78 +106,39 @@ func (s *MysqlService) UpdateRoleMenusById(id uint, req []uint) (err error) {
 	return
 }
 
-
 // 更新角色的权限接口
-func (s *MysqlService) UpdateRoleApisById(id uint, req request.UpdateIncrementalIdsReq) (err error) {
-	var oldRole models.SysRole
-	query := s.tx.Model(&oldRole).Where("id = ?", id).First(&oldRole)
-	if query.RecordNotFound() {
-		return errors.New("记录不存在")
+func (s *MysqlService) UpdateRoleApisById(id uint, req []uint) (err error) {
+	var apis []models.SysApi
+	err = s.tx.Where("id in (?)", req).Find(&apis).Error
+	if err != nil {
+		return
 	}
-	if len(req.Delete) > 0 {
-		// 查询需要删除的api
-		deleteApis := make([]models.SysApi, 0)
-		err = s.tx.Where("id IN (?)", req.Delete).Find(&deleteApis).Error
-		if err != nil {
-			return
-		}
-		// 构建casbin规则
-		cs := make([]models.SysRoleCasbin, 0)
-		for _, api := range deleteApis {
-			cs = append(cs, models.SysRoleCasbin{
-				Keyword: oldRole.Keyword,
-				Path:    api.Path,
-				Method:  api.Method,
-			})
-		}
-		// 批量删除
-		_, err = s.BatchDeleteRoleCasbins(cs)
-	}
-	if len(req.Create) > 0 {
-		// 查询需要新增的api
-		createApis := make([]models.SysApi, 0)
-		err = s.tx.Where("id IN (?)", req.Create).Find(&createApis).Error
-		if err != nil {
-			return
-		}
-		// 构建casbin规则
-		cs := make([]models.SysRoleCasbin, 0)
-		for _, api := range createApis {
-			cs = append(cs, models.SysRoleCasbin{
-				Keyword: oldRole.Keyword,
-				Path:    api.Path,
-				Method:  api.Method,
-			})
-		}
-		// 批量创建
-		_, err = s.BatchCreateRoleCasbins(cs)
-
-	}
+	// 替换菜单
+	err = s.tx.Where("id = ?", id).First(&models.SysRole{}).Association("Apis").Replace(&apis).Error
 	return
 }
+
 
 // 批量删除角色
 func (s *MysqlService) DeleteRoleByIds(ids []uint) (err error) {
 	var roles []models.SysRole
 	// 查询符合条件的角色, 以及关联的用户
-	err = s.tx.Preload("Users").Where("id IN (?)", ids).Find(&roles).Error
+	err = s.tx.Preload("Users").Preload("Menus").Preload("Apis").Where("id IN (?)", ids).Find(&roles).Error
 	if err != nil {
 		return
 	}
 	newIds := make([]uint, 0)
-	oldCasbins := make([]models.SysRoleCasbin, 0)
-	for _, v := range roles {
-		if len(v.Users) > 0 {
-			return errors.New(fmt.Sprintf("角色[%s]仍有%d位关联用户, 请先删除用户再删除角色", v.Name, len(v.Users)))
+	for _, role := range roles {
+		if len(role.Users) > 0 {
+			return errors.New(fmt.Sprintf("角色[%s]仍有%d位关联用户, 请先移除关联用户再删除角色", role.Name, len(role.Users)))
 		}
-		oldCasbins = append(oldCasbins, s.GetRoleCasbins(models.SysRoleCasbin{
-			Keyword: v.Keyword,
-		})...)
-		newIds = append(newIds, v.Id)
-	}
-	if len(oldCasbins) > 0 {
-		// 删除关联的casbin
-		s.BatchDeleteRoleCasbins(oldCasbins)
+		if len(role.Menus) > 0 {
+			return errors.New(fmt.Sprintf("角色[%s]仍有%d个关联菜单, 请先移除关联菜单再删除角色", role.Name, len(role.Apis)))
+		}
+		if len(role.Apis) > 0 {
+			return errors.New(fmt.Sprintf("角色[%s]仍有%d个关联接口, 请先移除关联接口再删除角色", role.Name, len(role.Apis)))
+		}
+		newIds = append(newIds, role.Id)
 	}
 	if len(newIds) > 0 {
 		// 执行删除

@@ -38,7 +38,7 @@ type CreateUserReq struct {
 	Name     string `json:"name" validate:"required"`
 	Email    string `json:"email"`
 	Status   *bool  `json:"status"`
-	Roles  []uint `json:"roles" validate:"required"` // 可绑定多个角色
+	Roles  []string `json:"roles" validate:"required"` // 可绑定多个角色
 	Creator  string `json:"creator"`
 }
 
@@ -49,7 +49,7 @@ type UpdateUserReq struct {
 	Name     string `json:"name" validate:"required"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
-	Roles  []uint `json:"roles"` // 可绑定多个角色
+	Roles  []string `json:"roles"` // 可绑定多个角色
 	Status   *bool  `json:"status"`
 }
 

@@ -156,5 +156,6 @@ func (s *MysqlService) GetUsers(req *request.UserListReq) ([]models.SysUser, err
 
 // 批量删除用户
 func (s *MysqlService) DeleteUserByIds(ids []uint) (err error) {
+
 	return s.tx.Where("id IN (?)", ids).Delete(models.SysUser{}).Error
 }

@@ -1,4 +1,4 @@
-package v1
+package system
 
 import (
 	"anew-server/dto/request"

@@ -4,8 +4,7 @@ go 1.15
 
 require (
 	github.com/appleboy/gin-jwt/v2 v2.6.4
-	github.com/casbin/casbin/v2 v2.2.2
-	github.com/casbin/gorm-adapter/v2 v2.1.0
+	github.com/casbin/casbin/v2 v2.13.0
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0
@@ -16,6 +15,7 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/jinzhu/now v1.1.1 // indirect
 	github.com/json-iterator/go v1.1.10 // indirect
+	github.com/mattn/go-sqlite3 v2.0.1+incompatible // indirect
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/spf13/viper v1.7.1
 	github.com/thoas/go-funk v0.7.0
