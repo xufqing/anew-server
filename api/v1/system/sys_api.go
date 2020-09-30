@@ -66,7 +66,13 @@ func GetApis(c *gin.Context) {
 		response.SuccessWithData(tree)
 		return
 	}
-	response.SuccessWithData(respStruct)
+	// 返回分页数据
+	var resp response.PageData
+	// 设置分页参数
+	resp.PageInfo = req.PageInfo
+	// 设置数据列表
+	resp.DataList = respStruct
+	response.SuccessWithData(resp)
 }
 
 

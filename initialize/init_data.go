@@ -427,7 +427,7 @@ func InitData() {
 				Id: 21,
 			},
 			Method:   "PATCH",
-			Path:     "/v1/api/update/:roleId",
+			Path:     "/v1/api/update/:apiId",
 			Category: "api",
 			Desc:     "更新接口",
 			Creator:  creator,
