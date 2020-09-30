@@ -11,8 +11,7 @@ import (
 func InitMenuRouter(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) (R gin.IRoutes) {
 	router := r.Group("menu").Use(authMiddleware.MiddlewareFunc()).Use(middleware.PermsMiddleware)
 	{
-		router.GET("/tree", system.GetMenuTree)
-		router.GET("/all/:roleId", system.GetAllMenuByRoleId)
+		router.GET("/tree", system.GetUserMenuTree)
 		router.GET("/list", system.GetMenus)
 		router.POST("/create", system.CreateMenu)
 		router.PATCH("/update/:menuId", system.UpdateMenuById)

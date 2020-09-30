@@ -1,19 +1,18 @@
 package service
 
 import (
-	"anew-server/common"
 	"anew-server/dto/request"
 	"anew-server/dto/response"
 	"anew-server/models"
 	"anew-server/utils"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"sort"
-	"fmt"
 )
 
 // 获取用户菜单的切片
-func (s *MysqlService) GetMenuList(roleId uint) ([]models.SysMenu, error) {
+func (s *MysqlService) GetUserMenuList(roleId uint) ([]models.SysMenu, error) {
 	//tree := make([]models.SysMenu, 0)
 	var role models.SysRole
 	err := s.tx.Table(new(models.SysRole).TableName()).Preload("Menus", "status = ?", true).Where("id = ?", roleId).Find(&role).Error
@@ -50,6 +49,7 @@ func GenMenuTree(parent *response.MenuTreeResp, menus []models.SysMenu) []respon
 	for _, menu := range resp {
 		// 增加key值
 		menu.Key = fmt.Sprintf("%d",menu.Id)
+		menu.Value = fmt.Sprintf("%d",menu.Id)
 		menu.Title = menu.Name
 		// 父菜单编号一致
 		if menu.ParentId == parentId {
@@ -64,27 +64,7 @@ func GenMenuTree(parent *response.MenuTreeResp, menus []models.SysMenu) []respon
 	return tree
 }
 
-// 根据权限编号获取全部菜单
-func (s *MysqlService) GetAllMenuByRoleId(roleId uint) ([]response.MenuTreeResp, []uint, error) {
-	// 菜单树
-	tree := make([]response.MenuTreeResp, 0)
-	// 有权限访问的id列表
-	accessIds := make([]uint, 0)
-	// 查询全部菜单
-	allMenu := s.getAllMenu()
-	// 查询角色拥有菜单
-	roleMenus := s.getRoleMenus(roleId)
 
-	// 生成菜单树
-	tree = GenMenuTree(nil, allMenu)
-	// 获取id列表
-	for _, menu := range roleMenus {
-		accessIds = append(accessIds, menu.Id)
-	}
-	// 只保留选中项目
-	accessIds = models.GetCheckedMenuIds(accessIds, allMenu)
-	return tree, accessIds, nil
-}
 
 // 创建菜单
 func (s *MysqlService) CreateMenu(req *request.CreateMenuReq) (err error) {
@@ -114,24 +94,26 @@ func (s *MysqlService) UpdateMenuById(id uint, req gin.H) (err error) {
 
 // 批量删除菜单
 func (s *MysqlService) DeleteMenuByIds(ids []uint) (err error) {
-	// 执行删除
-	return s.tx.Where("id IN (?)", ids).Delete(models.SysMenu{}).Error
+	var menu models.SysMenu
+	// 先解除父级关联
+	err = s.tx.Table(menu.TableName()).Where("parent_id IN (?)", ids).Update("parent_id",0).Error
+	if err != nil{
+		return err
+	}
+	// 再删除
+	err = s.tx.Where("id IN (?)", ids).Delete(models.SysMenu{}).Error
+	if err != nil{
+		return err
+	}
+	return
 }
 
-// 获取权限菜单, 非菜单树
-func (s *MysqlService) getRoleMenus(roleId uint) []models.SysMenu {
-	var role models.SysRole
-	// 根据角色ID获取菜单
-	err := s.tx.Preload("Menus").Where("id = ?", roleId).First(&role).Error
-	common.Log.Warn("[getRoleMenu]", err)
-	return role.Menus
-}
+
 
 // 获取全部菜单, 非菜单树
 func (s *MysqlService) getAllMenu() []models.SysMenu {
 	menus := make([]models.SysMenu, 0)
 	// 查询所有菜单
-	err := s.tx.Order("sort").Find(&menus).Error
-	common.Log.Warn("[getAllMenu]", err)
+	s.tx.Order("sort").Find(&menus)
 	return menus
 }

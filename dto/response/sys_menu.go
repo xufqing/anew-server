@@ -5,6 +5,7 @@ type MenuTreeResp struct {
 	Id       uint           `json:"id"`
 	ParentId uint           `json:"parentId"`
 	Key      string         `json:"key"`
+	Value    string         `json:"value"`
 	Name     string         `json:"name"`
 	Title    string         `json:"title"`
 	Icon     string         `json:"icon"`
@@ -13,7 +14,7 @@ type MenuTreeResp struct {
 	Sort     int            `json:"sort"`
 	Status   bool           `json:"status"`
 	Hidden   bool           `json:"hidden"`
-	Children []MenuTreeResp `json:"children"`
+	Children []MenuTreeResp `json:"children,omitempty"` //tag:omitempty 为空的值不显示
 }
 type MenuTreeRespList []MenuTreeResp
 

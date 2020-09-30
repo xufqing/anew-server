@@ -1,7 +1,6 @@
 package service
 
 import (
-	"anew-server/common"
 	"anew-server/dto/request"
 	"anew-server/models"
 	"fmt"
@@ -66,7 +65,6 @@ func (s *MysqlService) DeleteApiByIds(ids []uint) (err error) {
 func (s *MysqlService) GetAllApi() []models.SysApi {
 	apis := make([]models.SysApi, 0)
 	// 查询所有菜单
-	err := s.tx.Find(&apis).Error
-	common.Log.Warn("[getAllApi]", err)
+	s.tx.Find(&apis)
 	return apis
 }
