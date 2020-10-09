@@ -43,7 +43,7 @@ func InitLogger() {
 	core := zapcore.NewCore(
 		zapcore.NewConsoleEncoder(enConfig),                                            // 编码器配置
 		zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), zapcore.AddSync(hook)), // 打印到控制台和文件
-		Conf.Logs.Level, // 日志等级
+		Conf.Logs.Level,                                                                // 日志等级
 	)
 
 	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))

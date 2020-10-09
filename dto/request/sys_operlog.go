@@ -6,7 +6,7 @@ import (
 )
 
 // 获取操作日志列表结构体
-type OperationLogListReq struct {
+type OperLogListReq struct {
 	Method            string `json:"method" form:"method"`
 	Path              string `json:"path" form:"path"`
 	Username          string `json:"username" form:"username"`
@@ -16,15 +16,14 @@ type OperationLogListReq struct {
 }
 
 // 翻译需要校验的字段名称
-func (s OperationLogListReq) FieldTrans() map[string]string {
+func (s OperLogListReq) FieldTrans() map[string]string {
 	m := make(map[string]string, 0)
 	m["Status"] = "响应状态码"
 	return m
 }
 
 // 创建操作日志结构体
-type CreateOperationLogRequestStruct struct {
-	ApiDesc    string        `json:"apiDesc"`
+type CreateOperLogRequestStruct struct {
 	Path       string        `json:"path"`
 	Method     string        `json:"method"`
 	Params     string        `json:"params"`
@@ -32,7 +31,6 @@ type CreateOperationLogRequestStruct struct {
 	Data       string        `json:"data"`
 	Status     int           `json:"status"`
 	Username   string        `json:"username"`
-	RoleName   string        `json:"roleName"`
 	Ip         string        `json:"ip"`
 	IpLocation string        `json:"ipLocation"`
 	Latency    time.Duration `json:"latency"`

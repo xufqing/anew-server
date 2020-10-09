@@ -2,10 +2,10 @@ package middleware
 
 import (
 	"anew-server/api/v1/system"
-	"anew-server/common"
 	"anew-server/dto/response"
 	"anew-server/dto/service"
 	"anew-server/models"
+	"anew-server/pkg/common"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"strings"

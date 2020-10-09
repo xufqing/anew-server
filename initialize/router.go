@@ -1,8 +1,8 @@
 package initialize
 
 import (
-	"anew-server/common"
 	"anew-server/middleware"
+	"anew-server/pkg/common"
 	"anew-server/routers"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -43,6 +43,7 @@ func Routers() *gin.Engine {
 		routers.InitMenuRouter(v1, authMiddleware) // 注册菜单路由
 		routers.InitRoleRouter(v1, authMiddleware) // 注册角色路由
 		routers.InitApiRouter(v1, authMiddleware)  // 注册接口路由
+		routers.InitOperLogRouter(v1, authMiddleware)  // 注册操作日志路由
 	}
 
 	return r

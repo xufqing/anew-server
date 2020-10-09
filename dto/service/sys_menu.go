@@ -4,7 +4,7 @@ import (
 	"anew-server/dto/request"
 	"anew-server/dto/response"
 	"anew-server/models"
-	"anew-server/utils"
+	"anew-server/pkg/utils"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"

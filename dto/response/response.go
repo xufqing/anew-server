@@ -1,7 +1,7 @@
 package response
 
 import (
-	"anew-server/common"
+	"anew-server/pkg/common"
 	"github.com/gin-gonic/gin"
 )
 

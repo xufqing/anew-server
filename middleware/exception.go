@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"anew-server/common"
 	"anew-server/dto/response"
+	"anew-server/pkg/common"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"runtime/debug"

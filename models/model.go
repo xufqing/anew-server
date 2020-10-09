@@ -1,7 +1,7 @@
 package models
 
 import (
-	"anew-server/common"
+	"anew-server/pkg/common"
 	"database/sql/driver"
 	"fmt"
 	"time"

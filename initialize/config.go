@@ -1,7 +1,7 @@
 package initialize
 
 import (
-	"anew-server/common"
+	"anew-server/pkg/common"
 	"bytes"
 	"fmt"
 	"github.com/gobuffalo/packr/v2"

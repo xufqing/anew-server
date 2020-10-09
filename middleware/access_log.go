@@ -1,8 +1,8 @@
 package middleware
 
 import (
+	"anew-server/pkg/common"
 	"fmt"
-	"anew-server/common"
 	"github.com/gin-gonic/gin"
 	"time"
 )

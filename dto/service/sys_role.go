@@ -1,11 +1,11 @@
 package service
 
 import (
-	"anew-server/common"
 	"anew-server/dto/request"
 	"anew-server/dto/response"
 	"anew-server/models"
-	"anew-server/utils"
+	"anew-server/pkg/common"
+	"anew-server/pkg/utils"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"

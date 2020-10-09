@@ -1,8 +1,8 @@
 package initialize
 
 import (
-	"anew-server/common"
 	"anew-server/models"
+	"anew-server/pkg/common"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql" // mysql驱动
 	"github.com/jinzhu/gorm"
@@ -39,6 +39,6 @@ func autoMigrate() {
 		new(models.SysRole),
 		new(models.SysMenu),
 		new(models.SysApi),
-		new(models.SysOperationLog),
+		new(models.SysOperLog),
 	)
 }

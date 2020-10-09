@@ -2,18 +2,16 @@ package middleware
 
 import (
 	"anew-server/api/v1/system"
-	"anew-server/common"
-	"anew-server/dto/request"
 	"anew-server/dto/response"
-	"anew-server/dto/service"
 	"anew-server/models"
-	"anew-server/utils"
+	"anew-server/pkg/common"
+	"anew-server/pkg/utils"
 	"bytes"
-	"github.com/casbin/casbin/v2/util"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -71,7 +69,7 @@ func OperationLog(c *gin.Context) {
 				body = []byte(utils.Struct2Json(params))
 			}
 		}
-		log := models.SysOperationLog{
+		log := models.SysOperLog{
 			Model: models.Model{
 				// 记录最后时间
 				CreatedAt: models.LocalTime{
@@ -91,7 +89,9 @@ func OperationLog(c *gin.Context) {
 			// 浏览器标识
 			UserAgent: c.Request.UserAgent(),
 		}
-
+		// 处理密码信息
+		re, _ := regexp.Compile("\"password\":\".*\"");
+		log.Body = re.ReplaceAllString(log.Body, "\"password\":\"***\"")
 		// 清理事务
 		c.Set("tx", "")
 		// 获取当前登录用户
@@ -100,38 +100,11 @@ func OperationLog(c *gin.Context) {
 		// 用户名
 		if user.Id > 0 {
 			log.Username = user.Username
-			//log.RoleName = user.Role.Name
 		} else {
 			log.Username = "未登录"
-			log.RoleName = "未登录"
 		}
-
-		// 获取当前接口
-		cache := service.New(c)
-		apis, err := cache.GetApis(&request.ApiListReq{
-			Method: log.Method,
-			PageInfo: response.PageInfo{
-				All: true,
-			},
-		})
-		match := false
-		if err == nil {
-			for _, api := range apis {
-				// 通过casbin KeyMatch2来匹配url规则
-				match = util.KeyMatch2(log.Path, api.Path)
-				if match {
-					log.ApiDesc = api.Desc
-					break
-				}
-			}
-		}
-		if !match {
-			log.ApiDesc = "无"
-		}
-
 		// 获取Ip所在地
 		log.IpLocation = utils.GetIpRealLocation(log.Ip)
-
 		// 响应状态码
 		log.Status = c.Writer.Status()
 		// 响应数据

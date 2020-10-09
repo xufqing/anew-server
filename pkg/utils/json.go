@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"anew-server/common"
+	"anew-server/pkg/common"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"

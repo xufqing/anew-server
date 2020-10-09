@@ -1,9 +1,9 @@
 package initialize
 
 import (
-	"anew-server/common"
 	"anew-server/models"
-	"anew-server/utils"
+	"anew-server/pkg/common"
+	"anew-server/pkg/utils"
 )
 
 // 初始化数据
@@ -178,7 +178,7 @@ func InitData() {
 			Mobile:   "18888888888",
 			Avatar:   avatar,
 			Name:     "管理员",
-			Roles:   adminRole,
+			Roles:    adminRole,
 			Creator:  creator,
 		},
 		{
@@ -187,7 +187,7 @@ func InitData() {
 			Mobile:   "15888888888",
 			Avatar:   avatar,
 			Name:     "来宾",
-			Roles: guestRole,
+			Roles:    guestRole,
 			Creator:  creator,
 		},
 	}

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"anew-server/common"
 	"anew-server/initialize"
+	"anew-server/pkg/common"
 	"context"
 	"fmt"
 	"net/http"

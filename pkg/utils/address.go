@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"anew-server/common"
+	"anew-server/pkg/common"
 	"fmt"
 	"io/ioutil"
 	"net/http"

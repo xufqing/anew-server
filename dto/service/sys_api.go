@@ -3,11 +3,11 @@ package service
 import (
 	"anew-server/dto/request"
 	"anew-server/models"
-	"anew-server/utils"
+	"anew-server/pkg/utils"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"strings"
-	"errors"
 )
 
 
@@ -79,6 +79,6 @@ func (s *MysqlService) UpdateApiById(id uint, req gin.H) (err error) {
 
 // 批量删除接口
 func (s *MysqlService) DeleteApiByIds(ids []uint) (err error) {
-	
+
 	return s.tx.Where("id IN (?)", ids).Delete(models.SysApi{}).Error
 }

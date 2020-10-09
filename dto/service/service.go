@@ -1,7 +1,7 @@
 package service
 
 import (
-	"anew-server/common"
+	"anew-server/pkg/common"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )

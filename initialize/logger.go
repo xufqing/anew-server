@@ -1,7 +1,7 @@
 package initialize
 
 import (
-	"anew-server/common"
+	"anew-server/pkg/common"
 )
 
 // 初始化日志

@@ -9,7 +9,7 @@ type Configuration struct {
 	Logs   LogsConfiguration   `mapstructure:"logs" json:"logs"`
 	Mysql  MysqlConfiguration  `mapstructure:"mysql" json:"mysql"`
 	Jwt    JwtConfiguration    `mapstructure:"jwt" json:"jwt"`
-	Upload    UploadConfiguration    `mapstructure:"upload" json:"upload"`
+	Upload UploadConfiguration `mapstructure:"upload" json:"upload"`
 }
 
 type SystemConfiguration struct {
