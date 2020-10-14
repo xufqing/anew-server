@@ -90,7 +90,7 @@ func OperationLog(c *gin.Context) {
 			UserAgent: c.Request.UserAgent(),
 		}
 		// 处理密码信息
-		re, _ := regexp.Compile("\"password\":\".*\"");
+		re, _ := regexp.Compile("\"password\":\"([^\"]+)\"");
 		log.Body = re.ReplaceAllString(log.Body, "\"password\":\"***\"")
 		// 清理事务
 		c.Set("tx", "")

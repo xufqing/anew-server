@@ -9,7 +9,7 @@ import (
 // 初始化数据
 func InitData() {
 	// 1. 初始化角色
-	creator := "系统自动创建"
+	creator := "系统创建"
 	status := true
 	hidden := true
 	roles := []models.SysRole{
