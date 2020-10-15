@@ -9,7 +9,7 @@ system:
   # 操作日志key
   operation-log-key: operlog_response
   # 程序监听端口
-  port: 8000
+  port: 9000
 
 mysql:
   # 用户名
