@@ -239,27 +239,60 @@ func InitData() {
 			Model: models.Model{
 				Id: 4,
 			},
-			Method:   "GET",
-			Path:     "/v1/user/list",
+			Method:   "POST",
+			Path:     "/v1/user/info",
 			Category: "user",
-			Desc:     "获取用户列表",
+			Desc:     "用户信息",
 			Creator:  creator,
-			Permission: "user_list",
+			Permission: "user_info",
 		},
 		{
 			Model: models.Model{
 				Id: 5,
 			},
+			Method:   "PATCH",
+			Path:     "/v1/user/info/update/:userId",
+			Category: "user",
+			Desc:     "更新信息",
+			Creator:  creator,
+			Permission: "user_info_update",
+		},
+		{
+			Model: models.Model{
+				Id: 6,
+			},
+			Method:   "POST",
+			Path:     "/v1/user/info/uploadImg",
+			Category: "user",
+			Desc:     "上传头像",
+			Creator:  creator,
+			Permission: "user_info_upload",
+		},
+		{
+			Model: models.Model{
+				Id: 7,
+			},
+			Method:   "GET",
+			Path:     "/v1/user/list",
+			Category: "user",
+			Desc:     "用户列表",
+			Creator:  creator,
+			Permission: "user_list",
+		},
+		{
+			Model: models.Model{
+				Id: 8,
+			},
 			Method:   "PUT",
 			Path:     "/v1/user/changePwd",
 			Category: "user",
-			Desc:     "修改用户登录密码",
+			Desc:     "修改密码",
 			Creator:  creator,
 			Permission: "user_changePwd",
 		},
 		{
 			Model: models.Model{
-				Id: 6,
+				Id: 9,
 			},
 			Method:   "POST",
 			Path:     "/v1/user/create",
@@ -270,7 +303,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 7,
+				Id: 10,
 			},
 			Method:   "PATCH",
 			Path:     "/v1/user/update/:userId",
@@ -281,40 +314,40 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 8,
+				Id: 11,
 			},
 			Method:   "DELETE",
 			Path:     "/v1/user/delete",
 			Category: "user",
-			Desc:     "批量删除用户",
+			Desc:     "删除用户",
 			Creator:  creator,
 			Permission: "user_delete",
 		},
 		{
 			Model: models.Model{
-				Id: 9,
+				Id: 12,
 			},
 			Method:   "GET",
 			Path:     "/v1/menu/tree",
 			Category: "menu",
-			Desc:     "获取权限菜单",
+			Desc:     "获取菜单",
 			Creator:  creator,
 			Permission: "menu_tree",
 		},
 		{
 			Model: models.Model{
-				Id: 10,
+				Id: 13,
 			},
 			Method:   "GET",
 			Path:     "/v1/menu/list",
 			Category: "menu",
-			Desc:     "获取菜单列表",
+			Desc:     "菜单列表",
 			Creator:  creator,
 			Permission: "menu_list",
 		},
 		{
 			Model: models.Model{
-				Id: 11,
+				Id: 14,
 			},
 			Method:   "POST",
 			Path:     "/v1/menu/create",
@@ -325,7 +358,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 12,
+				Id: 15,
 			},
 			Method:   "PATCH",
 			Path:     "/v1/menu/update/:menuId",
@@ -336,29 +369,29 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 13,
+				Id: 16,
 			},
 			Method:   "DELETE",
 			Path:     "/v1/menu/delete",
 			Category: "menu",
-			Desc:     "批量删除菜单",
+			Desc:     "删除菜单",
 			Creator:  creator,
 			Permission: "menu_delete",
 		},
 		{
 			Model: models.Model{
-				Id: 14,
+				Id: 17,
 			},
 			Method:   "GET",
 			Path:     "/v1/role/list",
 			Category: "role",
-			Desc:     "获取角色列表",
+			Desc:     "角色列表",
 			Creator:  creator,
 			Permission: "role_list",
 		},
 		{
 			Model: models.Model{
-				Id: 15,
+				Id: 18,
 			},
 			Method:   "POST",
 			Path:     "/v1/role/create",
@@ -369,7 +402,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 16,
+				Id: 19,
 			},
 			Method:   "PATCH",
 			Path:     "/v1/role/update/:roleId",
@@ -380,40 +413,40 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 17,
+				Id: 20,
 			},
 			Method:   "PATCH",
 			Path:     "/v1/role/perms/update/:roleId",
 			Category: "role",
-			Desc:     "更新角色的权限",
+			Desc:     "更新权限",
 			Creator:  creator,
 			Permission: "role_perms_update",
 		},
 		{
 			Model: models.Model{
-				Id: 18,
+				Id: 21,
 			},
 			Method:   "DELETE",
 			Path:     "/v1/role/delete",
 			Category: "role",
-			Desc:     "批量删除角色",
+			Desc:     "删除角色",
 			Creator:  creator,
 			Permission: "role_detele",
 		},
 		{
 			Model: models.Model{
-				Id: 19,
+				Id: 22,
 			},
 			Method:   "GET",
 			Path:     "/v1/api/list",
 			Category: "api",
-			Desc:     "获取接口列表",
+			Desc:     "获取接口",
 			Creator:  creator,
 			Permission: "api_list",
 		},
 		{
 			Model: models.Model{
-				Id: 20,
+				Id: 23,
 			},
 			Method:   "POST",
 			Path:     "/v1/api/create",
@@ -424,7 +457,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 21,
+				Id: 24,
 			},
 			Method:   "PATCH",
 			Path:     "/v1/api/update/:apiId",
@@ -435,56 +468,56 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 22,
+				Id: 25,
 			},
 			Method:   "DELETE",
 			Path:     "/v1/api/delete",
 			Category: "api",
-			Desc:     "批量删除接口",
+			Desc:     "删除接口",
 			Creator:  creator,
 			Permission: "api_delete",
 		},
 		{
 			Model: models.Model{
-				Id: 23,
+				Id: 26,
 			},
 			Method:   "PATCH",
 			Path:     "/v1/role/menus/update/:roleId",
 			Category: "role",
-			Desc:     "更新角色的权限菜单",
+			Desc:     "更新菜单",
 			Creator:  creator,
 			Permission: "role_menus_update",
 		},
 		{
 			Model: models.Model{
-				Id: 24,
+				Id: 27,
 			},
 			Method:   "PATCH",
 			Path:     "/v1/role/apis/update/:roleId",
 			Category: "role",
-			Desc:     "更新角色的权限接口",
+			Desc:     "更新权限",
 			Creator:  creator,
 			Permission: "role_apis_update",
 		},
 		{
 			Model: models.Model{
-				Id: 25,
+				Id: 28,
 			},
 			Method:   "GET",
 			Path:     "/v1/operlog/list",
 			Category: "operLog",
-			Desc:     "获取操作日志列表",
+			Desc:     "获取操作日志",
 			Creator:  creator,
 			Permission: "operlog_list",
 		},
 		{
 			Model: models.Model{
-				Id: 26,
+				Id: 29,
 			},
 			Method:   "DELETE",
 			Path:     "/v1/operlog/delete",
 			Category: "operLog",
-			Desc:     "批量删除操作日志",
+			Desc:     "删除操作日志",
 			Creator:  creator,
 			Permission: "operlog_delete",
 		},
@@ -498,7 +531,7 @@ func InitData() {
 		}
 	}
 	// 角色添加权限
-	guestApiList := []int{1,2,3,9}
+	guestApiList := []int{1,2,3,4,5,6,9}
 	var adminApi []models.SysApi
 	common.Mysql.Find(&adminApi)
 	var guestApi []models.SysApi

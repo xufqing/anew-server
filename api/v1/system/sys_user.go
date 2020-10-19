@@ -9,11 +9,11 @@ import (
 	"anew-server/pkg/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"path"
 )
 
-
 // 获取当前请求用户信息
-func GetCurrentUser(c *gin.Context) (models.SysUser, []uint){
+func GetCurrentUser(c *gin.Context) (models.SysUser, []uint) {
 	user, exists := c.Get("user")
 	var newUser models.SysUser
 	if !exists {
@@ -31,9 +31,18 @@ func GetCurrentUser(c *gin.Context) (models.SysUser, []uint){
 	return newUser, roleIds
 }
 
+// 获取当前用户信息返回给页面
+func GetUserInfo(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	// 转为UserInfoResponseStruct, 隐藏部分字段
+	var resp response.UserInfoResp
+	utils.Struct2StructByJson(user, &resp)
+	response.SuccessWithData(resp)
+}
+
 // 创建用户
 func CreateUser(c *gin.Context) {
-	user,_ := GetCurrentUser(c)
+	user, _ := GetCurrentUser(c)
 	// 绑定参数
 	var req request.CreateUserReq
 	err := c.Bind(&req)
@@ -77,18 +86,18 @@ func GetUsers(c *gin.Context) {
 		return
 	}
 	var respStruct []response.UserListResp
-	for _,user := range users{
+	for _, user := range users {
 		// 把新增的key和title赋值
 		var item response.UserListResp
 		utils.Struct2StructByJson(user, &item)
-		newRole := make([]response.UserRolesResp,0)
-		for _,r := range item.Roles {
-			r.Key = fmt.Sprintf("%d",r.Id)
+		newRole := make([]response.UserRolesResp, 0)
+		for _, r := range item.Roles {
+			r.Key = fmt.Sprintf("%d", r.Id)
 			r.Title = r.Name
-			newRole = append(newRole,r)
+			newRole = append(newRole, r)
 		}
 		item.Roles = newRole
-		respStruct = append(respStruct,item)
+		respStruct = append(respStruct, item)
 	}
 	// 返回分页数据
 	var resp response.PageData
@@ -97,6 +106,38 @@ func GetUsers(c *gin.Context) {
 	// 设置数据列表
 	resp.DataList = respStruct
 	response.SuccessWithData(resp)
+}
+
+// 更新用户基本信息
+func UpdateUserBaseInfoById(c *gin.Context) {
+	// 绑定参数
+	var req request.UpdateUserBaseInfoReq
+	err := c.Bind(&req)
+	if err != nil {
+		response.FailWithCode(response.ParmError)
+		return
+	}
+	// 参数校验
+	err = common.NewValidatorError(common.Validate.Struct(req), req.FieldTrans())
+	if err != nil {
+		response.FailWithMsg(err.Error())
+		return
+	}
+	// 获取url path中的userId
+	userId := utils.Str2Uint(c.Param("userId"))
+	if userId == 0 {
+		response.FailWithMsg("用户编号不正确")
+		return
+	}
+	// 创建服务
+	s := service.New(c)
+	// 更新数据
+	err = s.UpdateUserBaseInfoById(userId, req)
+	if err != nil {
+		response.FailWithMsg(err.Error())
+		return
+	}
+	response.Success()
 }
 
 // 更新用户
@@ -144,7 +185,7 @@ func ChangePwd(c *gin.Context) {
 		return
 	}
 	// 获取当前用户
-	user,_ := GetCurrentUser(c)
+	user, _ := GetCurrentUser(c)
 	query := common.Mysql.Where("username = ?", user.Username).First(&user)
 	// 查询用户
 	err = query.Error
@@ -187,4 +228,39 @@ func DeleteUserByIds(c *gin.Context) {
 		return
 	}
 	response.Success()
+}
+
+func UserAvatarUpload(c *gin.Context) {
+	// 限制头像2MB(二进制移位xxxMB)
+	err := c.Request.ParseMultipartForm(2 << 20)
+	if err != nil {
+		response.FailWithMsg("文件为空或图片大小超出最大值2MB")
+		return
+	}
+	// 读取文件
+	file, err := c.FormFile("avatar")
+	if err != nil {
+		response.FailWithMsg("无法读取文件")
+		return
+	}
+	fileName := utils.CreateRandomString(8) + path.Ext(file.Filename)
+	imgPath := common.Conf.Upload.SaveDir + "/avatar/" + fileName
+	err = c.SaveUploadedFile(file, imgPath)
+	if err != nil {
+		response.FailWithMsg(err.Error())
+		return
+	}
+	// 将头像url保存到数据库
+	user, _ := GetCurrentUser(c)
+	query := common.Mysql.Where("username = ?", user.Username).First(&user)
+	err = query.Update("avatar", imgPath).Error
+	if err != nil {
+		response.FailWithMsg(err.Error())
+	}
+	resp := map[string]string{
+		"name": fileName,
+		"url":  imgPath,
+	}
+
+	response.SuccessWithData(resp)
 }

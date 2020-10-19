@@ -72,6 +72,21 @@ func (s *MysqlService) CreateUser(req *request.CreateUserReq) (err error) {
 	return
 }
 
+// 更新用户基本信息
+func (s *MysqlService) UpdateUserBaseInfoById(id uint, req request.UpdateUserBaseInfoReq) (err error) {
+	var oldUser models.SysUser
+	query := s.tx.Table(oldUser.TableName()).Where("id = ?", id).First(&oldUser)
+	if query.RecordNotFound() {
+		return errors.New("记录不存在")
+	}
+	m := make(gin.H, 0)
+	utils.CompareDifferenceStructByJson(oldUser, req, &m)
+	// 更新指定列
+	err = query.Updates(m).Error
+	return
+}
+
+
 // 更新用户
 func (s *MysqlService) UpdateUserById(id uint, req request.UpdateUserReq) (err error) {
 	var oldUser models.SysUser

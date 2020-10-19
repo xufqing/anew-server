@@ -6,6 +6,9 @@ import (
 
 // User login response structure
 type LoginResp struct {
+	Id       uint            `json:"id"`
+	Avatar   string          `json:"avatar"`
+	Name     string          `json:"name"`
 	Token   string           `json:"token"`   // jwt令牌
 	Expires models.LocalTime `json:"expires"` // 过期时间, 秒
 }
@@ -30,7 +33,6 @@ type UserInfoResp struct {
 	Name     string          `json:"name"`
 	Email    string          `json:"email"`
 	Roles    []UserRolesResp `json:"roles"`
-	LoginResp
 }
 
 // 用户列表信息响应, 字段含义见models.SysUser

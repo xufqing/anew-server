@@ -14,7 +14,7 @@ import (
 )
 
 // 创建一个userInfo全局变量来返回用户信息
-var userInfo response.UserInfoResp
+var loginInfo response.LoginResp
 
 func InitAuth() (*jwt.GinJWTMiddleware, error) {
 	return jwt.New(&jwt.GinJWTMiddleware{
@@ -75,7 +75,7 @@ func login(c *gin.Context) (interface{}, error) {
 		return nil, err
 	}
 	// 将用户以json格式写入, payloadFunc/authorizator会使用到
-	utils.Struct2StructByJson(user, &userInfo)
+	utils.Struct2StructByJson(user, &loginInfo)
 	ma := map[string]interface{}{
 		"user": utils.Struct2Json(user),
 	}
@@ -108,9 +108,9 @@ func unauthorized(c *gin.Context, code int, message string) {
 }
 
 func loginResponse(c *gin.Context, code int, token string, expires time.Time) {
-	userInfo.Token = token
-	userInfo.Expires = models.LocalTime{Time: expires}
-	response.SuccessWithData(userInfo)
+	loginInfo.Token = token
+	loginInfo.Expires = models.LocalTime{Time: expires}
+	response.SuccessWithData(loginInfo)
 }
 
 func logoutResponse(c *gin.Context, code int) {

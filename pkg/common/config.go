@@ -53,5 +53,4 @@ type JwtConfiguration struct {
 type UploadConfiguration struct {
 	SaveDir                      string `mapstructure:"save-dir" json:"saveDir"`
 	SingleMaxSize                uint   `mapstructure:"single-max-size" json:"singleMaxSize"`
-	MergeConcurrentCount         uint   `mapstructure:"merge-concurrent-count" json:"mergeConcurrentCount"`
 }

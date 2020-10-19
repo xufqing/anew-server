@@ -42,9 +42,16 @@ type CreateUserReq struct {
 	Creator  string `json:"creator"`
 }
 
+// 修改用户基本信息结构体
+type UpdateUserBaseInfoReq struct {
+	Mobile   string `json:"mobile"`
+	Name     string `json:"name" validate:"required"`
+	Email    string `json:"email"`
+}
+
 // 修改用户结构体
 type UpdateUserReq struct {
-	Username string `json:"username" validate:"required"`
+	Username string `json:"username"`
 	Mobile   string `json:"mobile"`
 	Name     string `json:"name" validate:"required"`
 	Email    string `json:"email"`
@@ -72,6 +79,12 @@ func (s ChangePwdReq) FieldTrans() map[string]string {
 func (s UpdateUserReq) FieldTrans() map[string]string {
 	m := make(map[string]string, 0)
 	m["Username"] = "用户名"
+	m["Name"] = "姓名"
+	return m
+}
+
+func (s UpdateUserBaseInfoReq) FieldTrans() map[string]string {
+	m := make(map[string]string, 0)
 	m["Name"] = "姓名"
 	return m
 }
