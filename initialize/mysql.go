@@ -36,6 +36,7 @@ func Mysql() {
 func autoMigrate() {
 	common.Mysql.AutoMigrate(
 		new(models.SysUser),
+		new(models.SysDept),
 		new(models.SysRole),
 		new(models.SysMenu),
 		new(models.SysApi),

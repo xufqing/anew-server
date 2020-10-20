@@ -29,8 +29,3 @@ func (hs MenuTreeRespList) Swap(i, j int) {
 	hs[i], hs[j] = hs[j], hs[i]
 }
 
-// 菜单树信息响应, 包含有权限访问的id列表
-type MenuTreeWithAccessResp struct {
-	DataList  []MenuTreeResp `json:"dataList"`
-	AccessIds []uint         `json:"accessIds"`
-}

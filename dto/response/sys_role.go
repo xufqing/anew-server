@@ -6,10 +6,11 @@ import (
 
 // 角色返回权限信息
 type RolePermsResp struct {
-	Id    uint             `json:"id"`
-	Name  string           `json:"name"`
-	Menus []models.SysMenu `json:"menus"`
-	Apis  []models.SysApi  `json:"apis"`
+	Id      uint             `json:"id"`
+	Name    string           `json:"name"`
+	Keyword string           `json:"keyword"`
+	Menus   []models.SysMenu `json:"menus"`
+	Apis    []models.SysApi  `json:"apis"`
 }
 
 // 角色返回字符串权限信息

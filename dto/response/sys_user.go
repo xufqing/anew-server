@@ -6,9 +6,9 @@ import (
 
 // User login response structure
 type LoginResp struct {
-	Id       uint            `json:"id"`
-	Avatar   string          `json:"avatar"`
-	Name     string          `json:"name"`
+	Id      uint             `json:"id"`
+	Avatar  string           `json:"avatar"`
+	Name    string           `json:"name"`
 	Token   string           `json:"token"`   // jwt令牌
 	Expires models.LocalTime `json:"expires"` // 过期时间, 秒
 }
@@ -32,6 +32,7 @@ type UserInfoResp struct {
 	Avatar   string          `json:"avatar"`
 	Name     string          `json:"name"`
 	Email    string          `json:"email"`
+	DeptId   uint            `json:"deptId"`
 	Roles    []UserRolesResp `json:"roles"`
 }
 
@@ -45,6 +46,7 @@ type UserListResp struct {
 	Email     string           `json:"email"`
 	Status    *bool            `json:"status"`
 	Roles     []UserRolesResp  `json:"roles"`
+	DeptId   uint            `json:"deptId"`
 	Creator   string           `json:"creator"`
 	CreatedAt models.LocalTime `json:"createdAt"`
 	UpdatedAt models.LocalTime `json:"updatedAt"`

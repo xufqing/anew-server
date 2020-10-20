@@ -12,6 +12,8 @@ type SysUser struct {
 	Status   *bool   `gorm:"type:tinyint(1);default:1;comment:'用户状态(正常/禁用, 默认正常)'" json:"status"` // 由于设置了默认值, 这里使用ptr, 可避免赋值失败
 	Creator  string  `gorm:"comment:'创建人';size:128" json:"creator"`
 	Roles   []SysRole `gorm:"many2many:relation_user_role;" json:"roles"` // 用户角色多对多关系
+	DeptId     uint       `gorm:"comment:'一对多部门编号'" json:"deptId"`
+	Dept       []SysDept    `gorm:"foreignkey:DeptId" json:"dept"`
 }
 
 func (m SysUser) TableName() string {

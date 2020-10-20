@@ -18,46 +18,48 @@ type ChangePwdReq struct {
 
 // 获取用户列表结构体
 type UserListReq struct {
-	Id       uint   `json:"id" form:"id"`
-	Username string `json:"username" form:"username"`
-	Mobile   string `json:"mobile" form:"mobile"`
-	Avatar   string `json:"avatar"`
-	Name     string `json:"name" form:"name"`
-	Email    string `json:"email" form:"email"`
-	Status   *bool  `json:"status" form:"status"`
-	Creator  string `json:"creator" form:"creator"`
+	Id                uint   `json:"id" form:"id"`
+	Username          string `json:"username" form:"username"`
+	Mobile            string `json:"mobile" form:"mobile"`
+	Avatar            string `json:"avatar"`
+	Name              string `json:"name" form:"name"`
+	Email             string `json:"email" form:"email"`
+	Status            *bool  `json:"status" form:"status"`
+	Creator           string `json:"creator" form:"creator"`
 	response.PageInfo        // 分页参数
 }
 
 // 创建用户结构体
 type CreateUserReq struct {
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
-	Mobile   string `json:"mobile"`
-	Avatar   string `json:"avatar"`
-	Name     string `json:"name" validate:"required"`
-	Email    string `json:"email"`
-	Status   *bool  `json:"status"`
-	Roles  []string `json:"roles" validate:"required"` // 可绑定多个角色
-	Creator  string `json:"creator"`
+	Username string   `json:"username" validate:"required"`
+	Password string   `json:"password" validate:"required"`
+	Mobile   string   `json:"mobile"`
+	Avatar   string   `json:"avatar"`
+	Name     string   `json:"name" validate:"required"`
+	Email    string   `json:"email"`
+	Status   *bool    `json:"status"`
+	DeptId   uint     `json:"deptId"`
+	Roles    []string `json:"roles" validate:"required"` // 可绑定多个角色
+	Creator  string   `json:"creator"`
 }
 
 // 修改用户基本信息结构体
 type UpdateUserBaseInfoReq struct {
-	Mobile   string `json:"mobile"`
-	Name     string `json:"name" validate:"required"`
-	Email    string `json:"email"`
+	Mobile string `json:"mobile"`
+	Name   string `json:"name" validate:"required"`
+	Email  string `json:"email"`
 }
 
 // 修改用户结构体
 type UpdateUserReq struct {
-	Username string `json:"username"`
-	Mobile   string `json:"mobile"`
-	Name     string `json:"name" validate:"required"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Roles  []string `json:"roles"` // 可绑定多个角色
-	Status   *bool  `json:"status"`
+	Username string   `json:"username"`
+	Mobile   string   `json:"mobile"`
+	Name     string   `json:"name" validate:"required"`
+	Email    string   `json:"email"`
+	Password string   `json:"password"`
+	Roles    []string `json:"roles"` // 可绑定多个角色
+	DeptId   uint     `json:"deptId"`
+	Status   *bool    `json:"status"`
 }
 
 // 翻译需要校验的字段名称

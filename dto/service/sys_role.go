@@ -62,6 +62,7 @@ func (s *MysqlService) GetPermsByRoleId(roleId uint) (response.RolePermsResp, er
 	}
 	resp.Id = role.Id
 	resp.Name = role.Name
+	resp.Keyword = role.Keyword
 	resp.Menus = role.Menus
 	resp.Apis = role.Apis
 	return resp, err

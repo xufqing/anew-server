@@ -40,6 +40,7 @@ func Routers() *gin.Engine {
 	v1 := apiGroup.Group("v1")
 	{
 		routers.InitUserRouter(v1, authMiddleware) // 注册用户路由
+		routers.InitDeptRouter(v1, authMiddleware) // 注册部门路由
 		routers.InitMenuRouter(v1, authMiddleware) // 注册菜单路由
 		routers.InitRoleRouter(v1, authMiddleware) // 注册角色路由
 		routers.InitApiRouter(v1, authMiddleware)  // 注册接口路由
