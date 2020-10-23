@@ -93,7 +93,6 @@ func GetUsers(c *gin.Context) {
 	resp.PageInfo = req.PageInfo
 	// 设置数据列表
 	resp.DataList = respStruct
-	resp.Success = true
 	response.SuccessWithData(resp)
 
 	//var respStruct []response.UserListResp

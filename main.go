@@ -30,6 +30,8 @@ func main() {
 	if len(os.Args) > 1 {
 		if os.Args[1] == "init" {
 			initialize.InitData()
+			fmt.Println("数据初始化成功!")
+			os.Exit(1)
 		}
 	}
 	// 启动服务器

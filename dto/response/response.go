@@ -30,7 +30,6 @@ type PageInfo struct {
 // 带分页数据封装
 type PageData struct {
 	PageInfo
-	Success  bool        `json:"success"`
 	DataList interface{} `json:"data"` // 数据列表
 }
 
