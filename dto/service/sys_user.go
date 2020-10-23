@@ -6,17 +6,19 @@ import (
 	"anew-server/models"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"sort"
 	"strings"
 )
 
-// 登录校验
-func (s *MysqlService) LoginCheck(user *models.SysUser) (*models.SysUser, error) {
+// 登录校验,返回指定信息
+func (s *MysqlService) LoginCheck(username string,password string) (*response.LoginResp, error) {
 	var u models.SysUser
 	// 查询用户及其角色
-	err := s.tx.Preload("Roles", "status = ?", true).Where("username = ?", user.Username).First(&u).Error
+	err := s.tx.Preload("Roles", "status = ?", true).Preload("Roles.Apis",).Where("username = ?", username).First(&u).Error
 	if err != nil {
 		return nil, errors.New(response.LoginCheckErrorMsg)
 	}
@@ -24,10 +26,34 @@ func (s *MysqlService) LoginCheck(user *models.SysUser) (*models.SysUser, error)
 		return nil, errors.New(response.UserForbiddenMsg)
 	}
 	// 校验密码
-	if ok := utils.ComparePwd(user.Password, u.Password); !ok {
+	if ok := utils.ComparePwd(password, u.Password); !ok {
 		return nil, errors.New(response.LoginCheckErrorMsg)
 	}
-	return &u, err
+	var loginInfo response.LoginResp
+	utils.Struct2StructByJson(u, &loginInfo)
+	// 处理角色关键字
+	for _, role := range u.Roles {
+		loginInfo.CurrentAuthority = append(loginInfo.CurrentAuthority, role.Keyword)
+		// 处理多个角色加入到CurrentAuthority切片
+		for _,api := range role.Apis {
+			loginInfo.CurrentAuthority = append(loginInfo.CurrentAuthority, api.Permission)
+		}
+	}
+	// 权限去重
+	var perms []string
+	resultMap := map[string]bool{}
+	for _, v := range loginInfo.CurrentAuthority {
+		data, _ := json.Marshal(v)
+		resultMap[string(data)] = true
+	}
+	for k := range resultMap {
+		var t string
+		json.Unmarshal([]byte(k), &t)
+		perms = append(perms, t)
+	}
+	sort.Strings(perms) // 排序
+	loginInfo.CurrentAuthority = perms
+	return &loginInfo, err
 }
 
 // 获取单个用户

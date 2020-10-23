@@ -37,7 +37,7 @@ func InitAuth() (*jwt.GinJWTMiddleware, error) {
 
 func payloadFunc(data interface{}) jwt.MapClaims {
 	if v, ok := data.(map[string]interface{}); ok {
-		var user models.SysUser
+		var user response.LoginResp
 		// 将用户json转为结构体
 		utils.JsonI2Struct(v["user"], &user)
 		return jwt.MapClaims{
@@ -61,21 +61,15 @@ func login(c *gin.Context) (interface{}, error) {
 	var req request.RegisterAndLoginReq
 	// 请求json绑定
 	_ = c.ShouldBindJSON(&req)
-
-	u := &models.SysUser{
-		Username: req.Username,
-		Password: req.Password,
-	}
-
 	// 创建服务
 	s := service.New(c)
 	// 密码校验
-	user, err := s.LoginCheck(u)
+	user, err := s.LoginCheck(req.Username,req.Password)
 	if err != nil {
 		return nil, err
 	}
+	loginInfo = *user
 	// 将用户以json格式写入, payloadFunc/authorizator会使用到
-	utils.Struct2StructByJson(user, &loginInfo)
 	ma := map[string]interface{}{
 		"user": utils.Struct2Json(user),
 	}
@@ -84,7 +78,7 @@ func login(c *gin.Context) (interface{}, error) {
 
 func authorizator(data interface{}, c *gin.Context) bool {
 	if v, ok := data.(map[string]interface{}); ok {
-		var user models.SysUser
+		var user response.LoginResp
 		// 将用户json转为结构体
 		utils.JsonI2Struct(v["user"], &user)
 		// 将用户保存到context, api调用时取数据方便

@@ -12,21 +12,28 @@ type RespInfo struct {
 	Data    interface{} `json:"data"`    // 数据内容
 	Message string      `json:"message"` // 消息提示
 }
+type RespPageInfo struct {
+	Code    int         `json:"code"`    // 错误代码代码
+	Status  bool        `json:"status"`  // 状态
+	Data    interface{} `json:"data"`    // 数据内容
+	Message string      `json:"message"` // 消息提示
+}
 
 // 分页封装
 type PageInfo struct {
-	PageNum   uint `json:"pageNum" form:"pageNum"`   // 当前页码
-	PageSize  uint `json:"pageSize" form:"pageSize"` // 每页显示条数
-	Total     uint `json:"total"`                    // 数据总条数
-	TotalPage uint `json:"totalPage"`               //总页数
-	All       bool `json:"all" form:"all"`           // 不使用分页
+	Current  uint `json:"current" form:"current"`   // 当前页码
+	PageSize uint `json:"pageSize" form:"pageSize"` // 每页显示条数
+	Total    uint `json:"total"`                    // 数据总条数
+	All      bool `json:"all" form:"all"`           // 不使用分页
 }
 
 // 带分页数据封装
 type PageData struct {
 	PageInfo
-	DataList interface{} `json:"dataList"` // 数据列表
+	Success  bool        `json:"success"`
+	DataList interface{} `json:"data"` // 数据列表
 }
+
 // 计算limit/offset, 如果需要用到返回的PageSize, PageNum, 务必保证Total值有效
 func (s *PageInfo) GetLimit() (limit uint, offset uint) {
 	// 传入参数可能不合法, 设置默认值
@@ -35,8 +42,8 @@ func (s *PageInfo) GetLimit() (limit uint, offset uint) {
 		s.PageSize = 10
 	}
 	// 页码不能小于1
-	if s.PageNum < 1 {
-		s.PageNum = 1
+	if s.Current < 1 {
+		s.Current = 1
 	}
 
 	// 如果偏移量比总条数还多
@@ -44,8 +51,8 @@ func (s *PageInfo) GetLimit() (limit uint, offset uint) {
 		if s.PageSize > s.Total {
 			s.PageSize = s.Total
 		}
-		if s.PageNum > s.Total {
-			s.PageNum = s.Total
+		if s.Current > s.Total {
+			s.Current = s.Total
 		}
 	}
 
@@ -60,13 +67,11 @@ func (s *PageInfo) GetLimit() (limit uint, offset uint) {
 	}
 
 	// 超出最后一页
-	if s.PageNum > maxPageNum {
-		s.PageNum = maxPageNum
+	if s.Current > maxPageNum {
+		s.Current = maxPageNum
 	}
-	// 总页数
-	s.TotalPage = maxPageNum
 	limit = s.PageSize
-	offset = limit * (s.PageNum - 1)
+	offset = limit * (s.Current - 1)
 	return
 }
 
@@ -97,12 +102,16 @@ func Success() {
 func SuccessWithData(data interface{}) {
 	Result(Ok, true, data)
 }
+
+func SuccessWithPageData(data interface{}) {
+	Result(Ok, true, data)
+}
+
 func SuccessWithMsg(msg string) {
 	MsgResult(Ok, true, msg, map[string]interface{}{})
 }
 
 func SuccessWithCode(code int) {
-	// 查找给定的错误码存在对应的错误信息, 默认使用NotOk
 	Result(code, true, map[string]interface{}{})
 }
 
@@ -111,7 +120,6 @@ func FailWithMsg(msg string) {
 }
 
 func FailWithCode(code int) {
-	// 查找给定的错误码存在对应的错误信息, 默认使用NotOk
 	Result(code, false, map[string]interface{}{})
 }
 

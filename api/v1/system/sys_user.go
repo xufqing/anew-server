@@ -7,7 +7,6 @@ import (
 	"anew-server/models"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"path"
 )
@@ -19,7 +18,7 @@ func GetCurrentUser(c *gin.Context) (models.SysUser, []uint) {
 	if !exists {
 		return newUser, []uint{}
 	}
-	u, _ := user.(models.SysUser)
+	u, _ := user.(response.LoginResp)
 	// 创建服务
 	s := service.New(c)
 	newUser, _ = s.GetUserById(u.Id)
@@ -85,27 +84,39 @@ func GetUsers(c *gin.Context) {
 		response.FailWithMsg(err.Error())
 		return
 	}
+	// 转为ResponseStruct, 隐藏部分字段
 	var respStruct []response.UserListResp
-	for _, user := range users {
-		// 把新增的key和title赋值
-		var item response.UserListResp
-		utils.Struct2StructByJson(user, &item)
-		newRole := make([]response.UserRolesResp, 0)
-		for _, r := range item.Roles {
-			r.Key = fmt.Sprintf("%d", r.Id)
-			r.Title = r.Name
-			newRole = append(newRole, r)
-		}
-		item.Roles = newRole
-		respStruct = append(respStruct, item)
-	}
+	utils.Struct2StructByJson(users, &respStruct)
 	// 返回分页数据
 	var resp response.PageData
 	// 设置分页参数
 	resp.PageInfo = req.PageInfo
 	// 设置数据列表
 	resp.DataList = respStruct
+	resp.Success = true
 	response.SuccessWithData(resp)
+
+	//var respStruct []response.UserListResp
+	//for _, user := range users {
+	//	// 把user.roles新增的key和title赋值
+	//	var item response.UserListResp
+	//	utils.Struct2StructByJson(user, &item)
+	//	newRole := make([]response.UserRolesResp, 0)
+	//	for _, r := range item.Roles {
+	//		r.Key = fmt.Sprintf("%d", r.Id)
+	//		r.Title = r.Name
+	//		newRole = append(newRole, r)
+	//	}
+	//	item.Roles = newRole
+	//	respStruct = append(respStruct, item)
+	//}
+	//// 返回分页数据
+	//var resp response.PageData
+	//// 设置分页参数
+	//resp.PageInfo = req.PageInfo
+	//// 设置数据列表
+	//resp.DataList = respStruct
+	//response.SuccessWithData(resp)
 }
 
 // 更新用户基本信息
