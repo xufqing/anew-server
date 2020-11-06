@@ -4,17 +4,32 @@ import (
 	"anew-server/dto/request"
 	"anew-server/dto/response"
 	"anew-server/models"
+	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"sort"
 	"fmt"
 	"errors"
+	"strings"
 )
 
 // 获取所有部门信息
-func (s *MysqlService) GetDepts() []models.SysDept {
-	//tree := make([]response.DeptTreeResp  , 0)
-	depts := s.getAllDept()
+func (s *MysqlService) GetDepts(req *request.DeptListReq) []models.SysDept {
+	depts := make([]models.SysDept, 0)
+	db := common.Mysql
+	name := strings.TrimSpace(req.Name)
+	if name != "" {
+		db = db.Where("name LIKE ?", fmt.Sprintf("%%%s%%", name))
+	}
+	status := req.Status
+	if status != nil {
+		if *status {
+			db = db.Where("status = ?", 1)
+		} else {
+			db = db.Where("status = ?", 0)
+		}
+	}
+	db.Order("sort").Find(&depts)
 	// 生成菜单树
 	//tree = GenDeptTree(nil, depts)
 	return depts
@@ -31,10 +46,6 @@ func GenDeptTree(parent *response.DeptTreeResp, depts []models.SysDept) []respon
 		parentId = parent.Id
 	}
 	for _, dept := range resp {
-		// 增加key值
-		dept.Key = fmt.Sprintf("%d",dept.Id)
-		dept.Value = fmt.Sprintf("%d",dept.Id)
-		dept.Title = dept.Name
 		// 父菜单编号一致
 		if dept.ParentId == parentId {
 			// 递归获取子菜单
@@ -48,12 +59,6 @@ func GenDeptTree(parent *response.DeptTreeResp, depts []models.SysDept) []respon
 	return tree
 }
 
-// 获取部门信息，非树列表
-func (s *MysqlService) getAllDept() []models.SysDept {
-	depts := make([]models.SysDept, 0)
-	s.tx.Order("sort").Find(&depts)
-	return depts
-}
 
 // 创建部门
 func (s *MysqlService) CreateDept(req *request.CreateDeptReq) (err error) {
@@ -81,7 +86,7 @@ func (s *MysqlService) UpdateDeptById(id uint, req gin.H) (err error) {
 	return
 }
 
-// 批量删除菜单
+// 批量删除部门
 func (s *MysqlService) DeleteDeptByIds(ids []uint) (err error) {
 	var dept models.SysDept
 	// 先解除父级关联

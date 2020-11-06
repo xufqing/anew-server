@@ -39,7 +39,7 @@ type CreateUserReq struct {
 	Email    string   `json:"email"`
 	Status   *bool    `json:"status"`
 	DeptId   uint     `json:"deptId"`
-	Roles    []string `json:"roles" validate:"required"` // 可绑定多个角色
+	Roles    []uint `json:"roles" validate:"required"` // 可绑定多个角色
 	Creator  string   `json:"creator"`
 }
 
@@ -52,12 +52,11 @@ type UpdateUserBaseInfoReq struct {
 
 // 修改用户结构体
 type UpdateUserReq struct {
-	Username string   `json:"username"`
 	Mobile   string   `json:"mobile"`
 	Name     string   `json:"name" validate:"required"`
 	Email    string   `json:"email"`
 	Password string   `json:"password"`
-	Roles    []string `json:"roles"` // 可绑定多个角色
+	Roles    []uint `json:"roles"` // 可绑定多个角色
 	DeptId   uint     `json:"deptId"`
 	Status   *bool    `json:"status"`
 }
@@ -80,7 +79,6 @@ func (s ChangePwdReq) FieldTrans() map[string]string {
 
 func (s UpdateUserReq) FieldTrans() map[string]string {
 	m := make(map[string]string, 0)
-	m["Username"] = "用户名"
 	m["Name"] = "姓名"
 	return m
 }

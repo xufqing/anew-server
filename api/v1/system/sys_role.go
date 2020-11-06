@@ -32,8 +32,6 @@ func GetRoles(c *gin.Context) {
 	for _, role := range roles {
 		var item response.RoleListResp
 		item.Id = role.Id
-		item.Key = fmt.Sprintf("%d", role.Id)
-		item.Title = role.Name
 		item.Name = role.Name
 		item.Keyword = role.Keyword
 		item.Desc = role.Desc

@@ -4,10 +4,7 @@ package response
 type DeptTreeResp struct {
 	Id       uint           `json:"id"`
 	ParentId uint           `json:"parentId"`
-	Key      string         `json:"key"`
-	Value    string         `json:"value"`
 	Name     string         `json:"name"`
-	Title    string         `json:"title"`
 	Creator  string         `json:"creator"`
 	Status   bool           `json:"status"`
 	Sort     int            `json:"sort"`

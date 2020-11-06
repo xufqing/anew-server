@@ -19,8 +19,6 @@ type LoginResp struct {
 type UserRolesResp struct {
 	Id      uint   `json:"id"`
 	Name    string `json:"name"`
-	Key     string `json:"key"`
-	Title   string `json:"title"`
 	Desc    string `json:"desc"`
 	Keyword string `json:"keyword"`
 	Status  *bool  `json:"status"`

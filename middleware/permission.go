@@ -21,10 +21,10 @@ func PermsMiddleware(c *gin.Context) {
 	for _,role := range roleId{
 		roleData,_ := s.GetPermsByRoleId(role)
 		//如果是管理员直接放行
-		//if roleData.Keyword == "admin" {
-		//	c.Next()
-		//	return
-		//}
+		if roleData.Keyword == "admin" {
+			c.Next()
+			return
+		}
 		for _,api := range roleData.Apis{
 			permsList = append(permsList,api)
 		}

@@ -9,6 +9,11 @@ type CreateDeptReq struct {
 	Creator    string `json:"creator"`
 }
 
+type DeptListReq struct {
+	Name              string `json:"name" form:"name"`
+	Status            *bool  `json:"status" form:"status"`
+}
+
 // 翻译需要校验的字段名称
 func (s CreateDeptReq) FieldTrans() map[string]string {
 	m := make(map[string]string, 0)

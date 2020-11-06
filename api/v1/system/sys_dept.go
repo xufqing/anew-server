@@ -11,12 +11,23 @@ import (
 
 // 查询所有部门
 func GetDepts(c *gin.Context) {
+	// 绑定参数
+	var req request.DeptListReq
+	err := c.Bind(&req)
+	if err != nil {
+		response.FailWithCode(response.ParmError)
+		return
+	}
 	// 创建服务
 	s := service.New(c)
-	depts := s.GetDepts()
-	var resp []response.DeptTreeResp
-	resp = service.GenDeptTree(nil,depts)
-	response.SuccessWithData(resp)
+	depts := s.GetDepts(&req)
+	if (req.Name != "" || req.Status != nil){
+		response.SuccessWithData(depts)
+	} else {
+		var resp []response.DeptTreeResp
+		resp = service.GenDeptTree(nil,depts)
+		response.SuccessWithData(resp)
+	}
 }
 
 // 创建部门

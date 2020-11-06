@@ -253,7 +253,8 @@ func UserAvatarUpload(c *gin.Context) {
 		response.FailWithMsg("无法读取文件")
 		return
 	}
-	fileName := utils.CreateRandomString(8) + path.Ext(file.Filename)
+	user, _ := GetCurrentUser(c)
+	fileName := user.Username+ "_avatar" + path.Ext(file.Filename)
 	imgPath := common.Conf.Upload.SaveDir + "/avatar/" + fileName
 	err = c.SaveUploadedFile(file, imgPath)
 	if err != nil {
@@ -261,15 +262,14 @@ func UserAvatarUpload(c *gin.Context) {
 		return
 	}
 	// 将头像url保存到数据库
-	user, _ := GetCurrentUser(c)
 	query := common.Mysql.Where("username = ?", user.Username).First(&user)
-	err = query.Update("avatar", imgPath).Error
+	err = query.Update("avatar", "/" + imgPath).Error
 	if err != nil {
 		response.FailWithMsg(err.Error())
 	}
 	resp := map[string]string{
 		"name": fileName,
-		"url":  imgPath,
+		"url":  "/" + imgPath,
 	}
 
 	response.SuccessWithData(resp)

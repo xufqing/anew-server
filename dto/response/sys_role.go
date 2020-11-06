@@ -24,9 +24,7 @@ type RolePermsStrResp struct {
 // 角色信息响应, 字段含义见models
 type RoleListResp struct {
 	Id        uint             `json:"id"`
-	Key       string           `json:"key"`
 	Name      string           `json:"name"`
-	Title     string           `json:"title"`
 	Keyword   string           `json:"keyword"`
 	Desc      string           `json:"desc"`
 	Status    *bool            `json:"status"`
