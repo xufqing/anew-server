@@ -5,6 +5,7 @@ import (
 	"anew-server/dto/response"
 	"anew-server/models"
 	"anew-server/pkg/utils"
+	"gorm.io/gorm"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -15,7 +16,7 @@ import (
 func (s *MysqlService) GetUserMenuList(roleId uint) ([]models.SysMenu, error) {
 	//tree := make([]models.SysMenu, 0)
 	var role models.SysRole
-	err := s.tx.Table(new(models.SysRole).TableName()).Preload("Menus", "status = ?", true).Where("id = ?", roleId).Find(&role).Error
+	err := s.db.Table(new(models.SysRole).TableName()).Preload("Menus", "status = ?", true).Where("id = ?", roleId).Find(&role).Error
 	menus := make([]models.SysMenu, 0)
 	if err != nil {
 		return menus, err
@@ -71,15 +72,15 @@ func (s *MysqlService) CreateMenu(req *request.CreateMenuReq) (err error) {
 	var menu models.SysMenu
 	utils.Struct2StructByJson(req, &menu)
 	// 创建数据
-	err = s.tx.Create(&menu).Error
+	err = s.db.Create(&menu).Error
 	return
 }
 
 // 更新菜单
 func (s *MysqlService) UpdateMenuById(id uint, req gin.H) (err error) {
 	var oldMenu models.SysMenu
-	query := s.tx.Table(oldMenu.TableName()).Where("id = ?", id).First(&oldMenu)
-	if query.RecordNotFound() {
+	query := s.db.Table(oldMenu.TableName()).Where("id = ?", id).First(&oldMenu)
+	if query.Error == gorm.ErrRecordNotFound {
 		return errors.New("记录不存在")
 	}
 
@@ -96,12 +97,12 @@ func (s *MysqlService) UpdateMenuById(id uint, req gin.H) (err error) {
 func (s *MysqlService) DeleteMenuByIds(ids []uint) (err error) {
 	var menu models.SysMenu
 	// 先解除父级关联
-	err = s.tx.Table(menu.TableName()).Where("parent_id IN (?)", ids).Update("parent_id",0).Error
+	err = s.db.Table(menu.TableName()).Where("parent_id IN (?)", ids).Update("parent_id",0).Error
 	if err != nil{
 		return err
 	}
 	// 再删除
-	err = s.tx.Where("id IN (?)", ids).Delete(models.SysMenu{}).Error
+	err = s.db.Where("id IN (?)", ids).Delete(models.SysMenu{}).Error
 	if err != nil{
 		return err
 	}
@@ -114,6 +115,6 @@ func (s *MysqlService) DeleteMenuByIds(ids []uint) (err error) {
 func (s *MysqlService) getAllMenu() []models.SysMenu {
 	menus := make([]models.SysMenu, 0)
 	// 查询所有菜单
-	s.tx.Order("sort").Find(&menus)
+	s.db.Order("sort").Find(&menus)
 	return menus
 }

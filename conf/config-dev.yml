@@ -27,11 +27,16 @@ mysql:
   # 是否打印SQL日志
   log-mode: true
   # 数据库表前缀
-  table-prefix: tb_
+  table-prefix: tb
   # 编码方式
   charset: utf8mb4
-  # 字符集(utf8mb4_general_ci速度比utf8mb4_unicode_ci快些)
+  # 字符集
   collation: utf8mb4_general_ci
+
+# casbin配置
+casbin:
+  # 模型配置文件, 默认以conf目录为根目录
+  model-path: 'rbac_model.conf'
 
 logs:
   # 日志等级(-1:Debug, 0:Info, -1<=level<=5, 参照zap.level源码)
@@ -54,9 +59,9 @@ jwt:
   # 服务端密钥
   key: vFr3RRkxlBG0ggRYLG
   # token过期时间, 小时
-  timeout: 24
+  timeout: 4
   # token更新时间, 小时
-  max-refresh: 24
+  max-refresh: 4
 
 # 上传配置
 upload:

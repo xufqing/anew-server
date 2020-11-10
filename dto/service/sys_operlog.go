@@ -47,5 +47,5 @@ func (s *MysqlService) GetOperLogs(req *request.OperLogListReq) ([]models.SysOpe
 
 // 批量删除操作日志
 func (s *MysqlService) DeleteOperationLogByIds(ids []uint) (err error) {
-	return s.tx.Where("id IN (?)", ids).Delete(models.SysOperLog{}).Error
+	return s.db.Where("id IN (?)", ids).Delete(models.SysOperLog{}).Error
 }

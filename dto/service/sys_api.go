@@ -4,6 +4,7 @@ import (
 	"anew-server/dto/request"
 	"anew-server/models"
 	"anew-server/pkg/utils"
+	"gorm.io/gorm"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -14,7 +15,7 @@ import (
 func (s *MysqlService) GetApis(req *request.ApiListReq) ([]models.SysApi, error) {
 	var err error
 	list := make([]models.SysApi, 0)
-	query := s.tx.Table(new(models.SysApi).TableName())
+	query := s.db.Table(new(models.SysApi).TableName())
 	method := strings.TrimSpace(req.Method)
 	if method != "" {
 		query = query.Where("method LIKE ?", fmt.Sprintf("%%%s%%", method))
@@ -57,15 +58,15 @@ func (s *MysqlService) CreateApi(req *request.CreateApiReq) (err error) {
 	var api models.SysApi
 	utils.Struct2StructByJson(req, &api)
 	// 创建数据
-	err = s.tx.Create(&api).Error
+	err = s.db.Create(&api).Error
 	return
 }
 
 // 更新接口
 func (s *MysqlService) UpdateApiById(id uint, req gin.H) (err error) {
 	var oldApi models.SysApi
-	query := s.tx.Table(oldApi.TableName()).Where("id = ?", id).First(&oldApi)
-	if query.RecordNotFound() {
+	query := s.db.Table(oldApi.TableName()).Where("id = ?", id).First(&oldApi)
+	if query.Error == gorm.ErrRecordNotFound {
 		return errors.New("记录不存在")
 	}
 
@@ -80,5 +81,5 @@ func (s *MysqlService) UpdateApiById(id uint, req gin.H) (err error) {
 // 批量删除接口
 func (s *MysqlService) DeleteApiByIds(ids []uint) (err error) {
 
-	return s.tx.Where("id IN (?)", ids).Delete(models.SysApi{}).Error
+	return s.db.Where("id IN (?)", ids).Delete(models.SysApi{}).Error
 }

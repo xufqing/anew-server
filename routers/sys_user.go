@@ -9,7 +9,7 @@ import (
 
 // User
 func InitUserRouter(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) (R gin.IRoutes) {
-	router := r.Group("user").Use(authMiddleware.MiddlewareFunc()).Use(middleware.PermsMiddleware)
+	router := r.Group("user").Use(authMiddleware.MiddlewareFunc()).Use(middleware.CasbinMiddleware)
 	{
 		router.POST("/info", system.GetUserInfo)
 		router.POST("/info/uploadImg", system.UserAvatarUpload)

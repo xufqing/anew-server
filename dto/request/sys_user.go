@@ -39,7 +39,7 @@ type CreateUserReq struct {
 	Email    string   `json:"email"`
 	Status   *bool    `json:"status"`
 	DeptId   uint     `json:"deptId"`
-	Roles    []uint `json:"roles" validate:"required"` // 可绑定多个角色
+	RoleId       uint   `json:"roleId" validate:"required"`
 	Creator  string   `json:"creator"`
 }
 

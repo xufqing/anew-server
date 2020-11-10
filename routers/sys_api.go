@@ -9,7 +9,7 @@ import (
 
 // 接口路由
 func InitApiRouter(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) (R gin.IRoutes) {
-	router := r.Group("api").Use(authMiddleware.MiddlewareFunc()).Use(middleware.PermsMiddleware)
+	router := r.Group("api").Use(authMiddleware.MiddlewareFunc()).Use(middleware.CasbinMiddleware)
 	{
 		router.GET("/list", system.GetApis)
 		router.POST("/create", system.CreateApi)

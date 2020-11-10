@@ -95,7 +95,7 @@ func OperationLog(c *gin.Context) {
 		// 清理事务
 		c.Set("tx", "")
 		// 获取当前登录用户
-		user ,_:= system.GetCurrentUser(c)
+		user := system.GetCurrentUser(c)
 
 		// 用户名
 		if user.Id > 0 {

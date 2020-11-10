@@ -6,10 +6,11 @@ import (
 	"anew-server/models"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
-	"github.com/gin-gonic/gin"
-	"sort"
-	"fmt"
 	"errors"
+	"fmt"
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+	"sort"
 	"strings"
 )
 
@@ -65,15 +66,15 @@ func (s *MysqlService) CreateDept(req *request.CreateDeptReq) (err error) {
 	var dept models.SysDept
 	utils.Struct2StructByJson(req, &dept)
 	// 创建数据
-	err = s.tx.Create(&dept).Error
+	err = s.db.Create(&dept).Error
 	return
 }
 
 // 更新部门
 func (s *MysqlService) UpdateDeptById(id uint, req gin.H) (err error) {
 	var oldDept models.SysDept
-	query := s.tx.Table(oldDept.TableName()).Where("id = ?", id).First(&oldDept)
-	if query.RecordNotFound() {
+	query := s.db.Table(oldDept.TableName()).Where("id = ?", id).First(&oldDept)
+	if query.Error == gorm.ErrRecordNotFound {
 		return errors.New("记录不存在")
 	}
 
@@ -90,12 +91,12 @@ func (s *MysqlService) UpdateDeptById(id uint, req gin.H) (err error) {
 func (s *MysqlService) DeleteDeptByIds(ids []uint) (err error) {
 	var dept models.SysDept
 	// 先解除父级关联
-	err = s.tx.Table(dept.TableName()).Where("parent_id IN (?)", ids).Update("parent_id",0).Error
+	err = s.db.Table(dept.TableName()).Where("parent_id IN (?)", ids).Update("parent_id",0).Error
 	if err != nil{
 		return err
 	}
 	// 再删除
-	err = s.tx.Where("id IN (?)", ids).Delete(models.SysDept{}).Error
+	err = s.db.Where("id IN (?)", ids).Delete(models.SysDept{}).Error
 	if err != nil{
 		return err
 	}

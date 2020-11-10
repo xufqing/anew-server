@@ -21,7 +21,7 @@ func GetApis(c *gin.Context) {
 	}
 
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	apis, err := s.GetApis(&req)
 	if err != nil {
 		response.FailWithMsg(err.Error())
@@ -78,7 +78,7 @@ func GetApis(c *gin.Context) {
 
 // 创建接口
 func CreateApi(c *gin.Context) {
-	user,_:= GetCurrentUser(c)
+	user := GetCurrentUser(c)
 	// 绑定参数
 	var req request.CreateApiReq
 	err := c.Bind(&req)
@@ -96,7 +96,7 @@ func CreateApi(c *gin.Context) {
 	// 记录当前创建人信息
 	req.Creator = user.Name
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	err = s.CreateApi(&req)
 	if err != nil {
 		response.FailWithMsg(err.Error())
@@ -122,7 +122,7 @@ func UpdateApiById(c *gin.Context) {
 		return
 	}
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	// 更新数据
 	err = s.UpdateApiById(apiId, req)
 	if err != nil {
@@ -142,7 +142,7 @@ func BatchDeleteApiByIds(c *gin.Context) {
 	}
 
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	// 删除数据
 	err = s.DeleteApiByIds(req.Ids)
 	if err != nil {

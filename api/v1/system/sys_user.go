@@ -12,27 +12,22 @@ import (
 )
 
 // 获取当前请求用户信息
-func GetCurrentUser(c *gin.Context) (models.SysUser, []uint) {
+func GetCurrentUser(c *gin.Context) (models.SysUser) {
 	user, exists := c.Get("user")
 	var newUser models.SysUser
 	if !exists {
-		return newUser, []uint{}
+		return newUser
 	}
 	u, _ := user.(response.LoginResp)
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	newUser, _ = s.GetUserById(u.Id)
-	// 返回roles的id格式化
-	roleIds := make([]uint, 0)
-	for _, role := range newUser.Roles {
-		roleIds = append(roleIds, role.Id)
-	}
-	return newUser, roleIds
+	return newUser
 }
 
 // 获取当前用户信息返回给页面
 func GetUserInfo(c *gin.Context) {
-	user, _ := GetCurrentUser(c)
+	user := GetCurrentUser(c)
 	// 转为UserInfoResponseStruct, 隐藏部分字段
 	var resp response.UserInfoResp
 	utils.Struct2StructByJson(user, &resp)
@@ -41,7 +36,7 @@ func GetUserInfo(c *gin.Context) {
 
 // 创建用户
 func CreateUser(c *gin.Context) {
-	user, _ := GetCurrentUser(c)
+	user := GetCurrentUser(c)
 	// 绑定参数
 	var req request.CreateUserReq
 	err := c.Bind(&req)
@@ -58,7 +53,7 @@ func CreateUser(c *gin.Context) {
 	// 记录当前创建人信息
 	req.Creator = user.Name
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	err = s.CreateUser(&req)
 	if err != nil {
 		response.FailWithMsg(err.Error())
@@ -78,7 +73,7 @@ func GetUsers(c *gin.Context) {
 	}
 
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	users, err := s.GetUsers(&req)
 	if err != nil {
 		response.FailWithMsg(err.Error())
@@ -140,7 +135,7 @@ func UpdateUserBaseInfoById(c *gin.Context) {
 		return
 	}
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	// 更新数据
 	err = s.UpdateUserBaseInfoById(userId, req)
 	if err != nil {
@@ -172,7 +167,7 @@ func UpdateUserById(c *gin.Context) {
 		return
 	}
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	// 更新数据
 	err = s.UpdateUserById(userId, req)
 	if err != nil {
@@ -195,7 +190,7 @@ func ChangePwd(c *gin.Context) {
 		return
 	}
 	// 获取当前用户
-	user, _ := GetCurrentUser(c)
+	user := GetCurrentUser(c)
 	query := common.Mysql.Where("username = ?", user.Username).First(&user)
 	// 查询用户
 	err = query.Error
@@ -230,7 +225,7 @@ func DeleteUserByIds(c *gin.Context) {
 	}
 
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	// 删除数据
 	err = s.DeleteUserByIds(req.Ids)
 	if err != nil {
@@ -253,7 +248,7 @@ func UserAvatarUpload(c *gin.Context) {
 		response.FailWithMsg("无法读取文件")
 		return
 	}
-	user, _ := GetCurrentUser(c)
+	user := GetCurrentUser(c)
 	fileName := user.Username+ "_avatar" + path.Ext(file.Filename)
 	imgPath := common.Conf.Upload.SaveDir + "/avatar/" + fileName
 	err = c.SaveUploadedFile(file, imgPath)

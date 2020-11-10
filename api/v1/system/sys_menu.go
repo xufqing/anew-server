@@ -4,52 +4,31 @@ import (
 	"anew-server/dto/request"
 	"anew-server/dto/response"
 	"anew-server/dto/service"
-	"anew-server/models"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
-	"encoding/json"
 	"github.com/gin-gonic/gin"
 )
 
 // 查询当前用户菜单树
 func GetUserMenuTree(c *gin.Context) {
-	_, roleIds := GetCurrentUser(c)
+	user := GetCurrentUser(c)
 
-	menuList := make([]models.SysMenu, 0)
-	for _, roleId := range roleIds {
-		// 创建服务
-		s := service.New(c)
-		menus, err := s.GetUserMenuList(roleId)
-		if err != nil {
-			response.FailWithMsg(err.Error())
-			return
-		}
-		for _, menu := range menus {
-			menuList = append(menuList, menu)
-		}
-	}
-	// menuList结构体切片去重
-	resultMap := map[string]bool{}
-	for _, v := range menuList {
-		data, _ := json.Marshal(v)
-		resultMap[string(data)] = true
-	}
-	menusResult := []models.SysMenu{}
-	for k := range resultMap {
-		var t models.SysMenu
-		json.Unmarshal([]byte(k), &t)
-		menusResult = append(menusResult, t)
+	s := service.New()
+	menus, err := s.GetUserMenuList(user.RoleId)
+	if err != nil {
+		response.FailWithMsg(err.Error())
+		return
 	}
 	var resp []response.MenuTreeResp
 	// 转换成树结构
-	resp = service.GenMenuTree(nil, menusResult)
+	resp = service.GenMenuTree(nil, menus)
 	response.SuccessWithData(resp)
 }
 
 // 查询所有菜单
 func GetMenus(c *gin.Context) {
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	menus := s.GetMenus()
 	var resp []response.MenuTreeResp
 	resp = service.GenMenuTree(nil,menus)
@@ -58,7 +37,7 @@ func GetMenus(c *gin.Context) {
 
 // 创建菜单
 func CreateMenu(c *gin.Context) {
-	user, _ := GetCurrentUser(c)
+	user := GetCurrentUser(c)
 	// 绑定参数
 	var req request.CreateMenuReq
 	err := c.Bind(&req)
@@ -76,7 +55,7 @@ func CreateMenu(c *gin.Context) {
 	// 记录当前创建人信息
 	req.Creator = user.Name
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	err = s.CreateMenu(&req)
 	if err != nil {
 		response.FailWithMsg(err.Error())
@@ -102,7 +81,7 @@ func UpdateMenuById(c *gin.Context) {
 		return
 	}
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	// 更新数据
 	err = s.UpdateMenuById(menuId, req)
 	if err != nil {
@@ -122,7 +101,7 @@ func BatchDeleteMenuByIds(c *gin.Context) {
 	}
 
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	// 删除数据
 	err = s.DeleteMenuByIds(req.Ids)
 	if err != nil {

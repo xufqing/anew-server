@@ -19,7 +19,7 @@ func GetDepts(c *gin.Context) {
 		return
 	}
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	depts := s.GetDepts(&req)
 	if (req.Name != "" || req.Status != nil){
 		response.SuccessWithData(depts)
@@ -32,7 +32,7 @@ func GetDepts(c *gin.Context) {
 
 // 创建部门
 func CreateDept(c *gin.Context) {
-	user, _ := GetCurrentUser(c)
+	user := GetCurrentUser(c)
 	// 绑定参数
 	var req request.CreateDeptReq
 	err := c.Bind(&req)
@@ -50,7 +50,7 @@ func CreateDept(c *gin.Context) {
 	// 记录当前创建人信息
 	req.Creator = user.Name
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	err = s.CreateDept(&req)
 	if err != nil {
 		response.FailWithMsg(err.Error())
@@ -74,7 +74,7 @@ func UpdateDeptById(c *gin.Context) {
 		return
 	}
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	// 更新数据
 	err = s.UpdateDeptById(deptId, req)
 	if err != nil {
@@ -94,7 +94,7 @@ func BatchDeleteDeptByIds(c *gin.Context) {
 	}
 
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	// 删除数据
 	err = s.DeleteDeptByIds(req.Ids)
 	if err != nil {

@@ -10,13 +10,14 @@ type Configuration struct {
 	Mysql  MysqlConfiguration  `mapstructure:"mysql" json:"mysql"`
 	Jwt    JwtConfiguration    `mapstructure:"jwt" json:"jwt"`
 	Upload UploadConfiguration `mapstructure:"upload" json:"upload"`
+	Casbin CasbinConfiguration `mapstructure:"casbin" json:"casbin"`
 }
 
 type SystemConfiguration struct {
-	UrlPathPrefix string `mapstructure:"url-path-prefix" json:"urlPathPrefix"`
-	AppMode       string `mapstructure:"app-mode" json:"appMode"`
-	Transaction   bool   `mapstructure:"transaction" json:"transaction"`
-	Port          int    `mapstructure:"port" json:"port"`
+	UrlPathPrefix   string `mapstructure:"url-path-prefix" json:"urlPathPrefix"`
+	AppMode         string `mapstructure:"app-mode" json:"appMode"`
+	Transaction     bool   `mapstructure:"transaction" json:"transaction"`
+	Port            int    `mapstructure:"port" json:"port"`
 	OperationLogKey string `mapstructure:"operation-log-key" json:"operationLogKey"`
 }
 
@@ -42,6 +43,10 @@ type MysqlConfiguration struct {
 	Collation   string `mapstructure:"collation" json:"collation"`
 }
 
+type CasbinConfiguration struct {
+	ModelPath string `mapstructure:"model-path" json:"modelPath"`
+}
+
 type JwtConfiguration struct {
 	Realm      string `mapstructure:"realm" json:"realm"`
 	Key        string `mapstructure:"key" json:"key"`
@@ -49,8 +54,7 @@ type JwtConfiguration struct {
 	MaxRefresh int    `mapstructure:"max-refresh" json:"maxRefresh"`
 }
 
-
 type UploadConfiguration struct {
-	SaveDir                      string `mapstructure:"save-dir" json:"saveDir"`
-	SingleMaxSize                uint   `mapstructure:"single-max-size" json:"singleMaxSize"`
+	SaveDir       string `mapstructure:"save-dir" json:"saveDir"`
+	SingleMaxSize uint   `mapstructure:"single-max-size" json:"singleMaxSize"`
 }

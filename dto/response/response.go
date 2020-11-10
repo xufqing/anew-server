@@ -21,10 +21,10 @@ type RespPageInfo struct {
 
 // 分页封装
 type PageInfo struct {
-	Current  uint `json:"current" form:"current"`   // 当前页码
-	PageSize uint `json:"pageSize" form:"pageSize"` // 每页显示条数
-	Total    uint `json:"total"`                    // 数据总条数
-	All      bool `json:"all" form:"all"`           // 不使用分页
+	Current  uint  `json:"current" form:"current"`   // 当前页码
+	PageSize uint  `json:"pageSize" form:"pageSize"` // 每页显示条数
+	Total    int64 `json:"total"`                    // 数据总条数
+	All      bool  `json:"all" form:"all"`           // 不使用分页
 }
 
 // 带分页数据封装
@@ -34,11 +34,13 @@ type PageData struct {
 }
 
 // 计算limit/offset, 如果需要用到返回的PageSize, PageNum, 务必保证Total值有效
-func (s *PageInfo) GetLimit() (limit uint, offset uint) {
+func (s *PageInfo) GetLimit() (int, int) {
+	var pageSize int64
+	var current int64
 	// 传入参数可能不合法, 设置默认值
 	// 每页显示条数不能小于1
 	if s.PageSize < 1 {
-		s.PageSize = 10
+		pageSize = 10
 	}
 	// 页码不能小于1
 	if s.Current < 1 {
@@ -47,18 +49,18 @@ func (s *PageInfo) GetLimit() (limit uint, offset uint) {
 
 	// 如果偏移量比总条数还多
 	if s.Total > 0 {
-		if s.PageSize > s.Total {
-			s.PageSize = s.Total
+		if pageSize > s.Total {
+			pageSize = s.Total
 		}
-		if s.Current > s.Total {
-			s.Current = s.Total
+		if current > s.Total {
+			current = s.Total
 		}
 	}
 
 	// 计算最大页码
-	maxPageNum := s.Total/s.PageSize + 1
-	if s.Total%s.PageSize == 0 {
-		maxPageNum = s.Total / s.PageSize
+	maxPageNum := s.Total/pageSize + 1
+	if s.Total%pageSize == 0 {
+		maxPageNum = s.Total / pageSize
 	}
 	// 页码不能小于1
 	if maxPageNum < 1 {
@@ -66,12 +68,12 @@ func (s *PageInfo) GetLimit() (limit uint, offset uint) {
 	}
 
 	// 超出最后一页
-	if s.Current > maxPageNum {
-		s.Current = maxPageNum
+	if current > maxPageNum {
+		current = maxPageNum
 	}
-	limit = s.PageSize
-	offset = limit * (s.Current - 1)
-	return
+	limit := pageSize
+	offset := limit * (current - 1)
+	return int(limit), int(offset)
 }
 
 func Result(code int, status bool, data interface{}) {

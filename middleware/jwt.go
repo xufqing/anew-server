@@ -62,7 +62,7 @@ func login(c *gin.Context) (interface{}, error) {
 	// 请求json绑定
 	_ = c.ShouldBindJSON(&req)
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	// 密码校验
 	user, err := s.LoginCheck(req.Username,req.Password)
 	if err != nil {

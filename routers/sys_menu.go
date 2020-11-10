@@ -9,7 +9,7 @@ import (
 
 // 菜单路由
 func InitMenuRouter(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) (R gin.IRoutes) {
-	router := r.Group("menu").Use(authMiddleware.MiddlewareFunc()).Use(middleware.PermsMiddleware)
+	router := r.Group("menu").Use(authMiddleware.MiddlewareFunc()).Use(middleware.CasbinMiddleware)
 	{
 		router.GET("/tree", system.GetUserMenuTree)
 		router.GET("/list", system.GetMenus)

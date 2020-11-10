@@ -19,7 +19,7 @@ func GetOperLogs(c *gin.Context) {
 	}
 
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	operationLogs, err := s.GetOperLogs(&req)
 	if err != nil {
 		response.FailWithMsg(err.Error())
@@ -47,7 +47,7 @@ func BatchDeleteOperLogByIds(c *gin.Context) {
 	}
 
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	// 删除数据
 	err = s.DeleteOperationLogByIds(req.Ids)
 	if err != nil {

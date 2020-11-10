@@ -2,12 +2,12 @@ package common
 
 import (
 	"errors"
-	"github.com/gin-gonic/gin"
+	"github.com/casbin/casbin/v2"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	"github.com/gobuffalo/packr/v2"
-	"github.com/jinzhu/gorm"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 	"strings"
 )
 
@@ -25,6 +25,9 @@ var (
 	Validate *validator.Validate
 	// validation.v10相关翻译器
 	Translator ut.Translator
+	// Casbin管理器
+	Casbin *casbin.Enforcer
+
 )
 
 // 全局常量
@@ -35,24 +38,6 @@ const (
 	DateLocalTimeFormat = "2006-01-02"
 )
 
-// 获取事务对象
-func GetTx(c *gin.Context) *gorm.DB {
-	// 默认使用无事务的mysql
-	tx := Mysql
-	if c != nil {
-		method := c.Request.Method
-		if !(method == "OPTIONS" || method == "GET" || !Conf.System.Transaction) {
-			// 从context对象中读取事务对象
-			txKey, exists := c.Get("tx")
-			if exists {
-				if item, ok := txKey.(*gorm.DB); ok {
-					tx = item
-				}
-			}
-		}
-	}
-	return tx
-}
 
 // 只返回一个错误即可
 func NewValidatorError(err error, custom map[string]string) (e error) {

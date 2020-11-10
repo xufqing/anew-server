@@ -21,43 +21,15 @@ func GetRoles(c *gin.Context) {
 	}
 
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	roles, err := s.GetRoles(&req)
 	if err != nil {
 		response.FailWithMsg(err.Error())
 		return
 	}
-	// 增加key，title, apis ,隐藏部分字段
+	// 转为ResponseStruct, 隐藏部分字段
 	var respStruct []response.RoleListResp
-	for _, role := range roles {
-		var item response.RoleListResp
-		item.Id = role.Id
-		item.Name = role.Name
-		item.Keyword = role.Keyword
-		item.Desc = role.Desc
-		item.Status = role.Status
-		item.Creator = role.Creator
-		item.CreatedAt = role.CreatedAt
-		for _,menu := range role.Menus {
-			item.Menus = append(item.Menus,fmt.Sprintf("%d",menu.Id))
-		}
-		for _,api := range role.Apis {
-			item.Apis = append(item.Apis,fmt.Sprintf("%d",api.Id))
-			item.Apis = append(item.Apis,api.Category)
-		}
-		// api去重，得到唯一分类名
-		result := []string{}
-		tempMap := map[string]byte{}
-		for _, e := range item.Apis {
-			l := len(tempMap)
-			tempMap[e] = 0
-			if len(tempMap) != l {
-				result = append(result, e)
-			}
-		}
-		item.Apis = result
-		respStruct = append(respStruct, item)
-	}
+	utils.Struct2StructByJson(roles, &respStruct)
 	// 返回分页数据
 	var resp response.PageData
 	// 设置分页参数
@@ -69,7 +41,7 @@ func GetRoles(c *gin.Context) {
 
 // 创建角色
 func CreateRole(c *gin.Context) {
-	user, _ := GetCurrentUser(c)
+	user := GetCurrentUser(c)
 	// 绑定参数
 	var req request.CreateRoleReq
 	err := c.Bind(&req)
@@ -87,7 +59,7 @@ func CreateRole(c *gin.Context) {
 	// 记录当前创建人信息
 	req.Creator = user.Name
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	err = s.CreateRole(&req)
 	if err != nil {
 		response.FailWithMsg(err.Error())
@@ -113,7 +85,7 @@ func UpdateRoleById(c *gin.Context) {
 		return
 	}
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	// 更新数据
 	err = s.UpdateRoleById(roleId, req)
 	if err != nil {
@@ -139,7 +111,7 @@ func UpdateRolePermsById(c *gin.Context) {
 		return
 	}
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	if req.Type == "menu" {
 		// 更新数据
 		err = s.UpdateRoleMenusById(roleId, req.Ids)
@@ -163,7 +135,7 @@ func BatchDeleteRoleByIds(c *gin.Context) {
 	}
 
 	// 创建服务
-	s := service.New(c)
+	s := service.New()
 	// 删除数据
 	err = s.DeleteRoleByIds(req.Ids)
 	if err != nil {

@@ -6,11 +6,10 @@ import (
 	"anew-server/models"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"sort"
+	"gorm.io/gorm"
 	"strings"
 )
 
@@ -18,7 +17,7 @@ import (
 func (s *MysqlService) LoginCheck(username string,password string) (*response.LoginResp, error) {
 	var u models.SysUser
 	// 查询用户及其角色
-	err := s.tx.Preload("Roles", "status = ?", true).Preload("Roles.Apis",).Where("username = ?", username).First(&u).Error
+	err := s.db.Preload("Role", "status = ?", true).Where("username = ?", username).First(&u).Error
 	if err != nil {
 		return nil, errors.New(response.LoginCheckErrorMsg)
 	}
@@ -31,28 +30,7 @@ func (s *MysqlService) LoginCheck(username string,password string) (*response.Lo
 	}
 	var loginInfo response.LoginResp
 	utils.Struct2StructByJson(u, &loginInfo)
-	// 处理角色关键字
-	for _, role := range u.Roles {
-		loginInfo.CurrentAuthority = append(loginInfo.CurrentAuthority, role.Keyword)
-		// 处理多个角色加入到CurrentAuthority切片
-		for _,api := range role.Apis {
-			loginInfo.CurrentAuthority = append(loginInfo.CurrentAuthority, api.Permission)
-		}
-	}
-	// 权限去重
-	var perms []string
-	resultMap := map[string]bool{}
-	for _, v := range loginInfo.CurrentAuthority {
-		data, _ := json.Marshal(v)
-		resultMap[string(data)] = true
-	}
-	for k := range resultMap {
-		var t string
-		json.Unmarshal([]byte(k), &t)
-		perms = append(perms, t)
-	}
-	sort.Strings(perms) // 排序
-	loginInfo.CurrentAuthority = perms
+	loginInfo.CurrentAuthority = nil
 	return &loginInfo, err
 }
 
@@ -60,7 +38,7 @@ func (s *MysqlService) LoginCheck(username string,password string) (*response.Lo
 func (s *MysqlService) GetUserById(id uint) (models.SysUser, error) {
 	var user models.SysUser
 	var err error
-	err = s.tx.Preload("Roles", "status = ?", true).Where("id = ?", id).First(&user).Error
+	err = s.db.Preload("Role", "status = ?", true).Where("id = ?", id).First(&user).Error
 	return user, err
 }
 
@@ -69,7 +47,7 @@ func (s *MysqlService) GetUserById(id uint) (models.SysUser, error) {
 func (s *MysqlService) CheckUser(username string) error {
 	var user models.SysUser
 	var err error
-	s.tx.Where("username = ?", username).First(&user)
+	s.db.Where("username = ?", username).First(&user)
 	if user.Id != 0 {
 		err = errors.New("用户名已存在")
 	}
@@ -86,23 +64,16 @@ func (s *MysqlService) CreateUser(req *request.CreateUserReq) (err error) {
 	utils.Struct2StructByJson(req, &user)
 	// 将初始密码转为密文
 	user.Password = utils.GenPwd(req.Password)
-	// 处理角色数据
-	var newRoles []models.SysRole
-	err = s.tx.Where("id in (?)", req.Roles).Find(&newRoles).Error
-	if err != nil {
-		return
-	}
-	user.Roles = newRoles
 	// 创建数据
-	err = s.tx.Create(&user).Error
+	err = s.db.Create(&user).Error
 	return
 }
 
 // 更新用户基本信息
 func (s *MysqlService) UpdateUserBaseInfoById(id uint, req request.UpdateUserBaseInfoReq) (err error) {
 	var oldUser models.SysUser
-	query := s.tx.Table(oldUser.TableName()).Where("id = ?", id).First(&oldUser)
-	if query.RecordNotFound() {
+	query := s.db.Table(oldUser.TableName()).Where("id = ?", id).First(&oldUser)
+	if query.Error == gorm.ErrInvalidField {
 		return errors.New("记录不存在")
 	}
 	m := make(gin.H, 0)
@@ -116,9 +87,9 @@ func (s *MysqlService) UpdateUserBaseInfoById(id uint, req request.UpdateUserBas
 // 更新用户
 func (s *MysqlService) UpdateUserById(id uint, req request.UpdateUserReq) (err error) {
 	var oldUser models.SysUser
-	query := s.tx.Table(oldUser.TableName()).Preload("Roles").Where("id = ?", id).First(&oldUser)
+	query := s.db.Table(oldUser.TableName()).Preload("Roles").Where("id = ?", id).First(&oldUser)
 
-	if query.RecordNotFound() {
+	if query.Error== gorm.ErrRecordNotFound {
 		return errors.New("记录不存在")
 	}
 	password := ""
@@ -127,20 +98,14 @@ func (s *MysqlService) UpdateUserById(id uint, req request.UpdateUserReq) (err e
 		password = utils.GenPwd(req.Password)
 	}
 	var newRoles []models.SysRole
-	err = s.tx.Where("id in (?)", req.Roles).Find(&newRoles).Error
+	err = s.db.Where("id in (?)", req.Roles).Find(&newRoles).Error
 	if err != nil {
 		return
 	}
-	// 替换角色
-	err = s.tx.Where("id = ?", id).First(&models.SysUser{}).Association("Roles").Replace(&newRoles).Error
-	if err != nil {
-		return
-	}
+
 	m := make(gin.H, 0)
-	oldUser.Roles = nil // roles赋值为空，否则报错
 	utils.CompareDifferenceStructByJson(oldUser, req, &m)
 	delete(m,"password")
-	delete(m,"roles")
 	if password != "" {
 		// 更新密码以及其他指定列
 		err = query.Update("password", password).Updates(m).Error
@@ -185,11 +150,11 @@ func (s *MysqlService) GetUsers(req *request.UserListReq) ([]models.SysUser, err
 	if err == nil {
 		if req.PageInfo.All {
 			// 不使用分页
-			err = db.Preload("Roles").Find(&list).Error
+			err = db.Find(&list).Error
 		} else {
 			// 获取分页参数
 			limit, offset := req.GetLimit()
-			err = db.Preload("Roles").Limit(limit).Offset(offset).Find(&list).Error
+			err = db.Limit(limit).Offset(offset).Find(&list).Error
 		}
 	}
 	return list, err
@@ -198,5 +163,5 @@ func (s *MysqlService) GetUsers(req *request.UserListReq) ([]models.SysUser, err
 // 批量删除用户
 func (s *MysqlService) DeleteUserByIds(ids []uint) (err error) {
 
-	return s.tx.Where("id IN (?)", ids).Delete(models.SysUser{}).Error
+	return s.db.Where("id IN (?)", ids).Delete(models.SysUser{}).Error
 }
