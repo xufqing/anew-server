@@ -32,7 +32,7 @@ type CreateOperLogRequestStruct struct {
 	Status     int           `json:"status"`
 	Username   string        `json:"username"`
 	Ip         string        `json:"ip"`
-	IpLocation string        `json:"ipLocation"`
+	IpLocation string        `json:"ip_location"`
 	Latency    time.Duration `json:"latency"`
-	UserAgent  string        `json:"userAgent"`
+	UserAgent  string        `json:"user_agent"`
 }

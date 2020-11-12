@@ -77,6 +77,5 @@ func main() {
 	if err := srv.Shutdown(ctx); err != nil {
 		common.Log.Error("Server forced to shutdown: ", err)
 	}
-
 	common.Log.Info("Server exiting")
 }

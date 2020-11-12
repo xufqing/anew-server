@@ -7,7 +7,6 @@ type MenuListReq struct {
 	Title      string `json:"title" form:"title"`
 	Path       string `json:"path" form:"path"`
 	Status     *bool  `json:"status" form:"status"`
-	Hidden    *bool  `json:"hidden" form:"hidden"`
 	Creator    string `json:"creator" form:"creator"`
 	response.PageInfo          // 分页参数
 }
@@ -19,8 +18,7 @@ type CreateMenuReq struct {
 	Path       string `json:"path"`
 	Sort       int    `json:"sort"`
 	Status     *bool  `json:"status"`
-	Hidden    *bool  `json:"hidden"`
-	ParentId   uint   `json:"parentId"`
+	ParentId   uint   `json:"parent_id"`
 	Creator    string `json:"creator"`
 }
 

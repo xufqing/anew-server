@@ -41,11 +41,11 @@ func (s *MysqlService) GetRoles(req *request.RoleListReq) ([]models.SysRole, err
 	if err == nil {
 		if req.PageInfo.All {
 			// 不使用分页
-			err = db.Preload("Menus", "status = ?", true).Preload("Apis").Find(&list).Error
+			err = db.Find(&list).Error
 		} else {
 			// 获取分页参数
 			limit, offset := req.GetLimit()
-			err = db.Preload("Menus", "status = ?", true).Preload("Apis").Limit(limit).Offset(offset).Find(&list).Error
+			err = db.Limit(limit).Offset(offset).Find(&list).Error
 		}
 	}
 	return list, err

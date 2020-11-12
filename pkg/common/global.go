@@ -25,8 +25,8 @@ var (
 	Validate *validator.Validate
 	// validation.v10相关翻译器
 	Translator ut.Translator
-	// Casbin管理器
-	Casbin *casbin.Enforcer
+	// Casbin 管理器
+	Casbin *casbin.SyncedEnforcer
 
 )
 

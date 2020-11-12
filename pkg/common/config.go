@@ -45,6 +45,7 @@ type MysqlConfiguration struct {
 
 type CasbinConfiguration struct {
 	ModelPath string `mapstructure:"model-path" json:"modelPath"`
+	LoadDelay int    `mapstructure:"load-delay" json:"loadDelay"`
 }
 
 type JwtConfiguration struct {

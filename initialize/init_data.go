@@ -14,7 +14,6 @@ func InitData() {
 	// 1. 初始化角色
 	creator := "系统创建"
 	status := true
-	hidden := true
 	roles := []models.SysRole{
 		{
 			Model: models.Model{
@@ -56,7 +55,6 @@ func InitData() {
 			Path:     "index",
 			Sort:     0,
 			Status:   &status,
-			Hidden:   &hidden,
 			ParentId: 0,
 			Creator:  creator,
 			Roles:    roles,
@@ -70,7 +68,6 @@ func InitData() {
 			Path:     "system",
 			Sort:     1,
 			Status:   &status,
-			Hidden:   &hidden,
 			ParentId: 0,
 			Creator:  creator,
 			Roles: []models.SysRole{
@@ -81,12 +78,11 @@ func InitData() {
 			Model: models.Model{
 				Id: 3,
 			},
-			Name:     "菜单管理",
-			Icon:     "icon-wuxupailie",
-			Path:     "system/menu", // 子菜单不用全路径, 自动继承
-			Sort:     12,
+			Name:     "用户管理",
+			Icon:     "icon-icon_zhanghao",
+			Path:     "user",
+			Sort:     10,
 			Status:   &status,
-			Hidden:   &hidden,
 			ParentId: 2,
 			Creator:  creator,
 			Roles: []models.SysRole{
@@ -97,12 +93,11 @@ func InitData() {
 			Model: models.Model{
 				Id: 4,
 			},
-			Name:     "角色管理",
-			Icon:     "icon-quanxianshenpi",
-			Path:     "system/role",
+			Name:     "部门管理",
+			Icon:     "icon-icon_zhanghao",
+			Path:     "dept",
 			Sort:     11,
 			Status:   &status,
-			Hidden:   &hidden,
 			ParentId: 2,
 			Creator:  creator,
 			Roles: []models.SysRole{
@@ -113,12 +108,11 @@ func InitData() {
 			Model: models.Model{
 				Id: 5,
 			},
-			Name:     "用户管理",
-			Icon:     "icon-icon_zhanghao",
-			Path:     "system/user",
-			Sort:     10,
+			Name:     "菜单管理",
+			Icon:     "icon-wuxupailie",
+			Path:     "menu", // 子菜单不用全路径, 自动继承
+			Sort:     12,
 			Status:   &status,
-			Hidden:   &hidden,
 			ParentId: 2,
 			Creator:  creator,
 			Roles: []models.SysRole{
@@ -129,12 +123,11 @@ func InitData() {
 			Model: models.Model{
 				Id: 6,
 			},
-			Name:     "接口管理",
-			Icon:     "icon-APIshuchu",
-			Path:     "system/api",
+			Name:     "角色管理",
+			Icon:     "icon-quanxianshenpi",
+			Path:     "role",
 			Sort:     13,
 			Status:   &status,
-			Hidden:   &hidden,
 			ParentId: 2,
 			Creator:  creator,
 			Roles: []models.SysRole{
@@ -145,12 +138,26 @@ func InitData() {
 			Model: models.Model{
 				Id: 7,
 			},
-			Name:     "操作日志",
-			Icon:     "icon-gaojing1",
-			Path:     "system/log",
+			Name:     "接口管理",
+			Icon:     "icon-APIshuchu",
+			Path:     "api",
 			Sort:     14,
 			Status:   &status,
-			Hidden:   &hidden,
+			ParentId: 2,
+			Creator:  creator,
+			Roles: []models.SysRole{
+				roles[0],
+			},
+		},
+		{
+			Model: models.Model{
+				Id: 8,
+			},
+			Name:     "操作日志",
+			Icon:     "icon-gaojing1",
+			Path:     "log",
+			Sort:     15,
+			Status:   &status,
 			ParentId: 2,
 			Creator:  creator,
 			Roles: []models.SysRole{
@@ -208,7 +215,6 @@ func InitData() {
 			Category:   "auth",
 			Desc:       "获取用户信息和token",
 			Creator:    creator,
-			Permission: "auth_info",
 		},
 		{
 			Model: models.Model{
@@ -219,7 +225,6 @@ func InitData() {
 			Category:   "auth",
 			Desc:       "用户登出",
 			Creator:    creator,
-			Permission: "auth_logout",
 		},
 		{
 			Model: models.Model{
@@ -230,7 +235,6 @@ func InitData() {
 			Category:   "auth",
 			Desc:       "刷新JWT令牌",
 			Creator:    creator,
-			Permission: "auth_refresh",
 		},
 		{
 			Model: models.Model{
@@ -241,7 +245,6 @@ func InitData() {
 			Category:   "user",
 			Desc:       "用户信息",
 			Creator:    creator,
-			Permission: "user_info",
 		},
 		{
 			Model: models.Model{
@@ -252,7 +255,6 @@ func InitData() {
 			Category:   "user",
 			Desc:       "更新信息",
 			Creator:    creator,
-			Permission: "user_info_update",
 		},
 		{
 			Model: models.Model{
@@ -263,7 +265,6 @@ func InitData() {
 			Category:   "user",
 			Desc:       "上传头像",
 			Creator:    creator,
-			Permission: "user_info_upload",
 		},
 		{
 			Model: models.Model{
@@ -274,7 +275,6 @@ func InitData() {
 			Category:   "user",
 			Desc:       "用户列表",
 			Creator:    creator,
-			Permission: "user_list",
 		},
 		{
 			Model: models.Model{
@@ -285,7 +285,6 @@ func InitData() {
 			Category:   "user",
 			Desc:       "修改密码",
 			Creator:    creator,
-			Permission: "user_changePwd",
 		},
 		{
 			Model: models.Model{
@@ -296,7 +295,6 @@ func InitData() {
 			Category:   "user",
 			Desc:       "创建用户",
 			Creator:    creator,
-			Permission: "user_creator",
 		},
 		{
 			Model: models.Model{
@@ -307,7 +305,6 @@ func InitData() {
 			Category:   "user",
 			Desc:       "更新用户",
 			Creator:    creator,
-			Permission: "user_update",
 		},
 		{
 			Model: models.Model{
@@ -318,7 +315,6 @@ func InitData() {
 			Category:   "user",
 			Desc:       "删除用户",
 			Creator:    creator,
-			Permission: "user_delete",
 		},
 		{
 			Model: models.Model{
@@ -329,7 +325,6 @@ func InitData() {
 			Category:   "menu",
 			Desc:       "获取菜单",
 			Creator:    creator,
-			Permission: "menu_tree",
 		},
 		{
 			Model: models.Model{
@@ -340,7 +335,6 @@ func InitData() {
 			Category:   "menu",
 			Desc:       "菜单列表",
 			Creator:    creator,
-			Permission: "menu_list",
 		},
 		{
 			Model: models.Model{
@@ -351,7 +345,6 @@ func InitData() {
 			Category:   "menu",
 			Desc:       "创建菜单",
 			Creator:    creator,
-			Permission: "menu_create",
 		},
 		{
 			Model: models.Model{
@@ -362,7 +355,6 @@ func InitData() {
 			Category:   "menu",
 			Desc:       "更新菜单",
 			Creator:    creator,
-			Permission: "menu_update",
 		},
 		{
 			Model: models.Model{
@@ -373,7 +365,6 @@ func InitData() {
 			Category:   "menu",
 			Desc:       "删除菜单",
 			Creator:    creator,
-			Permission: "menu_delete",
 		},
 		{
 			Model: models.Model{
@@ -384,7 +375,6 @@ func InitData() {
 			Category:   "role",
 			Desc:       "角色列表",
 			Creator:    creator,
-			Permission: "role_list",
 		},
 		{
 			Model: models.Model{
@@ -395,7 +385,6 @@ func InitData() {
 			Category:   "role",
 			Desc:       "创建角色",
 			Creator:    creator,
-			Permission: "role_create",
 		},
 		{
 			Model: models.Model{
@@ -406,7 +395,6 @@ func InitData() {
 			Category:   "role",
 			Desc:       "更新角色",
 			Creator:    creator,
-			Permission: "role_update",
 		},
 		{
 			Model: models.Model{
@@ -417,7 +405,6 @@ func InitData() {
 			Category:   "role",
 			Desc:       "更新权限",
 			Creator:    creator,
-			Permission: "role_perms_update",
 		},
 		{
 			Model: models.Model{
@@ -428,7 +415,6 @@ func InitData() {
 			Category:   "role",
 			Desc:       "删除角色",
 			Creator:    creator,
-			Permission: "role_detele",
 		},
 		{
 			Model: models.Model{
@@ -439,7 +425,6 @@ func InitData() {
 			Category:   "api",
 			Desc:       "获取接口",
 			Creator:    creator,
-			Permission: "api_list",
 		},
 		{
 			Model: models.Model{
@@ -450,7 +435,6 @@ func InitData() {
 			Category:   "api",
 			Desc:       "创建接口",
 			Creator:    creator,
-			Permission: "api_create",
 		},
 		{
 			Model: models.Model{
@@ -461,7 +445,6 @@ func InitData() {
 			Category:   "api",
 			Desc:       "更新接口",
 			Creator:    creator,
-			Permission: "api_update",
 		},
 		{
 			Model: models.Model{
@@ -472,7 +455,6 @@ func InitData() {
 			Category:   "api",
 			Desc:       "删除接口",
 			Creator:    creator,
-			Permission: "api_delete",
 		},
 		{
 			Model: models.Model{
@@ -483,7 +465,6 @@ func InitData() {
 			Category:   "role",
 			Desc:       "更新菜单",
 			Creator:    creator,
-			Permission: "role_menus_update",
 		},
 		{
 			Model: models.Model{
@@ -494,7 +475,6 @@ func InitData() {
 			Category:   "role",
 			Desc:       "更新权限",
 			Creator:    creator,
-			Permission: "role_apis_update",
 		},
 		{
 			Model: models.Model{
@@ -505,7 +485,6 @@ func InitData() {
 			Category:   "operLog",
 			Desc:       "获取操作日志",
 			Creator:    creator,
-			Permission: "operlog_list",
 		},
 		{
 			Model: models.Model{
@@ -516,7 +495,6 @@ func InitData() {
 			Category:   "operLog",
 			Desc:       "删除操作日志",
 			Creator:    creator,
-			Permission: "operlog_delete",
 		},
 	}
 	for _, api := range apis {

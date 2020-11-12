@@ -8,13 +8,12 @@ import (
 	"anew-server/pkg/utils"
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"strings"
 )
 
 // 登录校验,返回指定信息
-func (s *MysqlService) LoginCheck(username string,password string) (*response.LoginResp, error) {
+func (s *MysqlService) LoginCheck(username string, password string) (*response.LoginResp, error) {
 	var u models.SysUser
 	// 查询用户及其角色
 	err := s.db.Preload("Role", "status = ?", true).Where("username = ?", username).First(&u).Error
@@ -30,7 +29,7 @@ func (s *MysqlService) LoginCheck(username string,password string) (*response.Lo
 	}
 	var loginInfo response.LoginResp
 	utils.Struct2StructByJson(u, &loginInfo)
-	loginInfo.CurrentAuthority = nil
+	loginInfo.CurrentAuthority = []string{u.Role.Keyword}
 	return &loginInfo, err
 }
 
@@ -38,10 +37,9 @@ func (s *MysqlService) LoginCheck(username string,password string) (*response.Lo
 func (s *MysqlService) GetUserById(id uint) (models.SysUser, error) {
 	var user models.SysUser
 	var err error
-	err = s.db.Preload("Role", "status = ?", true).Where("id = ?", id).First(&user).Error
+	err = s.db.Preload("Role", "status = ?", true).Preload("Dept", "status = ?", true).Where("id = ?", id).First(&user).Error
 	return user, err
 }
-
 
 // 检查用户是否已存在
 func (s *MysqlService) CheckUser(username string) error {
@@ -72,24 +70,24 @@ func (s *MysqlService) CreateUser(req *request.CreateUserReq) (err error) {
 // 更新用户基本信息
 func (s *MysqlService) UpdateUserBaseInfoById(id uint, req request.UpdateUserBaseInfoReq) (err error) {
 	var oldUser models.SysUser
-	query := s.db.Table(oldUser.TableName()).Where("id = ?", id).First(&oldUser)
+	//query := s.db.Table(oldUser.TableName()).Where("id = ?", id).First(&oldUser)
+	query := s.db.First(&oldUser).Where("id = ?", id)
 	if query.Error == gorm.ErrInvalidField {
 		return errors.New("记录不存在")
 	}
-	m := make(gin.H, 0)
+	var m models.SysUser
 	utils.CompareDifferenceStructByJson(oldUser, req, &m)
 	// 更新指定列
 	err = query.Updates(m).Error
 	return
 }
 
-
 // 更新用户
 func (s *MysqlService) UpdateUserById(id uint, req request.UpdateUserReq) (err error) {
 	var oldUser models.SysUser
-	query := s.db.Table(oldUser.TableName()).Preload("Roles").Where("id = ?", id).First(&oldUser)
-
-	if query.Error== gorm.ErrRecordNotFound {
+	query := s.db.Table(oldUser.TableName()).Where("id = ?", id).First(&oldUser)
+	// query := s.db.First(&oldUser).Where("id = ?", id)
+	if query.Error == gorm.ErrRecordNotFound {
 		return errors.New("记录不存在")
 	}
 	password := ""
@@ -97,18 +95,13 @@ func (s *MysqlService) UpdateUserById(id uint, req request.UpdateUserReq) (err e
 	if strings.TrimSpace(req.Password) != "" {
 		password = utils.GenPwd(req.Password)
 	}
-	var newRoles []models.SysRole
-	err = s.db.Where("id in (?)", req.Roles).Find(&newRoles).Error
-	if err != nil {
-		return
-	}
-
-	m := make(gin.H, 0)
+	// 比对增量字段,使用map确保gorm可更新零值
+	var m map[string]interface{}
 	utils.CompareDifferenceStructByJson(oldUser, req, &m)
 	delete(m,"password")
 	if password != "" {
-		// 更新密码以及其他指定列
-		err = query.Update("password", password).Updates(m).Error
+		// 更新密码
+		err = query.Update("password",password).Updates(m).Error
 	} else {
 		// 更新指定列
 		err = query.Updates(m).Error
@@ -150,11 +143,11 @@ func (s *MysqlService) GetUsers(req *request.UserListReq) ([]models.SysUser, err
 	if err == nil {
 		if req.PageInfo.All {
 			// 不使用分页
-			err = db.Find(&list).Error
+			err = db.Preload("Role", "status = ?", true).Preload("Dept", "status = ?", true).Find(&list).Error
 		} else {
 			// 获取分页参数
 			limit, offset := req.GetLimit()
-			err = db.Limit(limit).Offset(offset).Find(&list).Error
+			err = db.Preload("Role", "status = ?", true).Preload("Dept", "status = ?", true).Limit(limit).Offset(offset).Find(&list).Error
 		}
 	}
 	return list, err
@@ -162,6 +155,6 @@ func (s *MysqlService) GetUsers(req *request.UserListReq) ([]models.SysUser, err
 
 // 批量删除用户
 func (s *MysqlService) DeleteUserByIds(ids []uint) (err error) {
-
-	return s.db.Where("id IN (?)", ids).Delete(models.SysUser{}).Error
+	var user models.SysUser
+	return s.db.Where("id IN (?)", ids).Delete(&user).Error
 }

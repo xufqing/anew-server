@@ -35,32 +35,32 @@ type PageData struct {
 
 // 计算limit/offset, 如果需要用到返回的PageSize, PageNum, 务必保证Total值有效
 func (s *PageInfo) GetLimit() (int, int) {
+	// 传入参数可能不合法, 设置默认值
 	var pageSize int64
 	var current int64
-	// 传入参数可能不合法, 设置默认值
+	total := s.Total
 	// 每页显示条数不能小于1
 	if s.PageSize < 1 {
 		pageSize = 10
+	} else {
+		pageSize = int64(s.PageSize)
 	}
 	// 页码不能小于1
 	if s.Current < 1 {
-		s.Current = 1
+		current = 1
+	} else {
+		current = int64(s.Current)
 	}
 
 	// 如果偏移量比总条数还多
-	if s.Total > 0 {
-		if pageSize > s.Total {
-			pageSize = s.Total
-		}
-		if current > s.Total {
-			current = s.Total
-		}
+	if total > 0 && current > total {
+		current = total
 	}
 
 	// 计算最大页码
-	maxPageNum := s.Total/pageSize + 1
-	if s.Total%pageSize == 0 {
-		maxPageNum = s.Total / pageSize
+	maxPageNum := total/pageSize + 1
+	if total%pageSize == 0 {
+		maxPageNum = total / pageSize
 	}
 	// 页码不能小于1
 	if maxPageNum < 1 {
@@ -71,8 +71,11 @@ func (s *PageInfo) GetLimit() (int, int) {
 	if current > maxPageNum {
 		current = maxPageNum
 	}
+
 	limit := pageSize
 	offset := limit * (current - 1)
+
+	// gorm v2参数从interface改为int, 这里也需要相应改变
 	return int(limit), int(offset)
 }
 

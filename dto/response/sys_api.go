@@ -14,8 +14,7 @@ type ApiListResp struct {
 	Creator    string           `json:"creator"`
 	Desc       string           `json:"desc"`
 	Title      string           `json:"title"`
-	Permission string           `json:"permission"`
-	CreatedAt  models.LocalTime `json:"createdAt"`
+	CreatedAt  models.LocalTime `json:"created_at"`
 }
 
 type ApiTreeResp struct {

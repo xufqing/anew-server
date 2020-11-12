@@ -13,8 +13,8 @@ type RoleListReq struct {
 
 // 更新角色权限的结构体
 type UpdateRolePermsReq struct {
-	IdsReq
-	Type string `json:"type"`
+	MenuIds []uint `json:"menu_ids" form:"menu_ids"` // 传多个id
+	ApiIds []uint `json:"api_ids" form:"api_ids"` // 传多个id
 }
 
 // 创建角色结构体

@@ -39,6 +39,7 @@ func Mysql() {
 		DisableForeignKeyConstraintWhenMigrating: true,
 	})
 	if err != nil {
+		common.Log.Error(fmt.Sprintf("初始化mysql异常: %v", err))
 		panic(fmt.Sprintf("初始化mysql异常: %v", err))
 	}
 	// 打印所有执行的sql

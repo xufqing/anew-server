@@ -62,7 +62,7 @@ func CreateDept(c *gin.Context) {
 // 更新部门
 func UpdateDeptById(c *gin.Context) {
 	// 绑定参数
-	var req gin.H
+	var req request.UpdateDeptReq
 	err := c.Bind(&req)
 	if err != nil {
 		response.FailWithCode(response.ParmError)

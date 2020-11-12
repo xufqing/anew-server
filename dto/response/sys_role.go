@@ -29,7 +29,5 @@ type RoleListResp struct {
 	Desc      string           `json:"desc"`
 	Status    *bool            `json:"status"`
 	Creator   string           `json:"creator"`
-	CreatedAt models.LocalTime `json:"createdAt"`
-	Menus     []string         `json:"menus"`
-	Apis      []string         `json:"apis"`
+	CreatedAt models.LocalTime `json:"created_at"`
 }

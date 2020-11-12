@@ -37,6 +37,8 @@ mysql:
 casbin:
   # 模型配置文件, 默认以conf目录为根目录
   model-path: 'rbac_model.conf'
+  # 自动加载策略延迟（秒）
+  load-delay: 60
 
 logs:
   # 日志等级(-1:Debug, 0:Info, -1<=level<=5, 参照zap.level源码)

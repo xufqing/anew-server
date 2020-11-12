@@ -112,15 +112,20 @@ func UpdateRolePermsById(c *gin.Context) {
 	}
 	// 创建服务
 	s := service.New()
-	if req.Type == "menu" {
+	if req.MenuIds != nil {
 		// 更新数据
-		err = s.UpdateRoleMenusById(roleId, req.Ids)
-	} else {
-		err = s.UpdateRoleApisById(roleId, req.Ids)
+		err = s.UpdateRoleMenusById(roleId, req.MenuIds)
+		if err != nil {
+			response.FailWithMsg(err.Error())
+			return
+		}
 	}
-	if err != nil {
-		response.FailWithMsg(err.Error())
-		return
+	if req.ApiIds != nil {
+		err = s.UpdateRoleApisById(roleId, req.ApiIds)
+		if err != nil {
+			response.FailWithMsg(err.Error())
+			return
+		}
 	}
 	response.Success()
 }

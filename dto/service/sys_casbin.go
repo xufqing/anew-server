@@ -12,9 +12,9 @@ func (s *MysqlService) GetRoleCasbins(c models.SysRoleCasbin) []models.SysRoleCa
 	cs := make([]models.SysRoleCasbin, 0)
 	for _, policy := range policies {
 		cs = append(cs, models.SysRoleCasbin{
-			Keyword: policy[0],
-			Path:    policy[1],
-			Method:  policy[2],
+			Keyword:    policy[0],
+			Path:       policy[1],
+			Method:     policy[2],
 		})
 	}
 	return cs
@@ -23,8 +23,7 @@ func (s *MysqlService) GetRoleCasbins(c models.SysRoleCasbin) []models.SysRoleCa
 // 创建一条casbin规则, 按角色
 func (s *MysqlService) CreateRoleCasbin(c models.SysRoleCasbin) (bool, error) {
 	e := common.Casbin
-	ret,err := e.AddPolicy(c.Keyword, c.Path, c.Method)
-	return ret,err
+	return e.AddPolicy(c.Keyword, c.Path, c.Method)
 }
 
 // 批量创建多条casbin规则, 按角色

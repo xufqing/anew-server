@@ -3,7 +3,7 @@ package response
 // 菜单树信息响应, 字段含义见models.SysMenu
 type MenuTreeResp struct {
 	Id       uint           `json:"id"`
-	ParentId uint           `json:"parentId"`
+	ParentId uint           `json:"parent_id"`
 	Key      string         `json:"key"`
 	Value    string         `json:"value"`
 	Name     string         `json:"name"`

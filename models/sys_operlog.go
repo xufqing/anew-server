@@ -14,9 +14,9 @@ type SysOperLog struct {
 	Status     int           `json:"status" gorm:"comment:'响应状态码'"`
 	Username   string        `json:"username" gorm:"comment:'用户登录名';size:128"`
 	Ip         string        `json:"ip" gorm:"comment:'Ip地址';size:128"`
-	IpLocation string        `json:"ipLocation" gorm:"comment:'Ip所在地';size:128"`
+	IpLocation string        `json:"ip_location" gorm:"comment:'Ip所在地';size:128"`
 	Latency    time.Duration `json:"latency" gorm:"comment:'请求耗时(ms)'"`
-	UserAgent  string        `json:"userAgent" gorm:"comment:'浏览器标识';size:255"`
+	UserAgent  string        `json:"user_agent" gorm:"comment:'浏览器标识';size:255"`
 }
 
 func (m SysOperLog) TableName() string {

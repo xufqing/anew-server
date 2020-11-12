@@ -3,7 +3,7 @@ package response
 // 部门树信息响应,
 type DeptTreeResp struct {
 	Id       uint           `json:"id"`
-	ParentId uint           `json:"parentId"`
+	ParentId uint           `json:"parent_id"`
 	Name     string         `json:"name"`
 	Creator  string         `json:"creator"`
 	Status   bool           `json:"status"`

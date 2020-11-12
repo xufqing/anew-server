@@ -8,7 +8,6 @@ import (
 	"anew-server/pkg/utils"
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"sort"
 	"strings"
@@ -21,6 +20,10 @@ func (s *MysqlService) GetDepts(req *request.DeptListReq) []models.SysDept {
 	name := strings.TrimSpace(req.Name)
 	if name != "" {
 		db = db.Where("name LIKE ?", fmt.Sprintf("%%%s%%", name))
+	}
+	creator := strings.TrimSpace(req.Creator)
+	if creator != "" {
+		db = db.Where("creator LIKE ?", fmt.Sprintf("%%%s%%", creator))
 	}
 	status := req.Status
 	if status != nil {
@@ -71,17 +74,18 @@ func (s *MysqlService) CreateDept(req *request.CreateDeptReq) (err error) {
 }
 
 // 更新部门
-func (s *MysqlService) UpdateDeptById(id uint, req gin.H) (err error) {
+func (s *MysqlService) UpdateDeptById(id uint, req request.UpdateDeptReq) (err error) {
+	if id == req.ParentId {
+		return errors.New("不能自关联")
+	}
 	var oldDept models.SysDept
 	query := s.db.Table(oldDept.TableName()).Where("id = ?", id).First(&oldDept)
 	if query.Error == gorm.ErrRecordNotFound {
 		return errors.New("记录不存在")
 	}
-
-	// 比对增量字段
-	m := make(gin.H, 0)
+	// 比对增量字段,使用map确保gorm可更新零值
+	var m map[string]interface{}
 	utils.CompareDifferenceStructByJson(oldDept, req, &m)
-
 	// 更新指定列
 	err = query.Updates(m).Error
 	return
@@ -96,7 +100,7 @@ func (s *MysqlService) DeleteDeptByIds(ids []uint) (err error) {
 		return err
 	}
 	// 再删除
-	err = s.db.Where("id IN (?)", ids).Delete(models.SysDept{}).Error
+	err = s.db.Where("id IN (?)", ids).Delete(&dept).Error
 	if err != nil{
 		return err
 	}
