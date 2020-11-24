@@ -4,6 +4,7 @@ import (
 	"anew-server/middleware"
 	"anew-server/pkg/common"
 	"anew-server/routers"
+	"anew-server/routers/system"
 	"fmt"
 	"github.com/gin-gonic/gin"
 )
@@ -33,16 +34,17 @@ func Routers() *gin.Engine {
 	apiGroup := r.Group(common.Conf.System.UrlPathPrefix)
 	// 注册公共路由，所有人都可以访问
 	routers.InitPublicRouter(apiGroup)
-	routers.InitAuthRouter(apiGroup, authMiddleware) // 注册认证路由, 不会鉴权
+	system.InitAuthRouter(apiGroup, authMiddleware) // 注册认证路由, 不会鉴权
 	// 方便统一添加路由前缀
 	v1 := apiGroup.Group("v1")
 	{
-		routers.InitUserRouter(v1, authMiddleware) // 注册用户路由
-		routers.InitDeptRouter(v1, authMiddleware) // 注册部门路由
-		routers.InitMenuRouter(v1, authMiddleware) // 注册菜单路由
-		routers.InitRoleRouter(v1, authMiddleware) // 注册角色路由
-		routers.InitApiRouter(v1, authMiddleware)  // 注册接口路由
-		routers.InitOperLogRouter(v1, authMiddleware)  // 注册操作日志路由
+		system.InitUserRouter(v1, authMiddleware)    // 注册用户路由
+		system.InitDeptRouter(v1, authMiddleware)    // 注册部门路由
+		system.InitMenuRouter(v1, authMiddleware)    // 注册菜单路由
+		system.InitRoleRouter(v1, authMiddleware)    // 注册角色路由
+		system.InitApiRouter(v1, authMiddleware)     // 注册接口路由
+		system.InitDictRouter(v1, authMiddleware)     // 注册字典路由
+		system.InitOperLogRouter(v1, authMiddleware) // 注册操作日志路由
 	}
 
 	return r

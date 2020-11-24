@@ -2,16 +2,16 @@ package service
 
 import (
 	"anew-server/dto/request"
-	"anew-server/models"
+	"anew-server/models/system"
 	"anew-server/pkg/common"
 	"fmt"
 	"strings"
 )
 
 // 获取操作日志
-func (s *MysqlService) GetOperLogs(req *request.OperLogListReq) ([]models.SysOperLog, error) {
+func (s *MysqlService) GetOperLogs(req *request.OperLogListReq) ([]system.SysOperLog, error) {
 	var err error
-	list := make([]models.SysOperLog, 0)
+	list := make([]system.SysOperLog, 0)
 	query := common.Mysql
 	method := strings.TrimSpace(req.Method)
 	if method != "" {
@@ -47,5 +47,5 @@ func (s *MysqlService) GetOperLogs(req *request.OperLogListReq) ([]models.SysOpe
 
 // 批量删除操作日志
 func (s *MysqlService) DeleteOperationLogByIds(ids []uint) (err error) {
-	return s.db.Where("id IN (?)", ids).Delete(models.SysOperLog{}).Error
+	return s.db.Where("id IN (?)", ids).Delete(system.SysOperLog{}).Error
 }

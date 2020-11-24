@@ -4,12 +4,11 @@ package request
 type CreateDeptReq struct {
 	Name      string `json:"name" validate:"required"`
 	Sort       int    `json:"sort"`
-	Status     *bool  `json:"status"`
 	ParentId   uint   `json:"parent_id"`
 	Creator    string `json:"creator"`
 }
 
-// 修改用户结构体
+// 修改部门
 type UpdateDeptReq struct {
 	Name     string `json:"name" validate:"required"`
 	Status   *bool  `json:"status"`

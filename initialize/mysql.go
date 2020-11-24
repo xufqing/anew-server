@@ -1,7 +1,7 @@
 package initialize
 
 import (
-	"anew-server/models"
+	"anew-server/models/system"
 	"anew-server/pkg/common"
 	"fmt"
 	"gorm.io/driver/mysql"
@@ -54,11 +54,12 @@ func Mysql() {
 func autoMigrate() {
 	common.Mysql.AutoMigrate(
 		//new(models.SysCasbin),
-		new(models.SysUser),
-		new(models.SysDept),
-		new(models.SysRole),
-		new(models.SysMenu),
-		new(models.SysApi),
-		new(models.SysOperLog),
+		new(system.SysUser),
+		new(system.SysDept),
+		new(system.SysRole),
+		new(system.SysMenu),
+		new(system.SysApi),
+		new(system.SysDict),
+		new(system.SysOperLog),
 	)
 }

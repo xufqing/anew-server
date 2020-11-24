@@ -22,7 +22,6 @@ type CreateRoleReq struct {
 	Name    string `json:"name" validate:"required"`
 	Keyword string `json:"keyword" validate:"required"`
 	Desc    string `json:"desc"`
-	Status  *bool  `json:"status"`
 	Creator string `json:"creator"`
 }
 

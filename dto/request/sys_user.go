@@ -35,7 +35,6 @@ type CreateUserReq struct {
 	Avatar   string `json:"avatar"`
 	Name     string `json:"name" validate:"required"`
 	Email    string `json:"email"`
-	Status   *bool  `json:"status"`
 	DeptId   uint   `json:"dept_id"`
 	RoleId   uint   `json:"role_id" validate:"required"`
 	Creator  string `json:"creator"`

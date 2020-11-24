@@ -17,9 +17,18 @@ type CreateMenuReq struct {
 	Icon       string `json:"icon"`
 	Path       string `json:"path"`
 	Sort       int    `json:"sort"`
-	Status     *bool  `json:"status"`
 	ParentId   uint   `json:"parent_id"`
 	Creator    string `json:"creator"`
+}
+
+// 修改菜单
+type UpdateMenuReq struct {
+	Name     string `json:"name" validate:"required"`
+	Icon       string `json:"icon"`
+	Path       string `json:"path"`
+	Sort       int    `json:"sort"`
+	Status     *bool  `json:"status"`
+	ParentId   uint   `json:"parent_id"`
 }
 
 // 翻译需要校验的字段名称

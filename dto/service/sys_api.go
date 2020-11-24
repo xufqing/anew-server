@@ -2,20 +2,20 @@ package service
 
 import (
 	"anew-server/dto/request"
-	"anew-server/models"
+	"anew-server/models/system"
 	"anew-server/pkg/utils"
-	"gorm.io/gorm"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"strings"
 )
 
 
-func (s *MysqlService) GetApis(req *request.ApiListReq) ([]models.SysApi, error) {
+func (s *MysqlService) GetApis(req *request.ApiListReq) ([]system.SysApi, error) {
 	var err error
-	list := make([]models.SysApi, 0)
-	query := s.db.Table(new(models.SysApi).TableName())
+	list := make([]system.SysApi, 0)
+	query := s.db.Table(new(system.SysApi).TableName())
 	name := strings.TrimSpace(req.Name)
 	if name != "" {
 		query = query.Where("name LIKE ?", fmt.Sprintf("%%%s%%", name))
@@ -51,7 +51,7 @@ func (s *MysqlService) GetApis(req *request.ApiListReq) ([]models.SysApi, error)
 
 // 创建接口
 func (s *MysqlService) CreateApi(req *request.CreateApiReq) (err error) {
-	var api models.SysApi
+	var api system.SysApi
 	utils.Struct2StructByJson(req, &api)
 	// 创建数据
 	err = s.db.Create(&api).Error
@@ -60,14 +60,14 @@ func (s *MysqlService) CreateApi(req *request.CreateApiReq) (err error) {
 
 // 更新接口
 func (s *MysqlService) UpdateApiById(id uint, req gin.H) (err error) {
-	var oldApi models.SysApi
+	var oldApi system.SysApi
 	query := s.db.Table(oldApi.TableName()).Where("id = ?", id).First(&oldApi)
 	if query.Error == gorm.ErrRecordNotFound {
 		return errors.New("记录不存在")
 	}
 
 	// 比对增量字段
-	var m models.SysApi
+	var m system.SysApi
 	utils.CompareDifferenceStructByJson(oldApi, req, &m)
 	// 更新指定列
 	err = query.Updates(m).Error
@@ -77,5 +77,5 @@ func (s *MysqlService) UpdateApiById(id uint, req gin.H) (err error) {
 // 批量删除接口
 func (s *MysqlService) DeleteApiByIds(ids []uint) (err error) {
 
-	return s.db.Where("id IN (?)", ids).Delete(models.SysApi{}).Error
+	return s.db.Where("id IN (?)", ids).Delete(system.SysApi{}).Error
 }

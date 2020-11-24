@@ -1,8 +1,10 @@
-package models
+package system
+
+import "anew-server/models"
 
 // 系统角色表
 type SysRole struct {
-	Model
+	models.Model
 	Name    string    `gorm:"comment:'角色名称';size:128" json:"name"`
 	Keyword string    `gorm:"unique;comment:'角色关键词';size:128" json:"keyword"`
 	Desc    string    `gorm:"comment:'角色说明';size:255" json:"desc"`

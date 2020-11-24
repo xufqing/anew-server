@@ -9,37 +9,34 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// 查询当前用户菜单树
-func GetUserMenuTree(c *gin.Context) {
-	user := GetCurrentUser(c)
-
-	s := service.New()
-	menus, err := s.GetUserMenuList(user.RoleId)
+// 查询所有字典
+func GetDicts(c *gin.Context) {
+	// 绑定参数
+	var req request.DictListReq
+	err := c.Bind(&req)
 	if err != nil {
-		response.FailWithMsg(err.Error())
+		response.FailWithCode(response.ParmError)
 		return
 	}
-	var resp []response.MenuTreeResp
-	// 转换成树结构
-	resp = service.GenMenuTree(nil, menus)
-	response.SuccessWithData(resp)
-}
-
-// 查询所有菜单
-func GetMenus(c *gin.Context) {
 	// 创建服务
 	s := service.New()
-	menus := s.GetMenus()
-	var resp []response.MenuTreeResp
-	resp = service.GenMenuTree(nil,menus)
-	response.SuccessWithData(resp)
+	dicts := s.GetDicts(&req)
+	if req.Key != "" || req.Value != "" || req.Status != nil || req.TypeKey != "" {
+		var newResp []response.DictTreeResp
+		utils.Struct2StructByJson(dicts, &newResp)
+		response.SuccessWithData(newResp)
+	} else {
+		var resp []response.DictTreeResp
+		resp = service.GenDictTree(nil, dicts)
+		response.SuccessWithData(resp)
+	}
 }
 
-// 创建菜单
-func CreateMenu(c *gin.Context) {
+// 创建字典
+func CreateDict(c *gin.Context) {
 	user := GetCurrentUser(c)
 	// 绑定参数
-	var req request.CreateMenuReq
+	var req request.CreateDictReq
 	err := c.Bind(&req)
 	if err != nil {
 		response.FailWithCode(response.ParmError)
@@ -56,7 +53,7 @@ func CreateMenu(c *gin.Context) {
 	req.Creator = user.Name
 	// 创建服务
 	s := service.New()
-	err = s.CreateMenu(&req)
+	err = s.CreateDict(&req)
 	if err != nil {
 		response.FailWithMsg(err.Error())
 		return
@@ -64,26 +61,24 @@ func CreateMenu(c *gin.Context) {
 	response.Success()
 }
 
-// 更新菜单
-func UpdateMenuById(c *gin.Context) {
+// 更新字典
+func UpdateDictById(c *gin.Context) {
 	// 绑定参数
-	var req request.UpdateMenuReq
+	var req request.UpdateDictReq
 	err := c.Bind(&req)
 	if err != nil {
 		response.FailWithCode(response.ParmError)
 		return
 	}
-
-	// 获取path中的menuId
-	menuId := utils.Str2Uint(c.Param("menuId"))
-	if menuId == 0 {
-		response.FailWithMsg("菜单编号不正确")
+	DictId := utils.Str2Uint(c.Param("DictId"))
+	if DictId == 0 {
+		response.FailWithMsg("字典编号不正确")
 		return
 	}
 	// 创建服务
 	s := service.New()
 	// 更新数据
-	err = s.UpdateMenuById(menuId, req)
+	err = s.UpdateDictById(DictId, req)
 	if err != nil {
 		response.FailWithMsg(err.Error())
 		return
@@ -91,8 +86,8 @@ func UpdateMenuById(c *gin.Context) {
 	response.Success()
 }
 
-// 批量删除菜单
-func BatchDeleteMenuByIds(c *gin.Context) {
+// 批量删除字典
+func BatchDeleteDictByIds(c *gin.Context) {
 	var req request.IdsReq
 	err := c.Bind(&req)
 	if err != nil {
@@ -103,7 +98,7 @@ func BatchDeleteMenuByIds(c *gin.Context) {
 	// 创建服务
 	s := service.New()
 	// 删除数据
-	err = s.DeleteMenuByIds(req.Ids)
+	err = s.DeleteDictByIds(req.Ids)
 	if err != nil {
 		response.FailWithMsg(err.Error())
 		return

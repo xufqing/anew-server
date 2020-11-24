@@ -4,6 +4,7 @@ import (
 	"anew-server/api/v1/system"
 	"anew-server/dto/response"
 	"anew-server/models"
+	system2 "anew-server/models/system"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
 	"bytes"
@@ -69,7 +70,7 @@ func OperationLog(c *gin.Context) {
 				body = []byte(utils.Struct2Json(params))
 			}
 		}
-		log := models.SysOperLog{
+		log := system2.SysOperLog{
 			Model: models.Model{
 				// 记录最后时间
 				CreatedAt: models.LocalTime{
@@ -95,7 +96,7 @@ func OperationLog(c *gin.Context) {
 		// 清理事务
 		c.Set("tx", "")
 		// 获取接口名称
-		var api models.SysApi
+		var api system2.SysApi
 		err = common.Mysql.Where("path = ? AND method = ?", strings.TrimPrefix(c.FullPath(), "/"+common.Conf.System.UrlPathPrefix), c.Request.Method).First(&api).Error
 		if err != nil {
 			common.Log.Error("获取接口详情失败: ", err)

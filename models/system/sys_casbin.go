@@ -1,4 +1,4 @@
-package models
+package system
 
 // Casbin权限访问控制表, 参见github.com/casbin/gorm-adapter/v2/adapter.go CasbinRule
 // 可以根据项目实际需要动态设定, 这里用到了3个字段 角色关键字/资源名称/请求类型

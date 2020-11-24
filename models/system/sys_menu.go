@@ -1,9 +1,11 @@
-package models
+package system
+
+import "anew-server/models"
 
 // 系统菜单表
 type SysMenu struct {
-	Model
-	Name      string    `gorm:"comment:'菜单名称';size:128" json:"name"`
+	models.Model
+	Name      string     `gorm:"comment:'菜单名称';size:128" json:"name"`
 	Icon       string    `gorm:"comment:'菜单图标';size:128" json:"icon"`
 	Path       string    `gorm:"comment:'菜单访问路径';size:255" json:"path"`
 	Sort       int       `gorm:"type:int(3);comment:'菜单顺序(同级菜单, 从0开始, 越小显示越靠前)'" json:"sort"`

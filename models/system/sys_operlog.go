@@ -1,12 +1,13 @@
-package models
+package system
 
 import (
+	"anew-server/models"
 	"time"
 )
 
 // 系统操作日志
 type SysOperLog struct {
-	Model
+	models.Model
 	Name     string `gorm:"comment:'接口名称';size:128" json:"name"`
 	Path       string        `json:"path" gorm:"comment:'访问路径';size:255"`
 	Method     string        `json:"method" gorm:"comment:'请求方式';size:128"`

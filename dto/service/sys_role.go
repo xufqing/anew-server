@@ -3,7 +3,7 @@ package service
 import (
 	"anew-server/dto/request"
 	"anew-server/dto/response"
-	"anew-server/models"
+	"anew-server/models/system"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
 	"errors"
@@ -14,9 +14,9 @@ import (
 )
 
 // 获取所有角色
-func (s *MysqlService) GetRoles(req *request.RoleListReq) ([]models.SysRole, error) {
+func (s *MysqlService) GetRoles(req *request.RoleListReq) ([]system.SysRole, error) {
 	var err error
-	list := make([]models.SysRole, 0)
+	list := make([]system.SysRole, 0)
 	db := common.Mysql
 	name := strings.TrimSpace(req.Name)
 	if name != "" {
@@ -54,7 +54,7 @@ func (s *MysqlService) GetRoles(req *request.RoleListReq) ([]models.SysRole, err
 
 // 根据角色ID获取角色权限：菜单和接口
 func (s *MysqlService) GetPermsByRoleId(roleId uint) (response.RolePermsResp, error) {
-	var role models.SysRole
+	var role system.SysRole
 	//var apis []models.SysApi
 	var resp response.RolePermsResp
 	err := s.db.Preload("Menus", "status = ?", true).Where("id = ?", roleId).First(&role).Error
@@ -67,7 +67,7 @@ func (s *MysqlService) GetPermsByRoleId(roleId uint) (response.RolePermsResp, er
 	for _,menu := range role.Menus{
 		resp.MenusId = append(resp.MenusId,menu.Id)
 	}
-	allApi := make([]models.SysApi, 0)
+	allApi := make([]system.SysApi, 0)
 	// 查询全部api
 	err = s.db.Find(&allApi).Error
 	if err == nil {
@@ -91,7 +91,7 @@ func (s *MysqlService) GetPermsByRoleId(roleId uint) (response.RolePermsResp, er
 
 // 创建角色
 func (s *MysqlService) CreateRole(req *request.CreateRoleReq) (err error) {
-	var role models.SysRole
+	var role system.SysRole
 	utils.Struct2StructByJson(req, &role)
 	// 创建数据
 	err = s.db.Create(&role).Error
@@ -100,13 +100,13 @@ func (s *MysqlService) CreateRole(req *request.CreateRoleReq) (err error) {
 
 // 更新角色
 func (s *MysqlService) UpdateRoleById(id uint, req gin.H) (err error) {
-	var oldRole models.SysRole
+	var oldRole system.SysRole
 	query := s.db.Model(oldRole).Where("id = ?", id).First(&oldRole)
 	if query.Error == gorm.ErrRecordNotFound {
 		return errors.New("记录不存在")
 	}
 	// 比对增量字段
-	var m models.SysRole
+	var m system.SysRole
 	utils.CompareDifferenceStructByJson(oldRole, req, &m)
 	// 更新指定列
 	err = query.Updates(m).Error
@@ -115,14 +115,14 @@ func (s *MysqlService) UpdateRoleById(id uint, req gin.H) (err error) {
 
 // 更新角色的菜单
 func (s *MysqlService) UpdateRoleMenusById(id uint, req []uint) (err error) {
-	var menus []models.SysMenu
+	var menus []system.SysMenu
 	err = s.db.Where("id in (?)", req).Find(&menus).Error
 	if err != nil {
 		return
 	}
 	//var role models.SysRole
 	// 替换菜单
-	err = s.db.Where("id = ?", id).First(&models.SysRole{}).Association("Menus").Replace(&menus)
+	err = s.db.Where("id = ?", id).First(&system.SysRole{}).Association("Menus").Replace(&menus)
 	//err = s.db.Where("id = ?", id).Find(&models.SysRole{}).Association("Menus").Replace(&menus)
 	//err = s.db.Model(&role).Where("id = ?", id).Association("Menus").Replace(&menus)
 	return
@@ -130,28 +130,28 @@ func (s *MysqlService) UpdateRoleMenusById(id uint, req []uint) (err error) {
 
 // 更新角色的权限接口
 func (s *MysqlService) UpdateRoleApisById(id uint, req []uint) (err error) {
-	var oldRole models.SysRole
+	var oldRole system.SysRole
 	query := s.db.Model(&oldRole).Where("id = ?", id).First(&oldRole)
 	if query.Error == gorm.ErrRecordNotFound {
 		return errors.New("角色不存在")
 	}
 	if len(req) > 0 {
 		// 先删除当前角色的规则
-		oldCasbin := s.GetRoleCasbins(models.SysRoleCasbin{
+		oldCasbin := s.GetRoleCasbins(system.SysRoleCasbin{
 			Keyword: oldRole.Keyword,
 		})
 		// 批量删除
 		_, err = s.BatchDeleteRoleCasbins(oldCasbin)
 
 		// 构建新的规则
-		apis := make([]models.SysApi, 0)
+		apis := make([]system.SysApi, 0)
 		err = s.db.Where("id IN (?)", req).Find(&apis).Error
 		if err != nil {
 			return
 		}
-		cs := make([]models.SysRoleCasbin, 0)
+		cs := make([]system.SysRoleCasbin, 0)
 		for _, api := range apis {
-			cs = append(cs, models.SysRoleCasbin{
+			cs = append(cs, system.SysRoleCasbin{
 				Keyword: oldRole.Keyword,
 				Path:    api.Path,
 				Method:  api.Method,
@@ -165,19 +165,19 @@ func (s *MysqlService) UpdateRoleApisById(id uint, req []uint) (err error) {
 
 // 批量删除角色
 func (s *MysqlService) DeleteRoleByIds(ids []uint) (err error) {
-	var roles []models.SysRole
+	var roles []system.SysRole
 	// 查询符合条件的角色, 以及关联的用户
 	err = s.db.Preload("Users").Preload("Menus").Where("id IN (?)", ids).Find(&roles).Error
 	if err != nil {
 		return
 	}
 	newIds := make([]uint, 0)
-	oldCasbins := make([]models.SysRoleCasbin, 0)
+	oldCasbins := make([]system.SysRoleCasbin, 0)
 	for _, role := range roles {
 		if len(role.Users) > 0 {
 			return errors.New(fmt.Sprintf("角色[%s]仍有%d位关联用户, 请先移除关联用户再删除角色", role.Name, len(role.Users)))
 		}
-		oldCasbins = append(oldCasbins, s.GetRoleCasbins(models.SysRoleCasbin{
+		oldCasbins = append(oldCasbins, s.GetRoleCasbins(system.SysRoleCasbin{
 			Keyword: role.Keyword,
 		})...)
 		newIds = append(newIds, role.Id)
@@ -188,7 +188,7 @@ func (s *MysqlService) DeleteRoleByIds(ids []uint) (err error) {
 	}
 	if len(newIds) > 0 {
 		// 执行删除
-		err = s.db.Where("id IN (?)", newIds).Delete(models.SysRole{}).Error
+		err = s.db.Where("id IN (?)", newIds).Delete(system.SysRole{}).Error
 	}
 	return
 }

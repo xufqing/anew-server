@@ -1,4 +1,4 @@
-package routers
+package system
 
 import (
 	"anew-server/api/v1/system"
@@ -11,7 +11,7 @@ import (
 func InitUserRouter(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) (R gin.IRoutes) {
 	router := r.Group("user").Use(authMiddleware.MiddlewareFunc()).Use(middleware.CasbinMiddleware)
 	{
-		router.POST("/info", system.GetUserInfo)
+		router.GET("/info", system.GetUserInfo)
 		router.POST("/info/uploadImg", system.UserAvatarUpload)
 		router.GET("/list", system.GetUsers)
 		router.POST("/create", system.CreateUser)

@@ -3,21 +3,24 @@ package service
 import (
 	"anew-server/dto/request"
 	"anew-server/dto/response"
-	"anew-server/models"
+	"anew-server/models/system"
 	"anew-server/pkg/utils"
 	"errors"
-	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"sort"
 )
 
 // 获取用户菜单的切片
-func (s *MysqlService) GetUserMenuList(roleId uint) ([]models.SysMenu, error) {
+func (s *MysqlService) GetUserMenuList(roleId uint) ([]system.SysMenu, error) {
 	//tree := make([]models.SysMenu, 0)
-	var role models.SysRole
-	err := s.db.Table(new(models.SysRole).TableName()).Preload("Menus", "status = ?", true).Where("id = ?", roleId).Find(&role).Error
-	menus := make([]models.SysMenu, 0)
+	var role system.SysRole
+	err := s.db.Table(new(system.SysRole).TableName()).Preload("Menus", "status = ?", true).Where("id = ?", roleId).Find(&role).Error
+	menus := make([]system.SysMenu, 0)
 	if err != nil {
+		return menus, err
+	}
+	if role.Keyword == "admin" {
+		err = s.db.Find(&menus).Error
 		return menus, err
 	}
 	// 生成菜单树
@@ -26,7 +29,7 @@ func (s *MysqlService) GetUserMenuList(roleId uint) ([]models.SysMenu, error) {
 }
 
 // 获取所有菜单
-func (s *MysqlService) GetMenus() []models.SysMenu {
+func (s *MysqlService) GetMenus() []system.SysMenu {
 	//tree := make([]models.SysMenu, 0)
 	menus := s.getAllMenu()
 	// 生成菜单树
@@ -36,7 +39,7 @@ func (s *MysqlService) GetMenus() []models.SysMenu {
 
 
 // 生成菜单树
-func GenMenuTree(parent *response.MenuTreeResp, menus []models.SysMenu) []response.MenuTreeResp {
+func GenMenuTree(parent *response.MenuTreeResp, menus []system.SysMenu) []response.MenuTreeResp {
 	tree := make(response.MenuTreeRespList, 0)
 	// 转为MenuTreeResponseStruct
 	var resp []response.MenuTreeResp
@@ -64,7 +67,7 @@ func GenMenuTree(parent *response.MenuTreeResp, menus []models.SysMenu) []respon
 
 // 创建菜单
 func (s *MysqlService) CreateMenu(req *request.CreateMenuReq) (err error) {
-	var menu models.SysMenu
+	var menu system.SysMenu
 	utils.Struct2StructByJson(req, &menu)
 	// 创建数据
 	err = s.db.Create(&menu).Error
@@ -72,8 +75,11 @@ func (s *MysqlService) CreateMenu(req *request.CreateMenuReq) (err error) {
 }
 
 // 更新菜单
-func (s *MysqlService) UpdateMenuById(id uint, req gin.H) (err error) {
-	var oldMenu models.SysMenu
+func (s *MysqlService) UpdateMenuById(id uint, req request.UpdateMenuReq) (err error) {
+	if id == req.ParentId {
+		return errors.New("不能自关联")
+	}
+	var oldMenu system.SysMenu
 	query := s.db.Table(oldMenu.TableName()).Where("id = ?", id).First(&oldMenu)
 	if query.Error == gorm.ErrRecordNotFound {
 		return errors.New("记录不存在")
@@ -88,7 +94,7 @@ func (s *MysqlService) UpdateMenuById(id uint, req gin.H) (err error) {
 
 // 批量删除菜单
 func (s *MysqlService) DeleteMenuByIds(ids []uint) (err error) {
-	var menu models.SysMenu
+	var menu system.SysMenu
 	// 先解除父级关联
 	err = s.db.Table(menu.TableName()).Where("parent_id IN (?)", ids).Update("parent_id",0).Error
 	if err != nil{
@@ -105,8 +111,8 @@ func (s *MysqlService) DeleteMenuByIds(ids []uint) (err error) {
 
 
 // 获取全部菜单, 非菜单树
-func (s *MysqlService) getAllMenu() []models.SysMenu {
-	menus := make([]models.SysMenu, 0)
+func (s *MysqlService) getAllMenu() []system.SysMenu {
+	menus := make([]system.SysMenu, 0)
 	// 查询所有菜单
 	s.db.Order("sort").Find(&menus)
 	return menus

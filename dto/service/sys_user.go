@@ -3,7 +3,7 @@ package service
 import (
 	"anew-server/dto/request"
 	"anew-server/dto/response"
-	"anew-server/models"
+	"anew-server/models/system"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
 	"errors"
@@ -14,7 +14,7 @@ import (
 
 // 登录校验,返回指定信息
 func (s *MysqlService) LoginCheck(username string, password string) (*response.LoginResp, error) {
-	var u models.SysUser
+	var u system.SysUser
 	// 查询用户及其角色
 	err := s.db.Preload("Role", "status = ?", true).Where("username = ?", username).First(&u).Error
 	if err != nil {
@@ -34,8 +34,8 @@ func (s *MysqlService) LoginCheck(username string, password string) (*response.L
 }
 
 // 获取单个用户
-func (s *MysqlService) GetUserById(id uint) (models.SysUser, error) {
-	var user models.SysUser
+func (s *MysqlService) GetUserById(id uint) (system.SysUser, error) {
+	var user system.SysUser
 	var err error
 	err = s.db.Preload("Role", "status = ?", true).Preload("Dept", "status = ?", true).Where("id = ?", id).First(&user).Error
 	return user, err
@@ -43,7 +43,7 @@ func (s *MysqlService) GetUserById(id uint) (models.SysUser, error) {
 
 // 检查用户是否已存在
 func (s *MysqlService) CheckUser(username string) error {
-	var user models.SysUser
+	var user system.SysUser
 	var err error
 	s.db.Where("username = ?", username).First(&user)
 	if user.Id != 0 {
@@ -54,7 +54,7 @@ func (s *MysqlService) CheckUser(username string) error {
 
 // 创建用户
 func (s *MysqlService) CreateUser(req *request.CreateUserReq) (err error) {
-	var user models.SysUser
+	var user system.SysUser
 	err = s.CheckUser(req.Username)
 	if err != nil {
 		return
@@ -69,13 +69,13 @@ func (s *MysqlService) CreateUser(req *request.CreateUserReq) (err error) {
 
 // 更新用户基本信息
 func (s *MysqlService) UpdateUserBaseInfoById(id uint, req request.UpdateUserBaseInfoReq) (err error) {
-	var oldUser models.SysUser
+	var oldUser system.SysUser
 	//query := s.db.Table(oldUser.TableName()).Where("id = ?", id).First(&oldUser)
 	query := s.db.First(&oldUser).Where("id = ?", id)
 	if query.Error == gorm.ErrInvalidField {
 		return errors.New("记录不存在")
 	}
-	var m models.SysUser
+	var m system.SysUser
 	utils.CompareDifferenceStructByJson(oldUser, req, &m)
 	// 更新指定列
 	err = query.Updates(m).Error
@@ -84,7 +84,7 @@ func (s *MysqlService) UpdateUserBaseInfoById(id uint, req request.UpdateUserBas
 
 // 更新用户
 func (s *MysqlService) UpdateUserById(id uint, req request.UpdateUserReq) (err error) {
-	var oldUser models.SysUser
+	var oldUser system.SysUser
 	query := s.db.Table(oldUser.TableName()).Where("id = ?", id).First(&oldUser)
 	// query := s.db.First(&oldUser).Where("id = ?", id)
 	if query.Error == gorm.ErrRecordNotFound {
@@ -110,9 +110,9 @@ func (s *MysqlService) UpdateUserById(id uint, req request.UpdateUserReq) (err e
 }
 
 // 获取用户
-func (s *MysqlService) GetUsers(req *request.UserListReq) ([]models.SysUser, error) {
+func (s *MysqlService) GetUsers(req *request.UserListReq) ([]system.SysUser, error) {
 	var err error
-	list := make([]models.SysUser, 0)
+	list := make([]system.SysUser, 0)
 	db := common.Mysql
 	username := strings.TrimSpace(req.Username)
 	if username != "" {
@@ -155,6 +155,6 @@ func (s *MysqlService) GetUsers(req *request.UserListReq) ([]models.SysUser, err
 
 // 批量删除用户
 func (s *MysqlService) DeleteUserByIds(ids []uint) (err error) {
-	var user models.SysUser
+	var user system.SysUser
 	return s.db.Where("id IN (?)", ids).Delete(&user).Error
 }

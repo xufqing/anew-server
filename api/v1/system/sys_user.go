@@ -4,7 +4,7 @@ import (
 	"anew-server/dto/request"
 	"anew-server/dto/response"
 	"anew-server/dto/service"
-	"anew-server/models"
+	"anew-server/models/system"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
 	"github.com/gin-gonic/gin"
@@ -12,9 +12,9 @@ import (
 )
 
 // 获取当前请求用户信息
-func GetCurrentUser(c *gin.Context) (models.SysUser) {
+func GetCurrentUser(c *gin.Context) (system.SysUser) {
 	user, exists := c.Get("user")
-	var newUser models.SysUser
+	var newUser system.SysUser
 	if !exists {
 		return newUser
 	}

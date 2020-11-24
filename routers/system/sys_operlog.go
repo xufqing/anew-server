@@ -1,4 +1,4 @@
-package routers
+package system
 
 import (
 	"anew-server/api/v1/system"

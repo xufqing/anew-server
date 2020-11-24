@@ -1,8 +1,10 @@
-package models
+package system
+
+import "anew-server/models"
 
 // User
 type SysUser struct {
-	Model
+	models.Model
 	Username string `gorm:"unique;comment:'用户名';size:128" json:"username" binding:"required"`
 	Password string `gorm:"comment:'密码';size:255" json:"password" binding:"required"`
 	Mobile   string `gorm:"comment:'手机';size:128" json:"mobile"`

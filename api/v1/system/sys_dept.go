@@ -22,7 +22,9 @@ func GetDepts(c *gin.Context) {
 	s := service.New()
 	depts := s.GetDepts(&req)
 	if (req.Name != "" || req.Status != nil){
-		response.SuccessWithData(depts)
+		var newResp []response.DictTreeResp
+		utils.Struct2StructByJson(depts, &newResp)
+		response.SuccessWithData(newResp)
 	} else {
 		var resp []response.DeptTreeResp
 		resp = service.GenDeptTree(nil,depts)
