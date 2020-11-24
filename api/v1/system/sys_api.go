@@ -6,7 +6,6 @@ import (
 	"anew-server/dto/service"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
-	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -46,8 +45,6 @@ func GetApis(c *gin.Context) {
 			// api结构转换
 			var item response.ApiListResp
 			utils.Struct2StructByJson(api, &item)
-			item.Title = fmt.Sprintf("[%s] [%s] %s", item.Method, item.Desc, item.Path )
-			item.Key = fmt.Sprintf("%d",item.Id)
 			children = append(children, item)
 			if existIndex != -1 {
 				// 更新元素
@@ -55,8 +52,6 @@ func GetApis(c *gin.Context) {
 			} else {
 				// 新增元素
 				tree = append(tree, response.ApiTreeResp{
-					Key: api.Category,
-					Title:    api.Category + " [分组]",
 					Category: api.Category,
 					Children: children,
 				})

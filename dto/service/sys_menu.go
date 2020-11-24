@@ -5,10 +5,9 @@ import (
 	"anew-server/dto/response"
 	"anew-server/models"
 	"anew-server/pkg/utils"
-	"gorm.io/gorm"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"sort"
 )
 
@@ -48,10 +47,6 @@ func GenMenuTree(parent *response.MenuTreeResp, menus []models.SysMenu) []respon
 		parentId = parent.Id
 	}
 	for _, menu := range resp {
-		// 增加key值
-		menu.Key = fmt.Sprintf("%d",menu.Id)
-		menu.Value = fmt.Sprintf("%d",menu.Id)
-		menu.Title = menu.Name
 		// 父菜单编号一致
 		if menu.ParentId == parentId {
 			// 递归获取子菜单
@@ -83,11 +78,9 @@ func (s *MysqlService) UpdateMenuById(id uint, req gin.H) (err error) {
 	if query.Error == gorm.ErrRecordNotFound {
 		return errors.New("记录不存在")
 	}
-
-	// 比对增量字段
-	m := make(gin.H, 0)
+	// 比对增量字段,使用map确保gorm可更新零值
+	var m map[string]interface{}
 	utils.CompareDifferenceStructByJson(oldMenu, req, &m)
-
 	// 更新指定列
 	err = query.Updates(m).Error
 	return
@@ -102,7 +95,7 @@ func (s *MysqlService) DeleteMenuByIds(ids []uint) (err error) {
 		return err
 	}
 	// 再删除
-	err = s.db.Where("id IN (?)", ids).Delete(models.SysMenu{}).Error
+	err = s.db.Where("id IN (?)", ids).Delete(&menu).Error
 	if err != nil{
 		return err
 	}

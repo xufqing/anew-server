@@ -3,6 +3,7 @@ package models
 // 系统接口表
 type SysApi struct {
 	Model
+	Name     string `gorm:"comment:'接口名称';size:128" json:"name"`
 	Method   string `gorm:"comment:'请求方式';size:128" json:"method"`
 	Path     string `gorm:"comment:'访问路径';size:255" json:"path"`
 	Category string `gorm:"comment:'所属类别';size:128" json:"category"`

@@ -95,7 +95,7 @@ func UpdateRoleById(c *gin.Context) {
 	response.Success()
 }
 
-// 更新角色的权限菜单
+// 更新角色的权限
 func UpdateRolePermsById(c *gin.Context) {
 	// 绑定参数
 	var req request.UpdateRolePermsReq
@@ -112,16 +112,16 @@ func UpdateRolePermsById(c *gin.Context) {
 	}
 	// 创建服务
 	s := service.New()
-	if req.MenuIds != nil {
+	if req.MenusId != nil {
 		// 更新数据
-		err = s.UpdateRoleMenusById(roleId, req.MenuIds)
+		err = s.UpdateRoleMenusById(roleId, req.MenusId)
 		if err != nil {
 			response.FailWithMsg(err.Error())
 			return
 		}
 	}
-	if req.ApiIds != nil {
-		err = s.UpdateRoleApisById(roleId, req.ApiIds)
+	if req.ApisId != nil {
+		err = s.UpdateRoleApisById(roleId, req.ApisId)
 		if err != nil {
 			response.FailWithMsg(err.Error())
 			return
@@ -148,4 +148,17 @@ func BatchDeleteRoleByIds(c *gin.Context) {
 		return
 	}
 	response.Success()
+}
+
+// 查询指定角色的权限
+func GetPermsByRoleId(c *gin.Context) {
+	// 创建服务
+	s := service.New()
+	// 绑定参数
+	resp,err := s.GetPermsByRoleId(utils.Str2Uint(c.Param("roleId")))
+	if err != nil {
+		response.FailWithMsg(err.Error())
+		return
+	}
+	response.SuccessWithData(resp)
 }

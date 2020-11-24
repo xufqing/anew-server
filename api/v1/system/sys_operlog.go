@@ -26,7 +26,7 @@ func GetOperLogs(c *gin.Context) {
 		return
 	}
 	// 转为ResponseStruct, 隐藏部分字段
-	var respStruct []response.OperationLogListResponseStruct
+	var respStruct []response.OperationLogListResp
 	utils.Struct2StructByJson(operationLogs, &respStruct)
 	// 返回分页数据
 	var resp response.PageData

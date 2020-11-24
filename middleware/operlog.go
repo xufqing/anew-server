@@ -90,13 +90,20 @@ func OperationLog(c *gin.Context) {
 			UserAgent: c.Request.UserAgent(),
 		}
 		// 处理密码信息
-		re, _ := regexp.Compile("\"password\":\"([^\"]+)\"");
+		re, _ := regexp.Compile("\"password\":\"([^\"]+)\"")
 		log.Body = re.ReplaceAllString(log.Body, "\"password\":\"***\"")
 		// 清理事务
 		c.Set("tx", "")
+		// 获取接口名称
+		var api models.SysApi
+		err = common.Mysql.Where("path = ? AND method = ?", strings.TrimPrefix(c.FullPath(), "/"+common.Conf.System.UrlPathPrefix), c.Request.Method).First(&api).Error
+		if err != nil {
+			common.Log.Error("获取接口详情失败: ", err)
+			log.Name = "查无记录"
+		}
+		log.Name = api.Name
 		// 获取当前登录用户
 		user := system.GetCurrentUser(c)
-
 		// 用户名
 		if user.Id > 0 {
 			log.Username = user.Username

@@ -9,17 +9,10 @@ type RolePermsResp struct {
 	Id      uint             `json:"id"`
 	Name    string           `json:"name"`
 	Keyword string           `json:"keyword"`
-	Menus   []models.SysMenu `json:"menus"`
-	Apis    []models.SysApi  `json:"apis"`
+	MenusId   []uint `json:"menus_id"`
+	ApisId    []uint `json:"apis_id"`
 }
 
-// 角色返回字符串权限信息
-type RolePermsStrResp struct {
-	Id    uint     `json:"id"`
-	Name  string   `json:"name"`
-	Menus []string `json:"menus"`
-	Apis  []string `json:"apis"`
-}
 
 // 角色信息响应, 字段含义见models
 type RoleListResp struct {

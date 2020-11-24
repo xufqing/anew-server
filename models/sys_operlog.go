@@ -7,6 +7,7 @@ import (
 // 系统操作日志
 type SysOperLog struct {
 	Model
+	Name     string `gorm:"comment:'接口名称';size:128" json:"name"`
 	Path       string        `json:"path" gorm:"comment:'访问路径';size:255"`
 	Method     string        `json:"method" gorm:"comment:'请求方式';size:128"`
 	Body       string        `json:"body" gorm:"type:blob;comment:'请求主体(通过二进制存储节省空间)';size:255"`

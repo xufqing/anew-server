@@ -16,6 +16,10 @@ func (s *MysqlService) GetApis(req *request.ApiListReq) ([]models.SysApi, error)
 	var err error
 	list := make([]models.SysApi, 0)
 	query := s.db.Table(new(models.SysApi).TableName())
+	name := strings.TrimSpace(req.Name)
+	if name != "" {
+		query = query.Where("name LIKE ?", fmt.Sprintf("%%%s%%", name))
+	}
 	method := strings.TrimSpace(req.Method)
 	if method != "" {
 		query = query.Where("method LIKE ?", fmt.Sprintf("%%%s%%", method))
@@ -27,14 +31,6 @@ func (s *MysqlService) GetApis(req *request.ApiListReq) ([]models.SysApi, error)
 	category := strings.TrimSpace(req.Category)
 	if category != "" {
 		query = query.Where("category LIKE ?", fmt.Sprintf("%%%s%%", category))
-	}
-	creator := strings.TrimSpace(req.Creator)
-	if creator != "" {
-		query = query.Where("creator LIKE ?", fmt.Sprintf("%%%s%%", creator))
-	}
-	permission := strings.TrimSpace(req.Permission)
-	if permission != "" {
-		query = query.Where("permission LIKE ?", fmt.Sprintf("%%%s%%", permission))
 	}
 
 	// 查询条数
@@ -71,7 +67,7 @@ func (s *MysqlService) UpdateApiById(id uint, req gin.H) (err error) {
 	}
 
 	// 比对增量字段
-	m := make(gin.H, 0)
+	var m models.SysApi
 	utils.CompareDifferenceStructByJson(oldApi, req, &m)
 	// 更新指定列
 	err = query.Updates(m).Error

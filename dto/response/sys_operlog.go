@@ -6,8 +6,9 @@ import (
 )
 
 // 接口信息响应, 字段含义见models
-type OperationLogListResponseStruct struct {
+type OperationLogListResp struct {
 	Id         uint             `json:"id"`
+	Name       string           `json:"name"`
 	Path       string           `json:"path"`
 	Method     string           `json:"method"`
 	Params     string           `json:"params"`

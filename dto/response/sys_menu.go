@@ -4,16 +4,12 @@ package response
 type MenuTreeResp struct {
 	Id       uint           `json:"id"`
 	ParentId uint           `json:"parent_id"`
-	Key      string         `json:"key"`
-	Value    string         `json:"value"`
 	Name     string         `json:"name"`
-	Title    string         `json:"title"`
 	Icon     string         `json:"icon"`
 	Path     string         `json:"path"`
 	Creator  string         `json:"creator"`
 	Sort     int            `json:"sort"`
 	Status   bool           `json:"status"`
-	Hidden   bool           `json:"hidden"`
 	Children []MenuTreeResp `json:"children,omitempty"` //tag:omitempty 为空的值不显示
 }
 type MenuTreeRespList []MenuTreeResp

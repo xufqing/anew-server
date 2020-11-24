@@ -2,6 +2,7 @@ package service
 
 import (
 	"anew-server/dto/request"
+	"anew-server/dto/response"
 	"anew-server/models"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
@@ -51,22 +52,42 @@ func (s *MysqlService) GetRoles(req *request.RoleListReq) ([]models.SysRole, err
 	return list, err
 }
 
-//// 根据角色ID获取权限：菜单和接口
-//func (s *MysqlService) GetPermsByRoleId(roleId uint) (response.RolePermsResp, error) {
-//	var role models.SysRole
-//	//var apis []models.SysApi
-//	var resp response.RolePermsResp
-//	err := s.db.Preload("Menus", "status = ?", true).Preload("Apis").Where("id = ?", roleId).First(&role).Error
-//	if err != nil {
-//		return resp, err
-//	}
-//	resp.Id = role.Id
-//	resp.Name = role.Name
-//	resp.Keyword = role.Keyword
-//	resp.Menus = role.Menus
-//	resp.Apis = role.Apis
-//	return resp, err
-//}
+// 根据角色ID获取角色权限：菜单和接口
+func (s *MysqlService) GetPermsByRoleId(roleId uint) (response.RolePermsResp, error) {
+	var role models.SysRole
+	//var apis []models.SysApi
+	var resp response.RolePermsResp
+	err := s.db.Preload("Menus", "status = ?", true).Where("id = ?", roleId).First(&role).Error
+	if err != nil {
+		return resp, err
+	}
+	resp.Id = role.Id
+	resp.Name = role.Name
+	resp.Keyword = role.Keyword
+	for _,menu := range role.Menus{
+		resp.MenusId = append(resp.MenusId,menu.Id)
+	}
+	allApi := make([]models.SysApi, 0)
+	// 查询全部api
+	err = s.db.Find(&allApi).Error
+	if err == nil {
+		casbins, err := s.GetCasbinListByRoleId(roleId)
+		if err == nil {
+			for _, api := range allApi {
+				path := api.Path
+				method := api.Method
+				for _, casbin := range casbins {
+					// 该api有权限
+					if path == casbin.V1 && method == casbin.V2 {
+						resp.ApisId = append(resp.ApisId, api.Id)
+						break
+					}
+				}
+			}
+		}
+	}
+	return resp, err
+}
 
 // 创建角色
 func (s *MysqlService) CreateRole(req *request.CreateRoleReq) (err error) {
@@ -99,8 +120,11 @@ func (s *MysqlService) UpdateRoleMenusById(id uint, req []uint) (err error) {
 	if err != nil {
 		return
 	}
+	//var role models.SysRole
 	// 替换菜单
 	err = s.db.Where("id = ?", id).First(&models.SysRole{}).Association("Menus").Replace(&menus)
+	//err = s.db.Where("id = ?", id).Find(&models.SysRole{}).Association("Menus").Replace(&menus)
+	//err = s.db.Model(&role).Where("id = ?", id).Association("Menus").Replace(&menus)
 	return
 }
 
@@ -143,7 +167,7 @@ func (s *MysqlService) UpdateRoleApisById(id uint, req []uint) (err error) {
 func (s *MysqlService) DeleteRoleByIds(ids []uint) (err error) {
 	var roles []models.SysRole
 	// 查询符合条件的角色, 以及关联的用户
-	err = s.db.Preload("Users").Preload("Menus").Preload("Apis").Where("id IN (?)", ids).Find(&roles).Error
+	err = s.db.Preload("Users").Preload("Menus").Where("id IN (?)", ids).Find(&roles).Error
 	if err != nil {
 		return
 	}

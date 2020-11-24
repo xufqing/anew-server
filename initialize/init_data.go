@@ -51,7 +51,7 @@ func InitData() {
 				Id: 1,
 			},
 			Name:     "仪表盘",
-			Icon:     "icon-yibiaopan",
+			Icon:     "iconyibiaopan",
 			Path:     "index",
 			Sort:     0,
 			Status:   &status,
@@ -64,7 +64,7 @@ func InitData() {
 				Id: 2,
 			},
 			Name:     "系统设置",
-			Icon:     "icon-icon_shezhi",
+			Icon:     "iconxitongshezhi1",
 			Path:     "system",
 			Sort:     1,
 			Status:   &status,
@@ -79,7 +79,6 @@ func InitData() {
 				Id: 3,
 			},
 			Name:     "用户管理",
-			Icon:     "icon-icon_zhanghao",
 			Path:     "user",
 			Sort:     10,
 			Status:   &status,
@@ -94,7 +93,6 @@ func InitData() {
 				Id: 4,
 			},
 			Name:     "部门管理",
-			Icon:     "icon-icon_zhanghao",
 			Path:     "dept",
 			Sort:     11,
 			Status:   &status,
@@ -109,8 +107,7 @@ func InitData() {
 				Id: 5,
 			},
 			Name:     "菜单管理",
-			Icon:     "icon-wuxupailie",
-			Path:     "menu", // 子菜单不用全路径, 自动继承
+			Path:     "menu",
 			Sort:     12,
 			Status:   &status,
 			ParentId: 2,
@@ -124,7 +121,6 @@ func InitData() {
 				Id: 6,
 			},
 			Name:     "角色管理",
-			Icon:     "icon-quanxianshenpi",
 			Path:     "role",
 			Sort:     13,
 			Status:   &status,
@@ -139,7 +135,6 @@ func InitData() {
 				Id: 7,
 			},
 			Name:     "接口管理",
-			Icon:     "icon-APIshuchu",
 			Path:     "api",
 			Sort:     14,
 			Status:   &status,
@@ -154,8 +149,7 @@ func InitData() {
 				Id: 8,
 			},
 			Name:     "操作日志",
-			Icon:     "icon-gaojing1",
-			Path:     "log",
+			Path:     "operlog",
 			Sort:     15,
 			Status:   &status,
 			ParentId: 2,
@@ -210,6 +204,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 1,
 			},
+			Name:     "用户登录",
 			Method:     "POST",
 			Path:       "/auth/login",
 			Category:   "auth",
@@ -220,6 +215,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 2,
 			},
+			Name:     "用户登出",
 			Method:     "POST",
 			Path:       "/auth/logout",
 			Category:   "auth",
@@ -230,6 +226,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 3,
 			},
+			Name:     "刷新令牌",
 			Method:     "POST",
 			Path:       "/auth/refresh_token",
 			Category:   "auth",
@@ -240,6 +237,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 4,
 			},
+			Name:     "用户信息",
 			Method:     "POST",
 			Path:       "/v1/user/info",
 			Category:   "user",
@@ -250,6 +248,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 5,
 			},
+			Name:     "更新基本信息",
 			Method:     "PATCH",
 			Path:       "/v1/user/info/update/:userId",
 			Category:   "user",
@@ -260,6 +259,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 6,
 			},
+			Name:     "上传头像",
 			Method:     "POST",
 			Path:       "/v1/user/info/uploadImg",
 			Category:   "user",
@@ -270,6 +270,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 7,
 			},
+			Name:     "查询用户",
 			Method:     "GET",
 			Path:       "/v1/user/list",
 			Category:   "user",
@@ -280,6 +281,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 8,
 			},
+			Name:     "修改密码",
 			Method:     "PUT",
 			Path:       "/v1/user/changePwd",
 			Category:   "user",
@@ -290,6 +292,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 9,
 			},
+			Name:     "创建用户",
 			Method:     "POST",
 			Path:       "/v1/user/create",
 			Category:   "user",
@@ -300,6 +303,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 10,
 			},
+			Name:     "更新用户",
 			Method:     "PATCH",
 			Path:       "/v1/user/update/:userId",
 			Category:   "user",
@@ -310,6 +314,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 11,
 			},
+			Name:     "删除用户",
 			Method:     "DELETE",
 			Path:       "/v1/user/delete",
 			Category:   "user",
@@ -320,6 +325,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 12,
 			},
+			Name:     "当前菜单",
 			Method:     "GET",
 			Path:       "/v1/menu/tree",
 			Category:   "menu",
@@ -330,6 +336,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 13,
 			},
+			Name:     "查询菜单",
 			Method:     "GET",
 			Path:       "/v1/menu/list",
 			Category:   "menu",
@@ -340,6 +347,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 14,
 			},
+			Name:     "创建菜单",
 			Method:     "POST",
 			Path:       "/v1/menu/create",
 			Category:   "menu",
@@ -350,6 +358,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 15,
 			},
+			Name:     "更新菜单",
 			Method:     "PATCH",
 			Path:       "/v1/menu/update/:menuId",
 			Category:   "menu",
@@ -360,6 +369,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 16,
 			},
+			Name:     "删除菜单",
 			Method:     "DELETE",
 			Path:       "/v1/menu/delete",
 			Category:   "menu",
@@ -370,6 +380,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 17,
 			},
+			Name:     "查询角色",
 			Method:     "GET",
 			Path:       "/v1/role/list",
 			Category:   "role",
@@ -380,6 +391,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 18,
 			},
+			Name:     "创建角色",
 			Method:     "POST",
 			Path:       "/v1/role/create",
 			Category:   "role",
@@ -390,6 +402,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 19,
 			},
+			Name:     "修改角色",
 			Method:     "PATCH",
 			Path:       "/v1/role/update/:roleId",
 			Category:   "role",
@@ -400,6 +413,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 20,
 			},
+			Name:     "修改权限",
 			Method:     "PATCH",
 			Path:       "/v1/role/perms/update/:roleId",
 			Category:   "role",
@@ -410,6 +424,18 @@ func InitData() {
 			Model: models.Model{
 				Id: 21,
 			},
+			Name:     "获取权限",
+			Method:     "GET",
+			Path:       "/v1/role/perms/:roleId",
+			Category:   "role",
+			Desc:       "获取权限信息",
+			Creator:    creator,
+		},
+		{
+			Model: models.Model{
+				Id: 22,
+			},
+			Name:     "删除角色",
 			Method:     "DELETE",
 			Path:       "/v1/role/delete",
 			Category:   "role",
@@ -418,8 +444,9 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 22,
+				Id: 23,
 			},
+			Name:     "查询接口",
 			Method:     "GET",
 			Path:       "/v1/api/list",
 			Category:   "api",
@@ -428,8 +455,9 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 23,
+				Id: 24,
 			},
+			Name:     "创建接口",
 			Method:     "POST",
 			Path:       "/v1/api/create",
 			Category:   "api",
@@ -438,8 +466,9 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 24,
+				Id: 25,
 			},
+			Name:     "修改接口",
 			Method:     "PATCH",
 			Path:       "/v1/api/update/:apiId",
 			Category:   "api",
@@ -448,8 +477,9 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 25,
+				Id: 26,
 			},
+			Name:     "删除接口",
 			Method:     "DELETE",
 			Path:       "/v1/api/delete",
 			Category:   "api",
@@ -458,28 +488,9 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 26,
-			},
-			Method:     "PATCH",
-			Path:       "/v1/role/menus/update/:roleId",
-			Category:   "role",
-			Desc:       "更新菜单",
-			Creator:    creator,
-		},
-		{
-			Model: models.Model{
 				Id: 27,
 			},
-			Method:     "PATCH",
-			Path:       "/v1/role/apis/update/:roleId",
-			Category:   "role",
-			Desc:       "更新权限",
-			Creator:    creator,
-		},
-		{
-			Model: models.Model{
-				Id: 28,
-			},
+			Name:     "查询日志",
 			Method:     "GET",
 			Path:       "/v1/operlog/list",
 			Category:   "operLog",
@@ -488,8 +499,9 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 29,
+				Id: 28,
 			},
+			Name:     "删除日志",
 			Method:     "DELETE",
 			Path:       "/v1/operlog/delete",
 			Category:   "operLog",
