@@ -4,6 +4,7 @@ import (
 	"anew-server/dto/request"
 	"anew-server/dto/response"
 	"anew-server/dto/service"
+	"anew-server/models/system"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
 	"github.com/gin-gonic/gin"
@@ -11,10 +12,9 @@ import (
 
 // 查询当前用户菜单树
 func GetUserMenuTree(c *gin.Context) {
-	user := GetCurrentUser(c)
-
+	user := GetCurrentUserFromCache(c)
 	s := service.New()
-	menus, err := s.GetUserMenuList(user.RoleId)
+	menus, err := s.GetUserMenuList(user.(system.SysUser).RoleId)
 	if err != nil {
 		response.FailWithMsg(err.Error())
 		return
@@ -37,7 +37,7 @@ func GetMenus(c *gin.Context) {
 
 // 创建菜单
 func CreateMenu(c *gin.Context) {
-	user := GetCurrentUser(c)
+	user := GetCurrentUserFromCache(c)
 	// 绑定参数
 	var req request.CreateMenuReq
 	err := c.Bind(&req)
@@ -53,7 +53,7 @@ func CreateMenu(c *gin.Context) {
 		return
 	}
 	// 记录当前创建人信息
-	req.Creator = user.Name
+	req.Creator = user.(system.SysUser).Name
 	// 创建服务
 	s := service.New()
 	err = s.CreateMenu(&req)

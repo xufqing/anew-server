@@ -4,6 +4,7 @@ import (
 	"anew-server/dto/request"
 	"anew-server/dto/response"
 	"anew-server/dto/service"
+	"anew-server/models/system"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
 	"github.com/gin-gonic/gin"
@@ -34,7 +35,7 @@ func GetDicts(c *gin.Context) {
 
 // 创建字典
 func CreateDict(c *gin.Context) {
-	user := GetCurrentUser(c)
+	user := GetCurrentUserFromCache(c)
 	// 绑定参数
 	var req request.CreateDictReq
 	err := c.Bind(&req)
@@ -50,7 +51,7 @@ func CreateDict(c *gin.Context) {
 		return
 	}
 	// 记录当前创建人信息
-	req.Creator = user.Name
+	req.Creator = user.(system.SysUser).Name
 	// 创建服务
 	s := service.New()
 	err = s.CreateDict(&req)
@@ -70,15 +71,15 @@ func UpdateDictById(c *gin.Context) {
 		response.FailWithCode(response.ParmError)
 		return
 	}
-	DictId := utils.Str2Uint(c.Param("DictId"))
-	if DictId == 0 {
+	dictId := utils.Str2Uint(c.Param("dictId"))
+	if dictId == 0 {
 		response.FailWithMsg("字典编号不正确")
 		return
 	}
 	// 创建服务
 	s := service.New()
 	// 更新数据
-	err = s.UpdateDictById(DictId, req)
+	err = s.UpdateDictById(dictId, req)
 	if err != nil {
 		response.FailWithMsg(err.Error())
 		return

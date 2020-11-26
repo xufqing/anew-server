@@ -34,7 +34,7 @@ func OperationLog(c *gin.Context) {
 	defer func() {
 		// 下列请求比较频繁无需写入日志
 		if c.Request.Method == http.MethodGet ||
-			c.Request.Method == http.MethodOptions {
+			c.Request.Method == http.MethodOptions || c.Writer.Status() == 404 {
 			return
 		}
 		// 结束时间
@@ -104,10 +104,10 @@ func OperationLog(c *gin.Context) {
 		}
 		log.Name = api.Name
 		// 获取当前登录用户
-		user := system.GetCurrentUser(c)
+		user := system.GetCurrentUserFromCache(c)
 		// 用户名
-		if user.Id > 0 {
-			log.Username = user.Username
+		if user.(system2.SysUser).Id > 0 {
+			log.Username = user.(system2.SysUser).Username
 		} else {
 			log.Username = "未登录"
 		}

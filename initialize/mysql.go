@@ -6,10 +6,6 @@ import (
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
-	"log"
-	"os"
-	"time"
 )
 
 // 初始化mysql数据库
@@ -25,16 +21,16 @@ func Mysql() {
 		common.Conf.Mysql.Charset,
 		common.Conf.Mysql.Collation,
 	)
-	newLogger := logger.New(
-		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
-		logger.Config{
-			SlowThreshold: time.Second, // 慢 SQL 阈值
-			LogLevel:      logger.Info, // Log level
-			Colorful:      false,       // 禁用彩色打印
-		},
-	)
+	//newLogger := logger.New(
+	//	log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+	//	logger.Config{
+	//		SlowThreshold: time.Second, // 慢 SQL 阈值
+	//		LogLevel:      logger.Info, // Log level
+	//		Colorful:      false,       // 禁用彩色打印
+	//	},
+	//)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: newLogger,
+		//Logger: newLogger,
 		// 禁用外键(指定外键时不会在mysql创建真实的外键约束)
 		DisableForeignKeyConstraintWhenMigrating: true,
 	})
@@ -47,7 +43,7 @@ func Mysql() {
 	common.Mysql = db
 	// 表结构
 	autoMigrate()
-	common.Log.Debug("初始化mysql完成")
+	common.Log.Info("Mysql初始化完成")
 }
 
 // 自动迁移表结构

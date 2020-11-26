@@ -13,6 +13,10 @@ func (s *MysqlService) GetOperLogs(req *request.OperLogListReq) ([]system.SysOpe
 	var err error
 	list := make([]system.SysOperLog, 0)
 	query := common.Mysql
+	name := strings.TrimSpace(req.Name)
+	if name != "" {
+		query = query.Where("name LIKE ?", fmt.Sprintf("%%%s%%", name))
+	}
 	method := strings.TrimSpace(req.Method)
 	if method != "" {
 		query = query.Where("method LIKE ?", fmt.Sprintf("%%%s%%", method))
@@ -24,10 +28,6 @@ func (s *MysqlService) GetOperLogs(req *request.OperLogListReq) ([]system.SysOpe
 	ip := strings.TrimSpace(req.Ip)
 	if ip != "" {
 		query = query.Where("ip LIKE ?", fmt.Sprintf("%%%s%%", ip))
-	}
-	status := strings.TrimSpace(req.Status)
-	if status != "" {
-		query = query.Where("status LIKE ?", fmt.Sprintf("%%%s%%", status))
 	}
 	query = query.Order("id DESC")
 	// 查询条数

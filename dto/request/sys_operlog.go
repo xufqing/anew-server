@@ -7,11 +7,11 @@ import (
 
 // 获取操作日志列表结构体
 type OperLogListReq struct {
+	Name            string `json:"name" form:"name"`
 	Method            string `json:"method" form:"method"`
 	Path              string `json:"path" form:"path"`
 	Username          string `json:"username" form:"username"`
 	Ip                string `json:"ip" form:"ip"`
-	Status            string `json:"status" form:"status"`
 	response.PageInfo        // 分页参数
 }
 

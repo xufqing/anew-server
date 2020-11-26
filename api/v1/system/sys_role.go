@@ -4,6 +4,7 @@ import (
 	"anew-server/dto/request"
 	"anew-server/dto/response"
 	"anew-server/dto/service"
+	"anew-server/models/system"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
 	"fmt"
@@ -41,7 +42,7 @@ func GetRoles(c *gin.Context) {
 
 // 创建角色
 func CreateRole(c *gin.Context) {
-	user := GetCurrentUser(c)
+	user := GetCurrentUserFromCache(c)
 	// 绑定参数
 	var req request.CreateRoleReq
 	err := c.Bind(&req)
@@ -57,7 +58,7 @@ func CreateRole(c *gin.Context) {
 		return
 	}
 	// 记录当前创建人信息
-	req.Creator = user.Name
+	req.Creator = user.(system.SysUser).Name
 	// 创建服务
 	s := service.New()
 	err = s.CreateRole(&req)

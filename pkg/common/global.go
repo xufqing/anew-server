@@ -5,6 +5,7 @@ import (
 	"github.com/casbin/casbin/v2"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
+	"github.com/go-redis/redis/v8"
 	"github.com/gobuffalo/packr/v2"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -21,6 +22,8 @@ var (
 	Log *zap.SugaredLogger
 	// Mysql实例
 	Mysql *gorm.DB
+	// Redis实例
+	Redis *redis.Client
 	// validation.v10校验器
 	Validate *validator.Validate
 	// validation.v10相关翻译器

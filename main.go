@@ -21,12 +21,16 @@ func main() {
 	r := initialize.Routers()
 	//初始化数据库
 	initialize.Mysql()
+	//初始化Redis
+	initialize.Redis()
 	// 初始校验器
 	initialize.Validate()
 	// 初始化Casbin
 	initialize.Casbin()
 	// 初始化创建上传目录
 	_ = os.MkdirAll(common.Conf.Upload.SaveDir + "/avatar/",644)
+	 //redis := cache.NewStringOperation()
+	 //fmt.Println(redis.Set("b","xx"))
 
 	//是否初始化数据(慎用) $anew-server init
 	if len(os.Args) > 1 {
@@ -36,6 +40,9 @@ func main() {
 			os.Exit(1)
 		}
 	}
+	// 关闭连接池
+	defer common.Redis.Close()
+
 	// 启动服务器
 	host := "0.0.0.0"
 	port := common.Conf.System.Port

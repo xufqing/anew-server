@@ -1,33 +1,44 @@
 package system
 
 import (
+	"anew-server/dto/cacheService"
 	"anew-server/dto/request"
 	"anew-server/dto/response"
 	"anew-server/dto/service"
 	"anew-server/models/system"
 	"anew-server/pkg/common"
+	"anew-server/pkg/redis"
 	"anew-server/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"path"
+	"time"
 )
 
 // 获取当前请求用户信息
-func GetCurrentUser(c *gin.Context) (system.SysUser) {
+func GetCurrentUserFromCache(c *gin.Context) interface{} {
 	user, exists := c.Get("user")
 	var newUser system.SysUser
 	if !exists {
 		return newUser
 	}
 	u, _ := user.(response.LoginResp)
-	// 创建服务
-	s := service.New()
-	newUser, _ = s.GetUserById(u.Id)
+	// 创建缓存对象
+	cache := cacheService.New(redis.NewStringOperation(), time.Second*15, cacheService.SERILIZER_JSON)
+	key := "user:" + u.Username
+	cache.DBGetter = func() interface{} {
+		// 创建mysql服务
+		s := service.New()
+		newUser, _ = s.GetUserById(u.Id)
+		return newUser
+	}
+
+	cache.GetCacheForObject(key, &newUser)
 	return newUser
 }
 
 // 获取当前用户信息返回给页面
 func GetUserInfo(c *gin.Context) {
-	user := GetCurrentUser(c)
+	user := GetCurrentUserFromCache(c)
 	// 转为UserInfoResponseStruct, 隐藏部分字段
 	var resp response.UserInfoResp
 	utils.Struct2StructByJson(user, &resp)
@@ -36,7 +47,7 @@ func GetUserInfo(c *gin.Context) {
 
 // 创建用户
 func CreateUser(c *gin.Context) {
-	user := GetCurrentUser(c)
+	user := GetCurrentUserFromCache(c)
 	// 绑定参数
 	var req request.CreateUserReq
 	err := c.Bind(&req)
@@ -50,8 +61,8 @@ func CreateUser(c *gin.Context) {
 		response.FailWithMsg(err.Error())
 		return
 	}
-	// 记录当前创建人信息
-	req.Creator = user.Name
+	// 断言，创建结构体获取当前创建人信息
+	req.Creator = user.(system.SysUser).Name
 	// 创建服务
 	s := service.New()
 	err = s.CreateUser(&req)
@@ -190,15 +201,15 @@ func ChangePwd(c *gin.Context) {
 		return
 	}
 	// 获取当前用户
-	user := GetCurrentUser(c)
-	query := common.Mysql.Where("username = ?", user.Username).First(&user)
+	user := GetCurrentUserFromCache(c)
+	query := common.Mysql.Where("username = ?", user.(system.SysUser).Username).First(&user)
 	// 查询用户
 	err = query.Error
 	if err != nil {
 		msg = err.Error()
 	} else {
 		// 校验密码
-		if ok := utils.ComparePwd(req.OldPassword, user.Password); !ok {
+		if ok := utils.ComparePwd(req.OldPassword, user.(system.SysUser).Password); !ok {
 			msg = "原密码错误"
 		} else {
 			// 更新密码
@@ -248,8 +259,9 @@ func UserAvatarUpload(c *gin.Context) {
 		response.FailWithMsg("无法读取文件")
 		return
 	}
-	user := GetCurrentUser(c)
-	fileName := user.Username+ "_avatar" + path.Ext(file.Filename)
+	user := GetCurrentUserFromCache(c)
+	username := user.(system.SysUser).Username
+	fileName := username + "_avatar" + path.Ext(file.Filename)
 	imgPath := common.Conf.Upload.SaveDir + "/avatar/" + fileName
 	err = c.SaveUploadedFile(file, imgPath)
 	if err != nil {
@@ -257,8 +269,8 @@ func UserAvatarUpload(c *gin.Context) {
 		return
 	}
 	// 将头像url保存到数据库
-	query := common.Mysql.Where("username = ?", user.Username).First(&user)
-	err = query.Update("avatar", "/" + imgPath).Error
+	query := common.Mysql.Where("username = ?", username).First(&user)
+	err = query.Update("avatar", "/"+imgPath).Error
 	if err != nil {
 		response.FailWithMsg(err.Error())
 	}

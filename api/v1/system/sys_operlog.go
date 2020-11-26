@@ -1,26 +1,39 @@
 package system
 
 import (
+	"anew-server/dto/cacheService"
 	"anew-server/dto/request"
 	"anew-server/dto/response"
 	"anew-server/dto/service"
+	"anew-server/models/system"
+	"anew-server/pkg/redis"
 	"anew-server/pkg/utils"
 	"github.com/gin-gonic/gin"
+	"time"
 )
 
 // 获取操作日志列表
 func GetOperLogs(c *gin.Context) {
 	// 绑定参数
 	var req request.OperLogListReq
-	err := c.Bind(&req)
-	if err != nil {
+	reqErr := c.Bind(&req)
+	if reqErr != nil {
 		response.FailWithCode(response.ParmError)
 		return
 	}
-
-	// 创建服务
-	s := service.New()
-	operationLogs, err := s.GetOperLogs(&req)
+	var operationLogs []system.SysOperLog
+	var err error
+	// 创建缓存对象
+	cache := cacheService.New(redis.NewStringOperation(), time.Second*15, cacheService.SERILIZER_JSON)
+	key := "operationLogs"
+	cache.DBGetter = func() interface{} {
+		// 创建服务
+		s := service.New()
+		operationLogs, err = s.GetOperLogs(&req)
+		return operationLogs
+	}
+	// 获取缓存
+	cache.GetCacheForObject(key, &operationLogs)
 	if err != nil {
 		response.FailWithMsg(err.Error())
 		return

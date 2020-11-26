@@ -4,8 +4,8 @@ import (
 	"anew-server/dto/request"
 	"anew-server/dto/response"
 	"anew-server/dto/service"
-	"anew-server/models"
 	"anew-server/pkg/common"
+	"anew-server/pkg/redis"
 	"anew-server/pkg/utils"
 	"fmt"
 	jwt "github.com/appleboy/gin-jwt/v2"
@@ -64,7 +64,7 @@ func login(c *gin.Context) (interface{}, error) {
 	// 创建服务
 	s := service.New()
 	// 密码校验
-	user, err := s.LoginCheck(req.Username,req.Password)
+	user, err := s.LoginCheck(req.Username, req.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -102,8 +102,25 @@ func unauthorized(c *gin.Context, code int, message string) {
 }
 
 func loginResponse(c *gin.Context, code int, token string, expires time.Time) {
-	loginInfo.Token = token
-	loginInfo.Expires = models.LocalTime{Time: expires}
+
+	// 缓存token
+	cache := redis.NewStringOperation()
+	tokenKey := "token:" + loginInfo.Username
+	expiresKey := "expires:" + loginInfo.Username
+	cacheToken := cache.Get(tokenKey).Unwrap()
+	cacheExpires:= cache.Get(expiresKey).Unwrap()
+	if cacheToken == "" {
+		cacheToken = token
+		// 超时时间为配置文件设置的值
+		cache.Set(tokenKey, cacheToken, redis.WithExpire(time.Hour*time.Duration(common.Conf.Jwt.Timeout)))
+	}
+	if cacheExpires == "" {
+		cacheExpires = expires.Format("2006-01-02 15:04:05")
+		// 超时时间为配置文件设置的值
+		cache.Set(expiresKey, cacheExpires, redis.WithExpire(time.Hour*time.Duration(common.Conf.Jwt.Timeout)))
+	}
+	loginInfo.Token = cacheToken
+	loginInfo.Expires = cacheExpires
 	response.SuccessWithData(loginInfo)
 }
 
