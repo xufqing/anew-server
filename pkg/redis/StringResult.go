@@ -35,9 +35,9 @@ func (this *StringResult) Unwrap_Or(str string) string {
 //获取key对应的值，若err则返回指定func
 func (this *StringResult) Unwrap_Or_Else(f func() string, key string) string {
 	if this.Err != nil {
-		common.Log.Debug(fmt.Sprintf("缓存未击中: %s", key))
+		//common.Log.Debug(fmt.Sprintf("缓存未击中: %s", key))
 		return f()
 	}
-	common.Log.Debug(fmt.Sprintf("缓存击中: %s", key))
+	//common.Log.Debug(fmt.Sprintf("缓存击中: %s", key))
 	return this.Result
 }

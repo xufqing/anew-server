@@ -1,6 +1,8 @@
 package common
 
-import "go.uber.org/zap/zapcore"
+import (
+	"go.uber.org/zap/zapcore"
+)
 
 // 系统配置, 配置字段可参见yml注释
 // viper内置了mapstructure, yml文件用"-"区分单词, 转为驼峰方便
@@ -8,6 +10,7 @@ type Configuration struct {
 	System SystemConfiguration `mapstructure:"system" json:"system"`
 	Logs   LogsConfiguration   `mapstructure:"logs" json:"logs"`
 	Mysql  MysqlConfiguration  `mapstructure:"mysql" json:"mysql"`
+	Redis  RedisConfiguration  `mapstructure:"redis" json:"redis"`
 	Jwt    JwtConfiguration    `mapstructure:"jwt" json:"jwt"`
 	Upload UploadConfiguration `mapstructure:"upload" json:"upload"`
 	Casbin CasbinConfiguration `mapstructure:"casbin" json:"casbin"`
@@ -41,6 +44,12 @@ type MysqlConfiguration struct {
 	TablePrefix string `mapstructure:"table-prefix" json:"tablePrefix"`
 	Charset     string `mapstructure:"charset" json:"charset"`
 	Collation   string `mapstructure:"collation" json:"collation"`
+}
+type RedisConfiguration struct {
+	Host     string `mapstructure:"host" json:"host"`
+	Password string `mapstructure:"password" json:"password"`
+	DB       int `mapstructure:"db" json:"db"`
+	Port     int    `mapstructure:"port" json:"port"`
 }
 
 type CasbinConfiguration struct {

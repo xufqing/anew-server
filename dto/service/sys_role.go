@@ -120,11 +120,10 @@ func (s *MysqlService) UpdateRoleMenusById(id uint, req []uint) (err error) {
 	if err != nil {
 		return
 	}
-	//var role models.SysRole
 	// 替换菜单
-	err = s.db.Where("id = ?", id).First(&system.SysRole{}).Association("Menus").Replace(&menus)
-	//err = s.db.Where("id = ?", id).Find(&models.SysRole{}).Association("Menus").Replace(&menus)
-	//err = s.db.Model(&role).Where("id = ?", id).Association("Menus").Replace(&menus)
+	var role system.SysRole
+	err = s.db.Where("id = ?", id).First(&role).Error
+	err = s.db.Model(&role).Association("Menus").Replace(&menus)
 	return
 }
 

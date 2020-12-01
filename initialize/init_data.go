@@ -214,8 +214,118 @@ func InitData() {
 			common.Mysql.Create(&user)
 		}
 	}
+	// 初始化字典
+	dicts := []system.SysDict{
+		{
+			Model: models.Model{
+				Id: 1,
+			},
+			Key: "env_type",
+			Value: "应用环境",
+			Desc: "应用环境",
+			Creator:    creator,
+		},
+		{
+			Model: models.Model{
+				Id: 2,
+			},
+			Key: "dev",
+			Value: "开发环境",
+			ParentId: 1,
+			Creator:    creator,
+		},
+		{
+			Model: models.Model{
+				Id: 3,
+			},
+			Key: "test",
+			Value: "测试环境",
+			ParentId: 1,
+			Creator:    creator,
+		},
+		{
+			Model: models.Model{
+				Id: 4,
+			},
+			Key: "prod",
+			Value: "生产环境",
+			ParentId: 1,
+			Creator:    creator,
+		},
+		{
+			Model: models.Model{
+				Id: 5,
+			},
+			Key: "auth_type",
+			Value: "认证类型",
+			Desc: "主机认证类型",
+			Creator:    creator,
+		},
+		{
+			Model: models.Model{
+				Id: 6,
+			},
+			Key: "key",
+			Value: "秘钥验证",
+			ParentId: 5,
+			Creator:    creator,
+		},
+		{
+			Model: models.Model{
+				Id: 7,
+			},
+			Key: "password",
+			Value: "密码验证",
+			ParentId: 5,
+			Creator:    creator,
+		},
+		{
+			Model: models.Model{
+				Id: 8,
+			},
+			Key: "host_type",
+			Value: "主机类型",
+			Desc: "主机分类",
+			Creator:    creator,
+		},
+		{
+			Model: models.Model{
+				Id: 9,
+			},
+			Key: "vm",
+			Value: "虚拟机",
+			ParentId: 8,
+			Creator:    creator,
+		},
+		{
+			Model: models.Model{
+				Id: 9,
+			},
+			Key: "phy",
+			Value: "物理机",
+			ParentId: 8,
+			Creator:    creator,
+		},
+		{
+			Model: models.Model{
+				Id: 9,
+			},
+			Key: "aliyun",
+			Value: "阿里云",
+			ParentId: 8,
+			Creator:    creator,
+		},
+	}
 
-	// 4. 初始化接口
+	for _, dict := range dicts {
+		oldDict := system.SysDict{}
+		err := common.Mysql.Where("id = ?", dict.Id).First(&oldDict).Error
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			common.Mysql.Create(&dict)
+		}
+	}
+
+	// 5. 初始化接口
 	apis := []system.SysApi{
 		{
 			Model: models.Model{
@@ -560,13 +670,57 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 29,
+				Id: 32,
 			},
 			Name:     "删除字典",
 			Method:     "DELETE",
 			Path:       "/v1/dict/delete",
 			Category:   "字典管理",
 			Desc:       "删除字典",
+			Creator:    creator,
+		},
+		{
+			Model: models.Model{
+				Id: 33,
+			},
+			Name:     "查询主机",
+			Method:     "GET",
+			Path:       "/v1/host/list",
+			Category:   "主机管理",
+			Desc:       "主机列表",
+			Creator:    creator,
+		},
+		{
+			Model: models.Model{
+				Id: 34,
+			},
+			Name:     "创建主机",
+			Method:     "POST",
+			Path:       "/v1/host/create",
+			Category:   "主机管理",
+			Desc:       "创建主机",
+			Creator:    creator,
+		},
+		{
+			Model: models.Model{
+				Id: 35,
+			},
+			Name:     "更新主机",
+			Method:     "PATCH",
+			Path:       "/v1/host/update/:hostId",
+			Category:   "主机管理",
+			Desc:       "更新主机",
+			Creator:    creator,
+		},
+		{
+			Model: models.Model{
+				Id: 36,
+			},
+			Name:     "删除主机",
+			Method:     "DELETE",
+			Path:       "/v1/host/delete",
+			Category:   "主机管理",
+			Desc:       "删除主机",
 			Creator:    creator,
 		},
 	}

@@ -9,6 +9,7 @@ import (
 	"anew-server/pkg/redis"
 	"anew-server/pkg/utils"
 	"github.com/gin-gonic/gin"
+	"strconv"
 	"time"
 )
 
@@ -24,8 +25,10 @@ func GetOperLogs(c *gin.Context) {
 	var operationLogs []system.SysOperLog
 	var err error
 	// 创建缓存对象
-	cache := cacheService.New(redis.NewStringOperation(), time.Second*15, cacheService.SERILIZER_JSON)
-	key := "operationLogs"
+	cache := cacheService.New(redis.NewStringOperation(), time.Second*20, cacheService.SERILIZER_JSON)
+	key := "operationLog:" + req.Name + ":" + req.Method + ":" + req.Username + ":" + req.Ip + ":" + req.Path + ":" +
+		strconv.Itoa(int(req.Current)) + ":" + strconv.Itoa(int(req.PageSize)) + ":" + strconv.Itoa(int(req.Total))
+
 	cache.DBGetter = func() interface{} {
 		// 创建服务
 		s := service.New()

@@ -4,6 +4,7 @@ import (
 	"anew-server/middleware"
 	"anew-server/pkg/common"
 	"anew-server/routers"
+	"anew-server/routers/asset"
 	"anew-server/routers/system"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -45,6 +46,7 @@ func Routers() *gin.Engine {
 		system.InitApiRouter(v1, authMiddleware)     // 注册接口路由
 		system.InitDictRouter(v1, authMiddleware)     // 注册字典路由
 		system.InitOperLogRouter(v1, authMiddleware) // 注册操作日志路由
+		asset.InitHostRouter(v1, authMiddleware) // 主机管理
 	}
 
 	return r

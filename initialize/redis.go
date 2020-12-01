@@ -3,18 +3,18 @@ package initialize
 import (
 	"anew-server/pkg/common"
 	"context"
+	"fmt"
 	"github.com/go-redis/redis/v8"
 	"time"
-	"fmt"
 )
 
-func Redis(){
+func Redis() {
 	client := redis.NewClient(&redis.Options{
 		//连接信息
-		Network:  "tcp",                  //网络类型，tcp or unix，默认tcp
-		Addr:     "192.168.56.100:6379", //主机名+冒号+端口，默认localhost:6379
-		Password: "fabao123",                     //密码
-		DB:       0,                      // redis数据库index
+		Network:  "tcp",                                                               //网络类型，tcp or unix，默认tcp
+		Addr:     fmt.Sprintf("%s:%d", common.Conf.Redis.Host, common.Conf.Redis.Port), //主机名+冒号+端口，默认localhost:6379
+		Password: common.Conf.Redis.Password,                                                          //密码
+		DB:       common.Conf.Redis.DB,                                                                   // redis数据库index
 
 		//连接池容量及闲置连接数量
 		PoolSize:     15, // 连接池最大socket连接数，默认为4倍CPU数， 4 * runtime.NumCPU

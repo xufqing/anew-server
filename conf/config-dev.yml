@@ -33,6 +33,16 @@ mysql:
   # 字符集
   collation: utf8mb4_general_ci
 
+redis:
+  # 地址
+  host: 192.168.56.100
+  # 密码
+  password: fabao123
+  # 数据库index
+  db: 0
+  # 端口
+  port: 6379
+
 # casbin配置
 casbin:
   # 模型配置文件, 默认以conf目录为根目录

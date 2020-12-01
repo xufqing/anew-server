@@ -25,6 +25,10 @@ func (s *MysqlService) GetOperLogs(req *request.OperLogListReq) ([]system.SysOpe
 	if path != "" {
 		query = query.Where("path LIKE ?", fmt.Sprintf("%%%s%%", path))
 	}
+	username := strings.TrimSpace(req.Username)
+	if path != "" {
+		query = query.Where("username LIKE ?", fmt.Sprintf("%%%s%%", username))
+	}
 	ip := strings.TrimSpace(req.Ip)
 	if ip != "" {
 		query = query.Where("ip LIKE ?", fmt.Sprintf("%%%s%%", ip))
