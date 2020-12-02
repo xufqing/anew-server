@@ -34,3 +34,6 @@ func WithExpire(t time.Duration) *OperationAttr {
 func WithNX() *OperationAttr {
 	return &OperationAttr{ATTR_NX, empty{}}
 }
+func WithXX() *OperationAttr {
+	return &OperationAttr{ATTR_XX, empty{}}
+}

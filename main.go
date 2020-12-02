@@ -40,7 +40,8 @@ func main() {
 			os.Exit(1)
 		}
 	}
-	// 关闭连接池
+
+	// 关闭cache连接池
 	defer common.Redis.Close()
 
 	// 启动服务器

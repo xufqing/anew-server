@@ -2,21 +2,27 @@ package utils
 
 import (
 	"bytes"
+	"crypto/md5"
 	"crypto/rand"
+	"fmt"
+	"io/ioutil"
 	"math/big"
+	"net"
+	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 //随机字符串
-func CreateRandomString(len int) string  {
+func CreateRandomString(len int) string {
 	var container string
 	var str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 	b := bytes.NewBufferString(str)
 	length := b.Len()
 	bigInt := big.NewInt(int64(length))
-	for i := 0;i < len ;i++  {
-		randomInt,_ := rand.Int(rand.Reader,bigInt)
+	for i := 0; i < len; i++ {
+		randomInt, _ := rand.Int(rand.Reader, bigInt)
 		container += string(str[randomInt.Int64()])
 	}
 	return container
@@ -47,4 +53,30 @@ func Str2UintArr(str string) (ids []uint) {
 		ids = append(ids, Str2Uint(v))
 	}
 	return
+}
+// 判断文件是否存在
+func FileExist(path string) bool {
+	_, err := os.Stat(path)
+	if err != nil && os.IsNotExist(err) {
+		return false
+	}
+	return true
+}
+
+// 获取文件的MD5
+func GetFileMd5(filename string) string {
+	file, _ := ioutil.ReadFile(filename)
+	return fmt.Sprintf("%x", md5.Sum(file))
+}
+
+// TCP端口测试
+func Tcping(ip string, port string) bool {
+	var conn net.Conn
+	var err error
+
+	if conn, err = net.DialTimeout("tcp", ip+":"+port, 2*time.Second); err != nil {
+		return false
+	}
+	defer conn.Close()
+	return true
 }

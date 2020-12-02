@@ -16,10 +16,11 @@ require (
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/natefinch/lumberjack v2.0.0+incompatible
+	github.com/pkg/sftp v1.12.0
 	github.com/spf13/viper v1.7.1
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.16.0
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
