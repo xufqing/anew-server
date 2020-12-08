@@ -81,3 +81,9 @@ func (s *MysqlService) DeleteHostByIds(ids []uint) (err error) {
 
 	return s.db.Where("id IN (?)", ids).Delete(asset.AssetHost{}).Error
 }
+
+func (s *MysqlService) GetHostById(id uint) (asset.AssetHost, error) {
+	var host asset.AssetHost
+	err := s.db.Table(host.TableName()).Where("id = ?", id).First(&host).Error
+	return host, err
+}

@@ -14,6 +14,7 @@ require (
 	github.com/go-redis/redis/v8 v8.4.0
 	github.com/gobuffalo/packr/v2 v2.8.0
 	github.com/golang/protobuf v1.4.2 // indirect
+	github.com/gorilla/websocket v1.4.2
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/pkg/sftp v1.12.0

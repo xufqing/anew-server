@@ -69,6 +69,16 @@ func GetFileMd5(filename string) string {
 	return fmt.Sprintf("%x", md5.Sum(file))
 }
 
+// 判断uint数组是否包含item元素
+func ContainsUint(arr []uint, item uint) bool {
+	for _, v := range arr {
+		if v == item {
+			return true
+		}
+	}
+	return false
+}
+
 // TCP端口测试
 func Tcping(ip string, port string) bool {
 	var conn net.Conn

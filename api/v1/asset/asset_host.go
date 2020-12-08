@@ -68,6 +68,33 @@ func CreateHost(c *gin.Context) {
 	response.Success()
 }
 
+// 获取当前主机信息
+func GetHostInfo(c *gin.Context) {
+	// 绑定参数
+	var req gin.H
+	err := c.Bind(&req)
+	if err != nil {
+		response.FailWithCode(response.ParmError)
+		return
+	}
+	hostId := utils.Str2Uint(c.Param("hostId"))
+	if hostId == 0 {
+		response.FailWithMsg("接口编号不正确")
+		return
+	}
+	// 创建服务
+	s := service.New()
+	host,err := s.GetHostById(hostId)
+	if err != nil {
+		response.FailWithMsg(err.Error())
+		return
+	}
+	// 转为ResponseStruct, 隐藏部分字段
+	var connStruct response.HostListResp
+	utils.Struct2StructByJson(host, &connStruct)
+	response.SuccessWithData(connStruct)
+}
+
 // 更新
 func UpdateHostById(c *gin.Context) {
 	// 绑定参数
@@ -93,7 +120,7 @@ func UpdateHostById(c *gin.Context) {
 	response.Success()
 }
 
-// 批量删除
+// 批删除
 func BatchDeleteHostByIds(c *gin.Context) {
 	var req request.IdsReq
 	err := c.Bind(&req)

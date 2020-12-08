@@ -8,12 +8,18 @@ import (
 )
 
 func InitHostRouter(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) (R gin.IRoutes) {
+	// 创建SSH连接池
+	asset.StartConnectionHub()
 	router := r.Group("host").Use(authMiddleware.MiddlewareFunc()).Use(middleware.CasbinMiddleware)
 	{
 		router.GET("/list", asset.GetHosts)
+		router.GET("/info/:hostId", asset.GetHostInfo)
 		router.POST("/create", asset.CreateHost)
 		router.PATCH("/update/:hostId", asset.UpdateHostById)
 		router.DELETE("/delete", asset.BatchDeleteHostByIds)
+		router.GET("/ssh", asset.SSHTunnel)
+		router.GET("/connection/list", asset.GetConnections)
+		router.DELETE("/connection/delete", asset.DeleteConnectionByKey)
 	}
 	return router
 }

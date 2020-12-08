@@ -85,6 +85,17 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
+				Id: 12,
+			},
+			Name:     "连接管理",
+			Path:     "connection",
+			Sort:     2,
+			Status:   &status,
+			ParentId: 10,
+			Creator:  creator,
+		},
+		{
+			Model: models.Model{
 				Id: 2,
 			},
 			Name:     "系统设置",
@@ -721,6 +732,28 @@ func InitData() {
 			Path:       "/v1/host/delete",
 			Category:   "主机管理",
 			Desc:       "删除主机",
+			Creator:    creator,
+		},
+		{
+			Model: models.Model{
+				Id: 37,
+			},
+			Name:     "查询连接",
+			Method:     "GET",
+			Path:       "/v1/host/connection/list",
+			Category:   "连接管理",
+			Desc:       "连接列表",
+			Creator:    creator,
+		},
+		{
+			Model: models.Model{
+				Id: 38,
+			},
+			Name:     "注销连接",
+			Method:     "DELETE",
+			Path:       "/v1/host/connection/delete",
+			Category:   "连接管理",
+			Desc:       "注销连接",
 			Creator:    creator,
 		},
 	}

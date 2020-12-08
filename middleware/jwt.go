@@ -19,6 +19,7 @@ var loginInfo response.LoginResp
 func InitAuth() (*jwt.GinJWTMiddleware, error) {
 	return jwt.New(&jwt.GinJWTMiddleware{
 		Realm:           common.Conf.Jwt.Realm,                                 // jwt标识
+		SigningAlgorithm: "HS512",
 		Key:             []byte(common.Conf.Jwt.Key),                           // 服务端密钥
 		Timeout:         time.Hour * time.Duration(common.Conf.Jwt.Timeout),    // token过期时间
 		MaxRefresh:      time.Hour * time.Duration(common.Conf.Jwt.MaxRefresh), // token更新时间

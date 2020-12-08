@@ -49,7 +49,7 @@ func New(host string, conf *ssh.ClientConfig) *SSHClient {
 
 //func main {
 //	conf, _ := NewAuthConfig("root", "123123", "", "")
-//	ssha := NewSSHClient("192.168.1.1:22", conf)
+//	ssha := New("192.168.1.1:22", conf)
 //}
 
 func NewAuthConfig(user string, password string, privateKeyPath string, privateKeyPassphrase string) (*ssh.ClientConfig, error) {
