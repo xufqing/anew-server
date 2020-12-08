@@ -7,6 +7,17 @@ golang  运维平台
 #### 软件架构
 软件架构说明
 
+gin/gormV2/go-redis/jwt/casbin/zap/websocket...
+
+#### 截图
+![1](pic/1.png)
+
+![2](pic/2.png)
+
+![3](pic/3.png)
+
+![4](pic/4.png)
+
 
 #### 安装教程
 
