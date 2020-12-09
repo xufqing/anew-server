@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unsafe"
 )
 
 //随机字符串
@@ -26,6 +27,16 @@ func CreateRandomString(len int) string {
 		container += string(str[randomInt.Int64()])
 	}
 	return container
+}
+
+func Str2Bytes(s string) []byte {
+	x := (*[2]uintptr)(unsafe.Pointer(&s))
+	h := [3]uintptr{x[0], x[1], x[1]}
+	return *(*[]byte)(unsafe.Pointer(&h))
+}
+
+func Bytes2Str(b []byte) string {
+	return *(*string)(unsafe.Pointer(&b))
 }
 
 // 字符串转int

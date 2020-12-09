@@ -9,7 +9,7 @@ import (
 
 func main() {
 	//
-	conf, _ := sshx.NewAuthConfig("root", "anson0418", "", "")
+	conf, _ := sshx.NewAuthConfig("root", "xxxx", "", "")
 	ssha := sshx.New("192.168.56.100:22", conf)
 	ctxa, cancela := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancela()
