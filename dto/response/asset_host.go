@@ -25,3 +25,13 @@ type ConnectionResp struct {
 	ConnectionTime models.LocalTime `json:"connection_time"`
 	LastActiveTime models.LocalTime `json:"last_active_time"`
 }
+
+type FileInfo struct {
+	Name   string           `json:"name"`
+	Path   string           `json:"path"`
+	IsDir  bool             `json:"isDir"`
+	Mode   string           `json:"mode"`
+	Size   int64            `json:"size"`
+	Mtime  models.LocalTime `json:"mtime"` // 修改时间
+	IsLink bool             `json:"isLink"`
+}

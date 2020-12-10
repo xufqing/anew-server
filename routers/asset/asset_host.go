@@ -18,6 +18,9 @@ func InitHostRouter(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) (R
 		router.PATCH("/update/:hostId", asset.UpdateHostById)
 		router.DELETE("/delete", asset.BatchDeleteHostByIds)
 		router.GET("/ssh", asset.SSHTunnel)
+		router.GET("/ssh/ls", asset.GetPathFromSSH)
+		router.POST("/ssh/upload", asset.UploadFileToSSH)
+		router.POST("/ssh/download", asset.DownloadFileFromSSH)
 		router.GET("/connection/list", asset.GetConnections)
 		router.DELETE("/connection/delete", asset.DeleteConnectionByKey)
 	}

@@ -2,8 +2,6 @@ package asset
 
 import (
 	system2 "anew-server/api/v1/system"
-	"anew-server/dto/request"
-	"anew-server/dto/response"
 	"anew-server/dto/service"
 	"anew-server/models"
 	"anew-server/models/system"
@@ -19,13 +17,6 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-)
-
-const (
-	// 心跳间隔
-	heartBeatPeriod = 10 * time.Second
-	// 心跳最大重试次数
-	HeartBeatMaxRetryCount = 3
 )
 
 var (
@@ -142,14 +133,17 @@ func SSHTunnel(c *gin.Context) {
 	// 关闭ws
 	defer client.Conn.Close()
 
-	conf, err := sshx.NewAuthConfig(host.User, host.Password, "", "")
-	if err != nil {
-		common.Log.Error(err.Error())
-		return
-	}
-	// 默认密码模式
-	if host.AuthType == "key" {
+	var conf *ssh.ClientConfig
+	switch host.AuthType {
+	case "key":
 		conf, err = sshx.NewAuthConfig(host.User, "", host.PrivateKey, host.KeyPassphrase)
+		if err != nil {
+			common.Log.Error(err.Error())
+			return
+		}
+	default:
+		// 默认密码模式
+		conf, err = sshx.NewAuthConfig(host.User, host.Password, "", "")
 		if err != nil {
 			common.Log.Error(err.Error())
 			return
@@ -162,50 +156,14 @@ func SSHTunnel(c *gin.Context) {
 		common.Log.Error(err.Error())
 	}
 	sshSession, err := NewSSHSession(cols, rows, sshClient)
+	if err != nil {
+		common.Log.Error(err.Error())
+		return
+	}
 	defer sshSession.Close()
 	quitChan := make(chan bool, 3)
 	var buff = new(bytes.Buffer)
 	go sshSession.sendOutput(client.Conn, quitChan)
 	go sshSession.sessionWait(quitChan, client.Key)
 	sshSession.receiveWsMsg(client.Conn, buff, quitChan, client.Key)
-}
-
-// 获取连接列表
-func GetConnections(c *gin.Context) {
-	var resp []response.ConnectionResp
-	for client, _ := range hub.Clients {
-		var connStruct response.ConnectionResp
-		connStruct.Key = hub.Clients[client].Key
-		connStruct.UserName = hub.Clients[client].UserName
-		connStruct.Name = hub.Clients[client].Name
-		connStruct.HostName = hub.Clients[client].HostName
-		connStruct.IpAddress = hub.Clients[client].IpAddress
-		connStruct.Port = hub.Clients[client].Port
-		connStruct.ConnectionTime = hub.Clients[client].ConnectionTime
-		connStruct.LastActiveTime = hub.Clients[client].LastActiveTime
-		resp = append(resp, connStruct)
-	}
-
-	response.SuccessWithData(resp)
-}
-
-// 注销已登录的连接
-func DeleteConnectionByKey(c *gin.Context) {
-	var req request.KeyReq
-	err := c.Bind(&req)
-	if err != nil {
-		response.FailWithCode(response.ParmError)
-		return
-	}
-
-	conn, err := hub.get(req.Key)
-	if err != nil {
-		response.FailWithMsg(err.Error())
-		return
-	}
-	// 连接池删除对象
-	hub.delete(req.Key)
-	// 关闭socket
-	conn.Conn.Close()
-	response.Success()
 }

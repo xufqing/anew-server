@@ -35,6 +35,12 @@ type SSHTunnelReq struct {
 	Token string `json:"token" form:"token"`
 }
 
+// 文件管理req
+type FileReq struct {
+	HostId uint   `json:"host_id" form:"host_id"` // hostId
+	Path   string `json:"path" form:"path"`
+}
+
 // 翻译需要校验的字段名称
 func (s CreateHostReq) FieldTrans() map[string]string {
 	m := make(map[string]string, 0)
