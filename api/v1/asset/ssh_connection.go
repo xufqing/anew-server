@@ -17,7 +17,7 @@ func GetConnections(c *gin.Context) {
 		connStruct.HostName = hub.Clients[client].HostName
 		connStruct.IpAddress = hub.Clients[client].IpAddress
 		connStruct.Port = hub.Clients[client].Port
-		connStruct.ConnectionTime = hub.Clients[client].ConnectionTime
+		connStruct.ConnectTime = hub.Clients[client].ConnectTime
 		connStruct.LastActiveTime = hub.Clients[client].LastActiveTime
 		resp = append(resp, connStruct)
 	}

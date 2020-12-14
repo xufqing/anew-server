@@ -22,7 +22,7 @@ type ConnectionResp struct {
 	HostName       string           `json:"host_name"`
 	IpAddress      string           `json:"ip_address"`
 	Port           string           `json:"port"`
-	ConnectionTime models.LocalTime `json:"connection_time"`
+	ConnectTime models.LocalTime `json:"connect_time"`
 	LastActiveTime models.LocalTime `json:"last_active_time"`
 }
 
@@ -31,7 +31,7 @@ type FileInfo struct {
 	Path   string           `json:"path"`
 	IsDir  bool             `json:"isDir"`
 	Mode   string           `json:"mode"`
-	Size   int64            `json:"size"`
+	Size   string            `json:"size"`
 	Mtime  models.LocalTime `json:"mtime"` // 修改时间
 	IsLink bool             `json:"isLink"`
 }

@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 	"net/http"
 	"strconv"
@@ -34,7 +35,7 @@ var (
 
 // 连接仓库，管理所有连接ssh的客户端
 type ConnectionHub struct {
-	// 客户端集合(用户id为每个socket key)
+	// 客户端集合
 	Clients map[string]*Connection
 }
 
@@ -56,14 +57,18 @@ type Connection struct {
 	// 主机端口
 	Port string
 	// 接入时间
-	ConnectionTime models.LocalTime
+	ConnectTime models.LocalTime
 	// 上次活跃时间
 	LastActiveTime models.LocalTime
+	// ssh session 对象
+	SSHClient *ssh.Client
+	// sftp session 对象
+	SFTPClient *sftp.Client
 	// 重试次数
 	RetryCount uint
 }
 
-// 启动消息中心仓库
+// 启动SSH连接仓库
 func StartConnectionHub() {
 	// 初始化仓库
 	hub.Clients = make(map[string]*Connection)
@@ -78,7 +83,7 @@ func (h *ConnectionHub) get(key string) (*Connection, error) {
 	client := h.Clients[key]
 	if client == nil {
 		err = errors.New("连接不存在")
-		return client, err
+		return nil, err
 	}
 	return client, err
 
@@ -120,7 +125,7 @@ func SSHTunnel(c *gin.Context) {
 			User:      host.User,
 			IpAddress: host.IpAddress,
 			Port:      host.Port,
-			ConnectionTime: models.LocalTime{
+			ConnectTime: models.LocalTime{
 				Time: time.Now(),
 			},
 			LastActiveTime: models.LocalTime{
@@ -132,7 +137,10 @@ func SSHTunnel(c *gin.Context) {
 	}
 	// 关闭ws
 	defer client.Conn.Close()
+	defer hub.delete(websocketKey)
+	// 发送websocketKey给前端
 
+	client.Conn.WriteMessage(websocket.TextMessage, utils.Str2Bytes("Anew-Sec-WebSocket-Key:" + websocketKey))
 	var conf *ssh.ClientConfig
 	switch host.AuthType {
 	case "key":
@@ -151,10 +159,16 @@ func SSHTunnel(c *gin.Context) {
 	}
 	addr := fmt.Sprintf("%s:%s", host.IpAddress, host.Port)
 	sshClient, err := ssh.Dial("tcp", addr, conf)
-
 	if err != nil {
 		common.Log.Error(err.Error())
 	}
+	sftpClient,err := sftp.NewClient(sshClient)
+	if err != nil {
+		common.Log.Error(err.Error())
+	}
+	client.SSHClient = sshClient
+	client.SFTPClient = sftpClient
+	// 创建ssh session
 	sshSession, err := NewSSHSession(cols, rows, sshClient)
 	if err != nil {
 		common.Log.Error(err.Error())
