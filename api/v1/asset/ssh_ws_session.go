@@ -5,9 +5,12 @@ import (
 	"anew-server/pkg/utils"
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/websocket"
 	"golang.org/x/crypto/ssh"
 	"io"
+	"regexp"
+	"strings"
 	"sync"
 	"time"
 )
@@ -16,8 +19,8 @@ import (
 const (
 	wsMsgCmd    = "cmd"
 	wsMsgResize = "resizePty"
-	wsHeartBeat = "heartBeat"
 )
+
 type wsWriter struct {
 	buffer bytes.Buffer
 	mu     sync.Mutex //互斥锁
@@ -95,10 +98,21 @@ func (s *SSHSession) Close() {
 
 }
 
+//利用正则表达式压缩字符串，去除空格或制表符
+func compressStr(str string) string {
+	if str == "" {
+		return ""
+	}
+	//匹配一个或多个空白符的正则表达式
+	reg := regexp.MustCompile("\\s+")
+	return reg.ReplaceAllString(str, "")
+}
+
 //ReceiveWsMsg  receive websocket msg do some handling then write into ssh.session.stdin
-func (s *SSHSession) receiveWsMsg(wsConn *websocket.Conn, logBuff *bytes.Buffer, exitCh chan bool,key string) {
+func (s *SSHSession) receiveWsMsg(wsConn *websocket.Conn, exitCh chan bool, key string) {
 	//tells other go routine quit
 	defer setQuit(exitCh)
+	var cmdStr string
 	for {
 		select {
 		case <-exitCh:
@@ -118,9 +132,6 @@ func (s *SSHSession) receiveWsMsg(wsConn *websocket.Conn, logBuff *bytes.Buffer,
 			var msgObj wsMsg
 			err = json.Unmarshal(wsData, &msgObj)
 			switch msgObj.Type {
-			case wsHeartBeat:
-				// 心跳包无需处理
-				return
 			case wsMsgResize:
 				if msgObj.Cols > 0 && msgObj.Rows > 0 {
 					if err := s.Session.WindowChange(msgObj.Rows, msgObj.Cols); err != nil {
@@ -132,9 +143,30 @@ func (s *SSHSession) receiveWsMsg(wsConn *websocket.Conn, logBuff *bytes.Buffer,
 				if _, err := s.StdinPipe.Write(utils.Str2Bytes(msgObj.Cmd)); err != nil {
 					common.Log.Debugf("ws cmd bytes write to ssh.stdin pipe failed:\t", err)
 				}
-				//write input cmd to log buffer
-				if _, err := logBuff.Write(utils.Str2Bytes(msgObj.Cmd)); err != nil {
-					common.Log.Debugf("write received cmd into log buffer failed:\t", err)
+				if msgObj.Cmd == "\r" || msgObj.Cmd == "\n" {
+					if cmdStr != "" {
+						fmt.Println(compressStr(cmdStr))
+						cmdStr = ""
+					}
+				} else {
+					//matched,_ :=regexp.MatchString("[\\u0001-\\u0003]",msgObj.Cmd)
+					//if matched{
+					//	cmdStr =cmdStr + msgObj.Cmd
+					//} else{
+					//	fmt.Println("特殊符号")
+					//}
+					switch msgObj.Cmd {
+					// ctrl + c
+					case "\u0003":
+						cmdStr = ""
+					// 退格
+					case "\u007F":
+						lastStr := cmdStr[len(cmdStr)-1:]
+						cmdStr = strings.TrimSuffix(cmdStr, lastStr)
+					default:
+						cmdStr = cmdStr + msgObj.Cmd
+					}
+
 				}
 			}
 		}

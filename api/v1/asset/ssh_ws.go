@@ -8,7 +8,6 @@ import (
 	"anew-server/pkg/common"
 	"anew-server/pkg/sshx"
 	"anew-server/pkg/utils"
-	"bytes"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -176,8 +175,7 @@ func SSHTunnel(c *gin.Context) {
 	}
 	defer sshSession.Close()
 	quitChan := make(chan bool, 3)
-	var buff = new(bytes.Buffer)
 	go sshSession.sendOutput(client.Conn, quitChan)
 	go sshSession.sessionWait(quitChan, client.Key)
-	sshSession.receiveWsMsg(client.Conn, buff, quitChan, client.Key)
+	sshSession.receiveWsMsg(client.Conn, quitChan, client.Key)
 }

@@ -3,6 +3,14 @@
 #### 介绍
 golang  运维平台
 
+demo 地址
+
+http://anew.xufqing.cn
+
+用户名:admin
+
+密码: 123456
+
 前端地址 https://github.com/xufqing/anew-ui-antd
 #### 软件架构
 软件架构说明
