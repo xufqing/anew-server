@@ -67,6 +67,19 @@ type Connection struct {
 	RetryCount uint
 }
 
+func (c *Connection) close() {
+	if c.Conn != nil {
+		c.Conn.Close()
+	}
+	if c.SSHClient != nil {
+		c.SSHClient.Close()
+	}
+	if c.SFTPClient != nil {
+		c.SSHClient.Close()
+	}
+	hub.delete(c.Key)
+}
+
 // 启动SSH连接仓库
 func StartConnectionHub() {
 	// 初始化仓库
@@ -134,12 +147,11 @@ func SSHTunnel(c *gin.Context) {
 		// 加入连接仓库
 		hub.append(websocketKey, client)
 	}
-	// 关闭ws
-	defer client.Conn.Close()
-	defer hub.delete(websocketKey)
+	// 关闭
+	defer client.close()
 	// 发送websocketKey给前端
 
-	client.Conn.WriteMessage(websocket.TextMessage, utils.Str2Bytes("Anew-Sec-WebSocket-Key:" + websocketKey))
+	client.Conn.WriteMessage(websocket.TextMessage, utils.Str2Bytes("Anew-Sec-WebSocket-Key:"+websocketKey))
 	var conf *ssh.ClientConfig
 	switch host.AuthType {
 	case "key":
@@ -159,18 +171,22 @@ func SSHTunnel(c *gin.Context) {
 	addr := fmt.Sprintf("%s:%s", host.IpAddress, host.Port)
 	sshClient, err := ssh.Dial("tcp", addr, conf)
 	if err != nil {
-		common.Log.Error(err.Error())
+		client.Conn.WriteMessage(websocket.TextMessage, utils.Str2Bytes(fmt.Sprintf("SSH无法连接: %s",err.Error())))
+		common.Log.Errorf("SSH无法连接: %s",err.Error())
+		return
 	}
-	sftpClient,err := sftp.NewClient(sshClient)
+	sftpClient, err := sftp.NewClient(sshClient)
 	if err != nil {
-		common.Log.Error(err.Error())
+		common.Log.Errorf("SFTP无法连接: %s",err.Error())
+		return
 	}
 	client.SSHClient = sshClient
 	client.SFTPClient = sftpClient
 	// 创建ssh session
 	sshSession, err := NewSSHSession(cols, rows, sshClient)
 	if err != nil {
-		common.Log.Error(err.Error())
+		client.Conn.WriteMessage(websocket.TextMessage, utils.Str2Bytes(fmt.Sprintf("SSH Session创建失败: %s",err.Error())))
+		common.Log.Error("SSH Session创建失败: %s",err.Error())
 		return
 	}
 	defer sshSession.Close()
