@@ -11,8 +11,22 @@ import (
 	"anew-server/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"path"
+	"strconv"
 	"time"
 )
+// 获取当前请求用户信息,非缓存获取
+func GetCurrentUser(c *gin.Context) system.SysUser {
+	user, exists := c.Get("user")
+	var newUser system.SysUser
+	if !exists {
+		return newUser
+	}
+	u, _ := user.(response.LoginResp)
+	// 创建服务
+	s := service.New()
+	newUser, _ = s.GetUserById(u.Id)
+	return newUser
+}
 
 // 获取当前请求用户信息
 func GetCurrentUserFromCache(c *gin.Context) interface{} {
@@ -38,7 +52,7 @@ func GetCurrentUserFromCache(c *gin.Context) interface{} {
 
 // 获取当前用户信息返回给页面
 func GetUserInfo(c *gin.Context) {
-	user := GetCurrentUserFromCache(c)
+	user := GetCurrentUser(c)
 	// 转为UserInfoResponseStruct, 隐藏部分字段
 	var resp response.UserInfoResp
 	utils.Struct2StructByJson(user, &resp)
@@ -261,7 +275,7 @@ func UserAvatarUpload(c *gin.Context) {
 	}
 	user := GetCurrentUserFromCache(c)
 	username := user.(system.SysUser).Username
-	fileName := username + "_avatar" + path.Ext(file.Filename)
+	fileName := username + "_avatar_" + strconv.FormatInt(time.Now().UnixNano(), 10) + path.Ext(file.Filename)
 	imgPath := common.Conf.Upload.SaveDir + "/avatar/" + fileName
 	err = c.SaveUploadedFile(file, imgPath)
 	if err != nil {
@@ -269,8 +283,9 @@ func UserAvatarUpload(c *gin.Context) {
 		return
 	}
 	// 将头像url保存到数据库
-	query := common.Mysql.Where("username = ?", username).First(&user)
-	err = query.Update("avatar", "/"+imgPath).Error
+	//query := common.Mysql.Where("username = ?", username).First(&user)
+	var oldUser system.SysUser
+	err = common.Mysql.Model(&oldUser).Where("username = ?", username).Update("avatar", "/"+imgPath).Error
 	if err != nil {
 		response.FailWithMsg(err.Error())
 	}

@@ -29,9 +29,6 @@ func main() {
 	initialize.Casbin()
 	// 初始化创建上传目录
 	_ = os.MkdirAll(common.Conf.Upload.SaveDir + "/avatar/",644)
-	 //redis := cache.NewStringOperation()
-	 //fmt.Println(redis.Set("b","xx"))
-
 	//是否初始化数据(慎用) $anew-server init
 	if len(os.Args) > 1 {
 		if os.Args[1] == "init" {
