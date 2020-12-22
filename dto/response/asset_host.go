@@ -23,7 +23,6 @@ type ConnectionResp struct {
 	IpAddress      string           `json:"ip_address"`
 	Port           string           `json:"port"`
 	ConnectTime models.LocalTime `json:"connect_time"`
-	LastActiveTime models.LocalTime `json:"last_active_time"`
 }
 
 type FileInfo struct {

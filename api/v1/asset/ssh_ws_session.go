@@ -1,6 +1,7 @@
 package asset
 
 import (
+	"anew-server/pkg/asciicast2"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
 	"bytes"
@@ -9,8 +10,6 @@ import (
 	"github.com/gorilla/websocket"
 	"golang.org/x/crypto/ssh"
 	"io"
-	"regexp"
-	"strings"
 	"sync"
 	"time"
 )
@@ -37,8 +36,8 @@ type SSHSession struct {
 	// calling Write() to write data into ssh server
 	StdinPipe io.WriteCloser
 	// Write() be called to receive data from ssh server
-	Output  *wsWriter
-	Session *ssh.Session
+	StdOutput *wsWriter
+	Session   *ssh.Session
 }
 
 type wsMsg struct {
@@ -69,7 +68,6 @@ func NewSSHSession(cols, rows int, sshClient *ssh.Client) (*SSHSession, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	writer := new(wsWriter)
 	//ssh.stdout and stderr will write output into comboWriter
 	sshSession.Stdout = writer
@@ -88,42 +86,29 @@ func NewSSHSession(cols, rows int, sshClient *ssh.Client) (*SSHSession, error) {
 	if err := sshSession.Shell(); err != nil {
 		return nil, err
 	}
-	return &SSHSession{StdinPipe: stdinP, Output: writer, Session: sshSession}, nil
+	return &SSHSession{StdinPipe: stdinP, StdOutput: writer, Session: sshSession}, nil
 }
 
 func (s *SSHSession) Close() {
 	if s.Session != nil {
 		s.Session.Close()
 	}
-
-}
-
-//利用正则表达式压缩字符串，去除空格或制表符
-func compressStr(str string) string {
-	if str == "" {
-		return ""
-	}
-	//匹配一个或多个空白符的正则表达式
-	reg := regexp.MustCompile("\\s+")
-	return reg.ReplaceAllString(str, "")
 }
 
 //ReceiveWsMsg  receive websocket msg do some handling then write into ssh.session.stdin
-func (s *SSHSession) receiveWsMsg(wsConn *websocket.Conn, exitCh chan bool, key string) {
+func (s *SSHSession) ReceiveWsMsg(c *Connection, exitCh chan bool) {
 	//tells other go routine quit
-	defer setQuit(exitCh)
-	var cmdStr string
 	for {
 		select {
 		case <-exitCh:
 			return
 		default:
 			//read websocket msg
-			_, wsData, err := wsConn.ReadMessage()
+			_, wsData, err := c.Conn.ReadMessage()
 			if err != nil {
 				code := err.(*websocket.CloseError).Code
 				if code == 1000 || code == 1001 {
-					hub.delete(key)
+					s.Close()
 				}
 				common.Log.Debugf("reading webSocket message failed\t%s", err)
 				return
@@ -143,37 +128,12 @@ func (s *SSHSession) receiveWsMsg(wsConn *websocket.Conn, exitCh chan bool, key 
 				if _, err := s.StdinPipe.Write(utils.Str2Bytes(msgObj.Cmd)); err != nil {
 					common.Log.Debugf("ws cmd bytes write to ssh.stdin pipe failed:\t", err)
 				}
-				if msgObj.Cmd == "\r" || msgObj.Cmd == "\n" {
-					if cmdStr != "" {
-						fmt.Println(compressStr(cmdStr))
-						cmdStr = ""
-					}
-				} else {
-					//matched,_ :=regexp.MatchString("[\\u0001-\\u0003]",msgObj.Cmd)
-					//if matched{
-					//	cmdStr =cmdStr + msgObj.Cmd
-					//} else{
-					//	fmt.Println("特殊符号")
-					//}
-					switch msgObj.Cmd {
-					// ctrl + c
-					case "\u0003":
-						cmdStr = ""
-					// 退格
-					case "\u007F":
-						lastStr := cmdStr[len(cmdStr)-1:]
-						cmdStr = strings.TrimSuffix(cmdStr, lastStr)
-					default:
-						cmdStr = cmdStr + msgObj.Cmd
-					}
-
-				}
 			}
 		}
 	}
 }
 
-func (s *SSHSession) sendOutput(wsConn *websocket.Conn, exitCh chan bool) {
+func (s *SSHSession) SendOutput(c *Connection, exitCh chan bool) {
 	//tells other go routine quit
 	defer setQuit(exitCh)
 	//every 120ms write combine output bytes into websocket response
@@ -183,8 +143,8 @@ func (s *SSHSession) sendOutput(wsConn *websocket.Conn, exitCh chan bool) {
 	for {
 		select {
 		case <-tick.C:
-			//write combine output bytes into websocket response
-			if err := WriteByteMessage(s.Output, wsConn); err != nil {
+			// 发送ws
+			if err := WriteByteMessage(s.StdOutput, c.Conn); err != nil {
 				common.Log.Debugf("ssh sending combo output to webSocket failed:\t", err)
 				return
 			}
@@ -194,11 +154,44 @@ func (s *SSHSession) sendOutput(wsConn *websocket.Conn, exitCh chan bool) {
 	}
 }
 
-func (s *SSHSession) sessionWait(quitChan chan bool, key string) {
+func (s *SSHSession) SessionWait(quitChan chan bool) {
 	if err := s.Session.Wait(); err != nil {
 		common.Log.Debugf("ssh session wait failed:\t%s", err)
-		hub.delete(key)
 		setQuit(quitChan)
+	}
+}
+func (s *SSHSession) save(buff *bytes.Buffer) {
+	fmt.Println(buff.String())
+}
+func (s *SSHSession) GenAsciicastFile(w uint, h uint, title string, quitChan chan bool) {
+	// ssh 录像
+	var buff bytes.Buffer
+	meta := asciicast2.CastV2Header{
+		Width:     w,
+		Height:    h,
+		Timestamp: time.Now().Unix(),
+		Title:     title,
+		Env: &map[string]string{
+			"SHELL": "/bin/bash", "TERM": "xterm-256color",
+		},
+	}
+	cast := asciicast2.NewCastV2(meta, &buff)
+	startTime := time.Now()
+
+	defer setQuit(quitChan)
+	defer s.save(&buff)
+	tick := time.NewTicker(time.Millisecond * time.Duration(120))
+	defer tick.Stop()
+	for {
+		select {
+		case <-tick.C:
+			if s.StdOutput.buffer.Len() != 0 {
+				cast.PushFrame(startTime, s.StdOutput.buffer.Bytes())
+				//s.StdOutput.buffer.Reset()
+			}
+		case <-quitChan:
+			return
+		}
 	}
 }
 

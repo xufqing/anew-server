@@ -18,7 +18,6 @@ func GetConnections(c *gin.Context) {
 		connStruct.IpAddress = hub.Clients[client].IpAddress
 		connStruct.Port = hub.Clients[client].Port
 		connStruct.ConnectTime = hub.Clients[client].ConnectTime
-		connStruct.LastActiveTime = hub.Clients[client].LastActiveTime
 		resp = append(resp, connStruct)
 	}
 
@@ -39,9 +38,6 @@ func DeleteConnectionByKey(c *gin.Context) {
 		response.FailWithMsg(err.Error())
 		return
 	}
-	// 连接池删除对象
-	hub.delete(req.Key)
-	// 关闭socket
-	conn.Conn.Close()
+	conn.close()
 	response.Success()
 }
