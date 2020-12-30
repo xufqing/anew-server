@@ -65,7 +65,7 @@ func Str2UintArr(str string) (ids []uint) {
 	}
 	return
 }
-// 判断文件是否存在
+// 判断文件或文件夹是否存在
 func FileExist(path string) bool {
 	_, err := os.Stat(path)
 	if err != nil && os.IsNotExist(err) {

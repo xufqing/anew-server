@@ -62,7 +62,7 @@ logs:
   # 存放时间, 天
   max-age: 30
   # 是否压缩
-  compress: false
+  compress: true
 
 # jwt配置
 jwt:
@@ -81,3 +81,8 @@ upload:
   save-dir: upload
   # 单个文件或分片文件最大限制, 单位MB(上传文件先读取到内存, 如果这个值设置过大会导致内存崩溃)
   single-max-size: 32
+
+# SSH配置
+ssh:
+  # ssh录像保存路径
+  record-dir: ssh-record

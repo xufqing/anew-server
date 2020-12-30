@@ -1,15 +1,18 @@
 package asset
 
 import (
+	"anew-server/models"
+	"anew-server/models/asset"
 	"anew-server/pkg/asciicast2"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/websocket"
 	"golang.org/x/crypto/ssh"
 	"io"
+	"os"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -32,7 +35,7 @@ func (w *wsWriter) Write(p []byte) (int, error) {
 }
 
 // 封装ssh session
-type SSHSession struct {
+type SshSession struct {
 	// calling Write() to write data into ssh server
 	StdinPipe io.WriteCloser
 	// Write() be called to receive data from ssh server
@@ -48,17 +51,14 @@ type wsMsg struct {
 }
 
 func WriteByteMessage(w *wsWriter, wsConn *websocket.Conn) error {
-	if w.buffer.Len() != 0 {
-		err := wsConn.WriteMessage(websocket.TextMessage, w.buffer.Bytes())
-		if err != nil {
-			return err
-		}
-		w.buffer.Reset()
+	err := wsConn.WriteMessage(websocket.TextMessage, w.buffer.Bytes())
+	if err != nil {
+		return err
 	}
 	return nil
 }
 
-func NewSSHSession(cols, rows int, sshClient *ssh.Client) (*SSHSession, error) {
+func NewSshSession(cols, rows int, sshClient *ssh.Client) (*SshSession, error) {
 	sshSession, err := sshClient.NewSession()
 	if err != nil {
 		return nil, err
@@ -86,17 +86,18 @@ func NewSSHSession(cols, rows int, sshClient *ssh.Client) (*SSHSession, error) {
 	if err := sshSession.Shell(); err != nil {
 		return nil, err
 	}
-	return &SSHSession{StdinPipe: stdinP, StdOutput: writer, Session: sshSession}, nil
+	return &SshSession{StdinPipe: stdinP, StdOutput: writer, Session: sshSession}, nil
 }
 
-func (s *SSHSession) Close() {
+func (s *SshSession) Close(c *Connection) {
+	s.saveRecord(c)
 	if s.Session != nil {
 		s.Session.Close()
 	}
 }
 
 //ReceiveWsMsg  receive websocket msg do some handling then write into ssh.session.stdin
-func (s *SSHSession) ReceiveWsMsg(c *Connection, exitCh chan bool) {
+func (s *SshSession) ReceiveWsMsg(c *Connection, exitCh chan bool) {
 	//tells other go routine quit
 	for {
 		select {
@@ -108,7 +109,7 @@ func (s *SSHSession) ReceiveWsMsg(c *Connection, exitCh chan bool) {
 			if err != nil {
 				code := err.(*websocket.CloseError).Code
 				if code == 1000 || code == 1001 {
-					s.Close()
+					s.Close(c)
 				}
 				common.Log.Debugf("reading webSocket message failed\t%s", err)
 				return
@@ -133,20 +134,43 @@ func (s *SSHSession) ReceiveWsMsg(c *Connection, exitCh chan bool) {
 	}
 }
 
-func (s *SSHSession) SendOutput(c *Connection, exitCh chan bool) {
+func (s *SshSession) SendOutput(c *Connection, exitCh chan bool) {
 	//tells other go routine quit
 	defer setQuit(exitCh)
 	//every 120ms write combine output bytes into websocket response
 	tick := time.NewTicker(time.Millisecond * time.Duration(120))
 	//for range time.Tick(120 * time.Millisecond){}
 	defer tick.Stop()
+	// ssh 录像
+	meta := asciicast2.CastV2Header{
+		Width:     130,
+		Height:    30,
+		Timestamp: time.Now().Unix(),
+		Title:     c.Key,
+		Env: &map[string]string{
+			"SHELL": "/bin/bash", "TERM": "xterm-256color",
+		},
+	}
+	startTime := time.Now()
+	castFile := c.IpAddress + "_"+ strconv.FormatInt(time.Now().UnixNano(), 10) + ".cast"
+	c.CastFileName = castFile
+	if !utils.FileExist(common.Conf.Ssh.RecordDir) {
+		_ = os.Mkdir(common.Conf.Ssh.RecordDir, 644)
+	}
+	cast, f := asciicast2.NewCastV2(meta, castFile)
+	defer f.Close()
 	for {
 		select {
 		case <-tick.C:
-			// 发送ws
-			if err := WriteByteMessage(s.StdOutput, c.Conn); err != nil {
-				common.Log.Debugf("ssh sending combo output to webSocket failed:\t", err)
-				return
+			if s.StdOutput.buffer.Len() != 0 {
+				// 发送ws和创建审计录像
+				if err := WriteByteMessage(s.StdOutput, c.Conn); err != nil {
+					common.Log.Debugf("ssh sending combo output to webSocket failed:\t", err)
+					return
+				}
+				// 录像
+				cast.Record(startTime, s.StdOutput.buffer.Bytes())
+				s.StdOutput.buffer.Reset() // 录像操作完毕后reset buffer
 			}
 		case <-exitCh:
 			return
@@ -154,45 +178,27 @@ func (s *SSHSession) SendOutput(c *Connection, exitCh chan bool) {
 	}
 }
 
-func (s *SSHSession) SessionWait(quitChan chan bool) {
+func (s *SshSession) SessionWait(quitChan chan bool) {
 	if err := s.Session.Wait(); err != nil {
 		common.Log.Debugf("ssh session wait failed:\t%s", err)
 		setQuit(quitChan)
 	}
 }
-func (s *SSHSession) save(buff *bytes.Buffer) {
-	fmt.Println(buff.String())
-}
-func (s *SSHSession) GenAsciicastFile(w uint, h uint, title string, quitChan chan bool) {
-	// ssh 录像
-	var buff bytes.Buffer
-	meta := asciicast2.CastV2Header{
-		Width:     w,
-		Height:    h,
-		Timestamp: time.Now().Unix(),
-		Title:     title,
-		Env: &map[string]string{
-			"SHELL": "/bin/bash", "TERM": "xterm-256color",
+func (s *SshSession) saveRecord(c *Connection) {
+	record := asset.SshRecord{
+		Key:         c.Key,
+		UserName:    c.UserName,
+		HostName:    c.HostName,
+		IpAddress:   c.IpAddress,
+		Port:        c.Port,
+		User:        c.User,
+		ConnectTime: c.ConnectTime,
+		LogoutTime: models.LocalTime{
+			Time: time.Now(),
 		},
+		CastFileName: c.CastFileName,
 	}
-	cast := asciicast2.NewCastV2(meta, &buff)
-	startTime := time.Now()
-
-	defer setQuit(quitChan)
-	defer s.save(&buff)
-	tick := time.NewTicker(time.Millisecond * time.Duration(120))
-	defer tick.Stop()
-	for {
-		select {
-		case <-tick.C:
-			if s.StdOutput.buffer.Len() != 0 {
-				cast.PushFrame(startTime, s.StdOutput.buffer.Bytes())
-				//s.StdOutput.buffer.Reset()
-			}
-		case <-quitChan:
-			return
-		}
-	}
+	common.Mysql.Create(&record)
 }
 
 func setQuit(ch chan bool) {

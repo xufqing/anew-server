@@ -8,7 +8,7 @@ import (
 )
 
 func InitHostRouter(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) (R gin.IRoutes) {
-	// 创建SSH连接池
+	// 创建Ssh连接池
 	asset.StartConnectionHub()
 	router := r.Group("host").Use(authMiddleware.MiddlewareFunc()).Use(middleware.CasbinMiddleware)
 	{
@@ -17,13 +17,16 @@ func InitHostRouter(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) (R
 		router.POST("/create", asset.CreateHost)
 		router.PATCH("/update/:hostId", asset.UpdateHostById)
 		router.DELETE("/delete", asset.BatchDeleteHostByIds)
-		router.GET("/ssh", asset.SSHTunnel)
-		router.GET("/ssh/ls", asset.GetPathFromSSH)
-		router.POST("/ssh/upload", asset.UploadFileToSSH)
-		router.GET("/ssh/download", asset.DownloadFileFromSSH)
-		router.DELETE("/ssh/rm", asset.DeleteFileInSSH)
+		router.GET("/ssh", asset.SshTunnel)
+		router.GET("/ssh/ls", asset.GetPathFromSsh)
+		router.POST("/ssh/upload", asset.UploadFileToSsh)
+		router.GET("/ssh/download", asset.DownloadFileFromSsh)
+		router.DELETE("/ssh/rm", asset.DeleteFileInSsh)
 		router.GET("/connection/list", asset.GetConnections)
 		router.DELETE("/connection/delete", asset.DeleteConnectionByKey)
+		router.GET("/record/list", asset.GetSshRecords)
+		router.DELETE("/record/delete", asset.BatchDeleteSshRecordByIds)
+		router.GET("/record/download", asset.DownloadSshRecord)
 	}
 	return router
 }

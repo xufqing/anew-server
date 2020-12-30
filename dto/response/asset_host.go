@@ -17,7 +17,7 @@ type HostListResp struct {
 
 type ConnectionResp struct {
 	Key            string           `json:"key"`
-	UserName       string           `json:"username"`
+	UserName       string           `json:"user_name"`
 	Name           string           `json:"name"`
 	HostName       string           `json:"host_name"`
 	IpAddress      string           `json:"ip_address"`

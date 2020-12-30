@@ -96,6 +96,17 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
+				Id: 13,
+			},
+			Name:     "操作审计",
+			Path:     "record",
+			Sort:     3,
+			Status:   &status,
+			ParentId: 10,
+			Creator:  creator,
+		},
+		{
+			Model: models.Model{
 				Id: 2,
 			},
 			Name:     "系统设置",
@@ -310,7 +321,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 9,
+				Id: 10,
 			},
 			Key:      "phy",
 			Value:    "物理机",
@@ -319,7 +330,7 @@ func InitData() {
 		},
 		{
 			Model: models.Model{
-				Id: 9,
+				Id: 11,
 			},
 			Key:      "aliyun",
 			Value:    "阿里云",
@@ -653,7 +664,7 @@ func InitData() {
 			Name:     "查询字典",
 			Method:   "GET",
 			Path:     "/v1/dict/list",
-			Category: "字典管理",
+			Category: "基本权限",
 			Desc:     "字典列表",
 			Creator:  creator,
 		},
@@ -760,7 +771,7 @@ func InitData() {
 			Model: models.Model{
 				Id: 39,
 			},
-			Name:     "连接SSH",
+			Name:     "连接Ssh",
 			Method:   "GET",
 			Path:     "/v1/host/ssh",
 			Category: "主机管理",
@@ -811,6 +822,50 @@ func InitData() {
 			Desc:     "删除文件",
 			Creator:  creator,
 		},
+		{
+			Model: models.Model{
+				Id: 44,
+			},
+			Name:     "主机信息",
+			Method:   "GET",
+			Path:     "/v1/host/info/:hostId",
+			Category: "主机管理",
+			Desc:     "查询主机信息",
+			Creator:  creator,
+		},
+		{
+			Model: models.Model{
+				Id: 45,
+			},
+			Name:     "查询记录",
+			Method:   "GET",
+			Path:     "/v1/host/record/list",
+			Category: "操作审计",
+			Desc:     "查询记录",
+			Creator:  creator,
+		},
+		{
+			Model: models.Model{
+				Id: 46,
+			},
+			Name:     "删除记录",
+			Method:   "DELETE",
+			Path:     "/v1/host/record/delete",
+			Category: "操作审计",
+			Desc:     "查询记录",
+			Creator:  creator,
+		},
+		{
+			Model: models.Model{
+				Id: 47,
+			},
+			Name:     "获取录像",
+			Method:   "GET",
+			Path:     "/v1/host//record/download",
+			Category: "操作审计",
+			Desc:     "获取录像",
+			Creator:  creator,
+		},
 	}
 	for _, api := range apis {
 		oldApi := system.SysApi{}
@@ -825,7 +880,7 @@ func InitData() {
 			//	Method:  api.Method,
 			//})
 			// 来宾权限
-			if api.Id <= 7 || api.Id == 12 {
+			if api.Id <= 7 || api.Id == 12 || api.Id == 29 {
 				_, err = s.CreateRoleCasbin(system.SysRoleCasbin{
 					Keyword: roles[1].Keyword,
 					Path:    api.Path,

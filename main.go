@@ -28,10 +28,6 @@ func main() {
 	// 初始化Casbin
 	initialize.Casbin()
 
-	// 初始化创建上传目录
-	dir,_ := os.Getwd()
-	_ = os.MkdirAll(dir + "/" + common.Conf.Upload.SaveDir + "/avatar/",644)
-	//_ = os.MkdirAll(common.Conf.Upload.SaveDir + "/avatar/",644)
 	//是否初始化数据(慎用) $anew-server init
 	if len(os.Args) > 1 {
 		if os.Args[1] == "init" {

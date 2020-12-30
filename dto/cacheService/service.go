@@ -33,9 +33,9 @@ func (this RedisService) SetCache(key string, value interface{}) {
 
 // 获取缓存，获取失败则返回func（func为db的逻辑）
 func (this RedisService) GetCache(key string) (ret interface{}) {
-	obj := this.DBGetter()
 	if this.Serilizer == SERILIZER_JSON {
 		f := func() string {
+			obj := this.DBGetter()
 			return utils.Struct2Json(obj)
 		}
 		ret = this.Operation.Get(key).Unwrap_Or_Else(f, key)
@@ -46,6 +46,7 @@ func (this RedisService) GetCache(key string) (ret interface{}) {
 	} else if this.Serilizer == SERILIZER_GOB {
 		f := func() string {
 			var buf = &bytes.Buffer{}
+			obj := this.DBGetter()
 			enc := gob.NewEncoder(buf)
 			if err := enc.Encode(obj); err != nil {
 				return ""
@@ -67,6 +68,7 @@ func (this RedisService) GetCacheForObject(key string, obj interface{}) interfac
 		return nil
 	}
 	if this.Serilizer == SERILIZER_JSON {
+		//fmt.Println("form cache")
 		utils.Json2Struct(ret.(string), obj) // Json转结构体
 	} else if this.Serilizer == SERILIZER_GOB {
 		var buf = &bytes.Buffer{}

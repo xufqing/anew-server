@@ -114,6 +114,6 @@ func (s *MysqlService) DeleteMenuByIds(ids []uint) (err error) {
 func (s *MysqlService) getAllMenu() []system.SysMenu {
 	menus := make([]system.SysMenu, 0)
 	// 查询所有菜单
-	s.db.Order("sort").Find(&menus)
+	s.db.Order("sort").Where("status = ?", true).Find(&menus)
 	return menus
 }

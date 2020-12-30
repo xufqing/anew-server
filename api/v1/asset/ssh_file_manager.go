@@ -14,7 +14,7 @@ import (
 )
 
 // 获取目录数据
-func GetPathFromSSH(c *gin.Context) {
+func GetPathFromSsh(c *gin.Context) {
 	urlPath := c.Query("path")
 	key := c.Query("key")
 	if key == ""  {
@@ -23,11 +23,15 @@ func GetPathFromSSH(c *gin.Context) {
 	}
 	conn, err := hub.get(key)
 	if err != nil {
-		response.FailWithMsg(fmt.Sprintf("获取SSH连接失败: %s", err))
+		response.FailWithMsg(fmt.Sprintf("获取Ssh连接失败: %s", err))
+		return
+	}
+	if conn.SshClient == nil {
+		response.FailWithMsg("主机未连接")
 		return
 	}
 	if urlPath == "" {
-		session, _ := conn.SSHClient.NewSession()
+		session, _ := conn.SshClient.NewSession()
 		res, _ := session.CombinedOutput("echo ${HOME}")
 		urlPath = strings.Replace(utils.Bytes2Str(res), "\n", "", -1)
 		defer session.Close()
@@ -55,7 +59,7 @@ func GetPathFromSSH(c *gin.Context) {
 	response.SuccessWithData(files)
 }
 
-func UploadFileToSSH(c *gin.Context) {
+func UploadFileToSsh(c *gin.Context) {
 	urlPath := c.Query("path")
 	key := c.Query("key")
 	if key == "" || urlPath == "" {
@@ -72,7 +76,7 @@ func UploadFileToSSH(c *gin.Context) {
 	remoteFile := path.Join(urlPath, filename)
 	conn, err := hub.get(key)
 	if err != nil {
-		response.FailWithMsg(fmt.Sprintf("获取SSH连接失败: %s", err))
+		response.FailWithMsg(fmt.Sprintf("获取Ssh连接失败: %s", err))
 		return
 	}
 	dstFile, err := conn.SFTPClient.Create(remoteFile)
@@ -97,7 +101,7 @@ func UploadFileToSSH(c *gin.Context) {
 	response.Success()
 }
 
-func DownloadFileFromSSH(c *gin.Context) {
+func DownloadFileFromSsh(c *gin.Context) {
 	urlPath := c.Query("path")
 	key := c.Query("key")
 	if key == "" || urlPath == "" {
@@ -106,7 +110,7 @@ func DownloadFileFromSSH(c *gin.Context) {
 	}
 	conn, err := hub.get(key)
 	if err != nil {
-		response.FailWithMsg(fmt.Sprintf("获取SSH连接失败: %s", err))
+		response.FailWithMsg(fmt.Sprintf("获取Ssh连接失败: %s", err))
 		return
 	}
 	dstFile, err := conn.SFTPClient.Open(urlPath)
@@ -124,7 +128,7 @@ func DownloadFileFromSSH(c *gin.Context) {
 
 
 // 删除文件
-func DeleteFileInSSH(c *gin.Context) {
+func DeleteFileInSsh(c *gin.Context) {
 	urlPath := c.Query("path")
 	key := c.Query("key")
 	if key == "" || urlPath == "" {
@@ -133,7 +137,7 @@ func DeleteFileInSSH(c *gin.Context) {
 	}
 	conn, err := hub.get(key)
 	if err != nil {
-		response.FailWithMsg(fmt.Sprintf("获取SSH连接失败: %s", err))
+		response.FailWithMsg(fmt.Sprintf("获取Ssh连接失败: %s", err))
 		return
 	}
 	if err := conn.SFTPClient.Remove(urlPath); err != nil {

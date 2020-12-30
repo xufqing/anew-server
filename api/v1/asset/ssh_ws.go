@@ -58,27 +58,29 @@ type Connection struct {
 	// 接入时间
 	ConnectTime models.LocalTime
 	// ssh session 对象
-	SSHClient *ssh.Client
+	SshClient *ssh.Client
 	// sftp session 对象
 	SFTPClient *sftp.Client
+	// 录像文件名称
+	CastFileName string
 }
 
 func (c *Connection) close() {
 	if c.Conn != nil {
 		c.Conn.Close()
 	}
-	if c.SSHClient != nil {
-		c.SSHClient.Close()
+	if c.SshClient != nil {
+		c.SshClient.Close()
 	}
 	if c.SFTPClient != nil {
-		c.SSHClient.Close()
+		c.SshClient.Close()
 	}
 	if c.Key != "" {
 		hub.delete(c.Key)
 	}
 }
 
-// 启动SSH连接仓库
+// 启动Ssh连接仓库
 func StartConnectionHub() {
 	// 初始化仓库
 	hub.Clients = make(map[string]*Connection)
@@ -104,7 +106,7 @@ func (h *ConnectionHub) delete(key string) {
 }
 
 // websocket
-func SSHTunnel(c *gin.Context) {
+func SshTunnel(c *gin.Context) {
 	hostId := utils.Str2Uint(c.Query("host_id"))
 	s := service.New()
 	host, err := s.GetHostById(hostId)
@@ -166,8 +168,8 @@ func SSHTunnel(c *gin.Context) {
 	addr := fmt.Sprintf("%s:%s", host.IpAddress, host.Port)
 	sshClient, err := ssh.Dial("tcp", addr, conf)
 	if err != nil {
-		client.Conn.WriteMessage(websocket.TextMessage, utils.Str2Bytes(fmt.Sprintf("SSH无法连接: %s", err.Error())))
-		common.Log.Errorf("SSH无法连接: %s", err.Error())
+		client.Conn.WriteMessage(websocket.TextMessage, utils.Str2Bytes(fmt.Sprintf("Ssh无法连接: %s", err.Error())))
+		common.Log.Errorf("Ssh无法连接: %s", err.Error())
 		return
 	}
 	sftpClient, err := sftp.NewClient(sshClient)
@@ -175,20 +177,18 @@ func SSHTunnel(c *gin.Context) {
 		common.Log.Errorf("SFTP无法连接: %s", err.Error())
 		return
 	}
-	client.SSHClient = sshClient
+	client.SshClient = sshClient
 	client.SFTPClient = sftpClient
 	// 创建ssh session
-	sshSession, err := NewSSHSession(cols, rows, sshClient)
+	sshSession, err := NewSshSession(cols, rows, sshClient)
 	if err != nil {
-		client.Conn.WriteMessage(websocket.TextMessage, utils.Str2Bytes(fmt.Sprintf("SSH Session创建失败: %s", err.Error())))
-		common.Log.Error("SSH Session创建失败: %s", err.Error())
+		client.Conn.WriteMessage(websocket.TextMessage, utils.Str2Bytes(fmt.Sprintf("Ssh Session创建失败: %s", err.Error())))
+		common.Log.Error("Ssh Session创建失败: %s", err.Error())
 		return
 	}
-	defer sshSession.Close()
+	defer sshSession.Session.Close()
 	quitChan := make(chan bool, 3)
-
-	go sshSession.GenAsciicastFile(uint(cols), uint(rows), client.Key, quitChan)   // 创建录像
-	go sshSession.SendOutput(client, quitChan)
+	go sshSession.SendOutput(client, quitChan)  // 协程输出ws和进行录像
 	go sshSession.SessionWait(quitChan)
 	sshSession.ReceiveWsMsg(client, quitChan)
 

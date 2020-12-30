@@ -10,6 +10,7 @@ import (
 	"anew-server/pkg/redis"
 	"anew-server/pkg/utils"
 	"github.com/gin-gonic/gin"
+	"os"
 	"path"
 	"strconv"
 	"time"
@@ -275,10 +276,11 @@ func UserAvatarUpload(c *gin.Context) {
 	}
 	user := GetCurrentUserFromCache(c)
 	username := user.(system.SysUser).Username
-	fileName := username + "_avatar_" + strconv.FormatInt(time.Now().UnixNano(), 10) + path.Ext(file.Filename)
+	fileName := username + "_avatar_" + strconv.FormatInt(time.Now().UnixNano(), 8) + path.Ext(file.Filename)
 	imgPath := common.Conf.Upload.SaveDir + "/avatar/" + fileName
-	//dir,_ := os.Getwd()
-	//localPath := dir + "/" + imgPath
+	if !utils.FileExist(common.Conf.Upload.SaveDir) {
+		_ = os.MkdirAll(common.Conf.Upload.SaveDir + "/avatar/",644)
+	}
 	err = c.SaveUploadedFile(file, imgPath)
 	if err != nil {
 		response.FailWithMsg(err.Error())

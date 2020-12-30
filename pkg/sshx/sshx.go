@@ -28,7 +28,7 @@ type AuthConfig struct {
 	PrivateKeyPassphrase string
 }
 
-type SSHClient struct {
+type SshClient struct {
 	Host   string
 	Conf   *ssh.ClientConfig
 	Client *ssh.Client //ssh客户端
@@ -42,8 +42,8 @@ var ErrSessionCanceled = errors.New("session canceled because context canceled")
 // ErrFileFingerNotMatch 文件指纹不匹配
 var ErrFileFingerNotMatch = errors.New("file finger not match")
 
-func New(host string, conf *ssh.ClientConfig) *SSHClient {
-	return &SSHClient{Host: host, Conf: conf, Logger: common.Log}
+func New(host string, conf *ssh.ClientConfig) *SshClient {
+	return &SshClient{Host: host, Conf: conf, Logger: common.Log}
 }
 
 
@@ -67,11 +67,11 @@ func NewAuthConfig(user string, password string, privateKeyPath string, privateK
 		}
 		conf.Auth = append(conf.Auth, pk)
 	} else {
-		// if occur error "Failed to open SSH_AUTH_SOCK: dial unix: missing address",
+		// if occur error "Failed to open Ssh_AUTH_SOCK: dial unix: missing address",
 		// execute command: eval `ssh-agent`,and enter passphrase
-		conn, err := net.Dial("unix", os.Getenv("SSH_AUTH_SOCK"))
+		conn, err := net.Dial("unix", os.Getenv("Ssh_AUTH_SOCK"))
 		if err != nil {
-			return nil, fmt.Errorf("failed to open SSH_AUTH_SOCK: %w", err)
+			return nil, fmt.Errorf("failed to open Ssh_AUTH_SOCK: %w", err)
 		}
 		agentClient := agent.NewClient(conn)
 		// Use a callback rather than PublicKeys so we only consult the
@@ -101,7 +101,7 @@ func getPrivateKey(privateKeyPath string, privateKeyPassphrase string) (ssh.Auth
 	return ssh.PublicKeys(signer), nil
 }
 
-func (s *SSHClient) run(ctx context.Context, client *ssh.Client, cmd string, opts ...SessionOption) ([]byte, error) {
+func (s *SshClient) run(ctx context.Context, client *ssh.Client, cmd string, opts ...SessionOption) ([]byte, error) {
 	session, err := client.NewSession()
 	if err != nil {
 		return nil, fmt.Errorf("create session failed: %w", err)
@@ -131,7 +131,7 @@ func (s *SSHClient) run(ctx context.Context, client *ssh.Client, cmd string, opt
 	return resp, err
 }
 
-func (s *SSHClient) checkFileConsistency(src string, remoteDest string) (bool, error) {
+func (s *SshClient) checkFileConsistency(src string, remoteDest string) (bool, error) {
 	// md5sum默认路径
 	md5bin := "/usr/bin/md5sum"
 	localFinger := utils.GetFileMd5(src)
@@ -152,7 +152,7 @@ func (s *SSHClient) checkFileConsistency(src string, remoteDest string) (bool, e
 	return strings.EqualFold(localFinger, remoteFinger[0]), nil
 }
 
-func (s *SSHClient) transferToRemoteTmp(client *sftp.Client, destTmp string, src string) (int64, error) {
+func (s *SshClient) transferToRemoteTmp(client *sftp.Client, destTmp string, src string) (int64, error) {
 	srcFile, err := os.Open(src)
 	if err != nil {
 		s.Logger.Errorf("open local file %s failed: %w", src, err)
@@ -170,7 +170,7 @@ func (s *SSHClient) transferToRemoteTmp(client *sftp.Client, destTmp string, src
 	return io.Copy(destFile, srcFile)
 }
 
-func (s *SSHClient) remoteFileExist(client *sftp.Client, path string) bool {
+func (s *SshClient) remoteFileExist(client *sftp.Client, path string) bool {
 	_, err := client.Stat(path)
 	if err != nil && os.IsNotExist(err) {
 		return false
@@ -179,7 +179,7 @@ func (s *SSHClient) remoteFileExist(client *sftp.Client, path string) bool {
 	return true
 }
 
-func (s *SSHClient) transferFile(client *ssh.Client, dest string, src string, override bool, checkConsistency bool) (written int64, err error) {
+func (s *SshClient) transferFile(client *ssh.Client, dest string, src string, override bool, checkConsistency bool) (written int64, err error) {
 	sftpClient, err := sftp.NewClient(client)
 	if err != nil {
 		s.Logger.Errorf("creates SFTP client failed: %w", err)
@@ -231,7 +231,7 @@ func (s *SSHClient) transferFile(client *ssh.Client, dest string, src string, ov
 }
 
 // Command 在远程服务器上执行命令
-func (s *SSHClient) Command(ctx context.Context, cmd string, opts ...SessionOption) ([]byte, error) {
+func (s *SshClient) Command(ctx context.Context, cmd string, opts ...SessionOption) ([]byte, error) {
 	client, err := ssh.Dial("tcp", s.Host, s.Conf)
 	if err != nil {
 		return nil, err
@@ -241,7 +241,7 @@ func (s *SSHClient) Command(ctx context.Context, cmd string, opts ...SessionOpti
 }
 
 // SendFile 将本地文件传输到远程服务器
-func (s *SSHClient) SendFile(dest string, src string, override bool, consistencyCheck bool) (written int64, err error) {
+func (s *SshClient) SendFile(dest string, src string, override bool, consistencyCheck bool) (written int64, err error) {
 	conn, err := ssh.Dial("tcp", s.Host, s.Conf)
 	if err != nil {
 		s.Logger.Errorf("can not establish a connection to %s: %w", s.Host, err)

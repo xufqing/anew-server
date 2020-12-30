@@ -14,6 +14,7 @@ type Configuration struct {
 	Jwt    JwtConfiguration    `mapstructure:"jwt" json:"jwt"`
 	Upload UploadConfiguration `mapstructure:"upload" json:"upload"`
 	Casbin CasbinConfiguration `mapstructure:"casbin" json:"casbin"`
+	Ssh    SshConfiguration    `mapstructure:"ssh" json:"ssh"`
 }
 
 type SystemConfiguration struct {
@@ -48,7 +49,7 @@ type MysqlConfiguration struct {
 type RedisConfiguration struct {
 	Host     string `mapstructure:"host" json:"host"`
 	Password string `mapstructure:"password" json:"password"`
-	DB       int `mapstructure:"db" json:"db"`
+	DB       int    `mapstructure:"db" json:"db"`
 	Port     int    `mapstructure:"port" json:"port"`
 }
 
@@ -65,6 +66,10 @@ type JwtConfiguration struct {
 }
 
 type UploadConfiguration struct {
-	SaveDir       string `mapstructure:"save-dir" json:"saveDir"`
+	SaveDir string `mapstructure:"save-dir" json:"saveDir"`
 	SingleMaxSize uint   `mapstructure:"single-max-size" json:"singleMaxSize"`
+}
+
+type SshConfiguration struct {
+	RecordDir string `mapstructure:"record-dir" json:"recordDir"`
 }
