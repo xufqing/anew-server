@@ -2,8 +2,8 @@ package request
 
 import "anew-server/dto/response"
 
-// 获取角色列表结构体
-type RoleListReq struct {
+// 请求角色列表结构体
+type RoleReq struct {
 	Name              string `json:"name" form:"name"`
 	Keyword           string `json:"keyword" form:"keyword"`
 	Status            *bool  `json:"status" form:"status"`

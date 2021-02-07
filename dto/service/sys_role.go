@@ -14,7 +14,7 @@ import (
 )
 
 // 获取所有角色
-func (s *MysqlService) GetRoles(req *request.RoleListReq) ([]system.SysRole, error) {
+func (s *MysqlService) GetRoles(req *request.RoleReq) ([]system.SysRole, error) {
 	var err error
 	list := make([]system.SysRole, 0)
 	db := common.Mysql

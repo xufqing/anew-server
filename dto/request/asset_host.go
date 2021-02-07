@@ -3,13 +3,14 @@ package request
 import "anew-server/dto/response"
 
 // 获取接口列表结构体
-type HostListReq struct {
+type HostReq struct {
 	HostName          string `json:"host_name" form:"host_name"`
 	IpAddress         string `json:"ip_address" form:"ip_address"`
 	OSVersion         string `json:"os_version" form:"os_version"`
 	HostType          string `json:"host_type" form:"host_type"`
 	AuthType          string `json:"auth_type" form:"auth_type"`
 	Creator           string `json:"creator" form:"creator"`
+	GroupID           string `json:"group_id" form:"group_id"`
 	response.PageInfo        // 分页参数
 }
 
@@ -27,8 +28,8 @@ type CreateHostReq struct {
 	Creator       string `json:"creator" form:"creator"`
 }
 
-// Ssh结构体
-type SshTunnelReq struct {
+// SSh结构体
+type SShTunnelReq struct {
 	HostId uint   `json:"hostId" form:"host_id"`
 	Width  int    `json:"width" form:"width"`
 	Hight  int    `json:"hight" form:"hight"`

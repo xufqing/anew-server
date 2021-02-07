@@ -14,7 +14,7 @@ import (
 // 获取列表
 func GetHosts(c *gin.Context) {
 	// 绑定参数
-	var req request.HostListReq
+	var req request.HostReq
 	err := c.Bind(&req)
 	if err != nil {
 		response.FailWithCode(response.ParmError)

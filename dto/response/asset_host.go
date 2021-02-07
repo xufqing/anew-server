@@ -1,6 +1,8 @@
 package response
 
-import "anew-server/models"
+import (
+	"anew-server/models"
+)
 
 type HostListResp struct {
 	Id         uint   `json:"id"`

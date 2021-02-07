@@ -11,10 +11,14 @@ import (
 	"strings"
 )
 
-func (s *MysqlService) GetHosts(req *request.HostListReq) ([]asset.AssetHost, error) {
+func (s *MysqlService) GetHosts(req *request.HostReq) ([]asset.AssetHost, error) {
 	var err error
 	list := make([]asset.AssetHost, 0)
 	query := s.db.Table(new(asset.AssetHost).TableName())
+	group_id := strings.TrimSpace(req.GroupID)
+	if group_id != "" {
+		query = query.Raw("select * from tb_asset_host a where id in (select asset_host_id from relation_group_host where asset_group_id = ? ) and a.deleted_at is null", group_id)
+	}
 	host_name := strings.TrimSpace(req.HostName)
 	if host_name != "" {
 		query = query.Where("host_name LIKE ?", fmt.Sprintf("%%%s%%", host_name))
@@ -35,16 +39,22 @@ func (s *MysqlService) GetHosts(req *request.HostListReq) ([]asset.AssetHost, er
 	if auth_type != "" {
 		query = query.Where("auth_type LIKE ?", fmt.Sprintf("%%%s%%", auth_type))
 	}
-	// 查询条数
-	err = query.Find(&list).Count(&req.PageInfo.Total).Error
-	if err == nil {
-		if req.PageInfo.All {
-			// 不使用分页
-			err = query.Find(&list).Error
-		} else {
-			// 获取分页参数
-			limit, offset := req.GetLimit()
-			err = query.Limit(limit).Offset(offset).Find(&list).Error
+	if group_id != "" {
+		// 不使用分页
+		err = query.Scan(&list).Error
+		req.PageInfo.Total = int64((len(list)))
+
+	} else {
+		err = query.Find(&list).Count(&req.PageInfo.Total).Error
+		if err == nil {
+			if req.PageInfo.All {
+				// 不使用分页
+				err = query.Find(&list).Error
+			} else {
+				// 获取分页参数
+				limit, offset := req.GetLimit()
+				err = query.Limit(limit).Offset(offset).Find(&list).Error
+			}
 		}
 	}
 

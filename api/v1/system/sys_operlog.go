@@ -16,7 +16,7 @@ import (
 // 获取操作日志列表
 func GetOperLogs(c *gin.Context) {
 	// 绑定参数
-	var req request.OperLogListReq
+	var req request.OperLogReq
 	reqErr := c.Bind(&req)
 	if reqErr != nil {
 		response.FailWithCode(response.ParmError)

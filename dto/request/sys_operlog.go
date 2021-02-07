@@ -6,7 +6,7 @@ import (
 )
 
 // 获取操作日志列表结构体
-type OperLogListReq struct {
+type OperLogReq struct {
 	Name            string `json:"name" form:"name"`
 	Method            string `json:"method" form:"method"`
 	Path              string `json:"path" form:"path"`
@@ -16,7 +16,7 @@ type OperLogListReq struct {
 }
 
 // 翻译需要校验的字段名称
-func (s OperLogListReq) FieldTrans() map[string]string {
+func (s OperLogReq) FieldTrans() map[string]string {
 	m := make(map[string]string, 0)
 	m["Status"] = "响应状态码"
 	return m

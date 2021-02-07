@@ -12,7 +12,7 @@ import (
 )
 
 
-func (s *MysqlService) GetApis(req *request.ApiListReq) ([]system.SysApi, error) {
+func (s *MysqlService) GetApis(req *request.ApiReq) ([]system.SysApi, error) {
 	var err error
 	list := make([]system.SysApi, 0)
 	query := s.db.Table(new(system.SysApi).TableName())

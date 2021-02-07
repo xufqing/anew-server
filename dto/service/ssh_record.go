@@ -9,9 +9,9 @@ import (
 )
 
 // 获取操作日志
-func (s *MysqlService) GetSshRecords(req *request.SshRecordListReq) ([]asset.SshRecord, error) {
+func (s *MysqlService) GetSSHRecords(req *request.SShRecordReq) ([]asset.SShRecord, error) {
 	var err error
-	list := make([]asset.SshRecord, 0)
+	list := make([]asset.SShRecord, 0)
 	query := common.Mysql
 	key := strings.TrimSpace(req.Key)
 	if key != "" {
@@ -46,6 +46,6 @@ func (s *MysqlService) GetSshRecords(req *request.SshRecordListReq) ([]asset.Ssh
 }
 
 // 批量删除记录
-func (s *MysqlService) DeleteSshRecordByIds(ids []uint) (err error) {
-	return s.db.Where("id IN (?)", ids).Delete(asset.SshRecord{}).Error
+func (s *MysqlService) DeleteSSHRecordByIds(ids []uint) (err error) {
+	return s.db.Where("id IN (?)", ids).Delete(asset.SShRecord{}).Error
 }

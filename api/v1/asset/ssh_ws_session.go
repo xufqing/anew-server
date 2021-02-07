@@ -35,7 +35,7 @@ func (w *wsWriter) Write(p []byte) (int, error) {
 }
 
 // 封装ssh session
-type SshSession struct {
+type SShSession struct {
 	// calling Write() to write data into ssh server
 	StdinPipe io.WriteCloser
 	// Write() be called to receive data from ssh server
@@ -58,7 +58,7 @@ func WriteByteMessage(w *wsWriter, wsConn *websocket.Conn) error {
 	return nil
 }
 
-func NewSshSession(cols, rows int, sshClient *ssh.Client) (*SshSession, error) {
+func NewSShSession(cols, rows int, sshClient *ssh.Client) (*SShSession, error) {
 	sshSession, err := sshClient.NewSession()
 	if err != nil {
 		return nil, err
@@ -86,10 +86,10 @@ func NewSshSession(cols, rows int, sshClient *ssh.Client) (*SshSession, error) {
 	if err := sshSession.Shell(); err != nil {
 		return nil, err
 	}
-	return &SshSession{StdinPipe: stdinP, StdOutput: writer, Session: sshSession}, nil
+	return &SShSession{StdinPipe: stdinP, StdOutput: writer, Session: sshSession}, nil
 }
 
-func (s *SshSession) Close(c *Connection) {
+func (s *SShSession) Close(c *Connection) {
 	s.saveRecord(c)
 	if s.Session != nil {
 		s.Session.Close()
@@ -97,7 +97,7 @@ func (s *SshSession) Close(c *Connection) {
 }
 
 //ReceiveWsMsg  receive websocket msg do some handling then write into ssh.session.stdin
-func (s *SshSession) ReceiveWsMsg(c *Connection, exitCh chan bool) {
+func (s *SShSession) ReceiveWsMsg(c *Connection, exitCh chan bool) {
 	//tells other go routine quit
 	for {
 		select {
@@ -134,7 +134,7 @@ func (s *SshSession) ReceiveWsMsg(c *Connection, exitCh chan bool) {
 	}
 }
 
-func (s *SshSession) SendOutput(c *Connection, exitCh chan bool) {
+func (s *SShSession) SendOutput(c *Connection, exitCh chan bool) {
 	//tells other go routine quit
 	defer setQuit(exitCh)
 	//every 120ms write combine output bytes into websocket response
@@ -154,8 +154,8 @@ func (s *SshSession) SendOutput(c *Connection, exitCh chan bool) {
 	startTime := time.Now()
 	castFile := c.IpAddress + "_"+ strconv.FormatInt(time.Now().UnixNano(), 10) + ".cast"
 	c.CastFileName = castFile
-	if !utils.FileExist(common.Conf.Ssh.RecordDir) {
-		_ = os.Mkdir(common.Conf.Ssh.RecordDir, 644)
+	if !utils.FileExist(common.Conf.SSh.RecordDir) {
+		_ = os.Mkdir(common.Conf.SSh.RecordDir, 644)
 	}
 	cast, f := asciicast2.NewCastV2(meta, castFile)
 	defer f.Close()
@@ -178,14 +178,14 @@ func (s *SshSession) SendOutput(c *Connection, exitCh chan bool) {
 	}
 }
 
-func (s *SshSession) SessionWait(quitChan chan bool) {
+func (s *SShSession) SessionWait(quitChan chan bool) {
 	if err := s.Session.Wait(); err != nil {
 		common.Log.Debugf("ssh session wait failed:\t%s", err)
 		setQuit(quitChan)
 	}
 }
-func (s *SshSession) saveRecord(c *Connection) {
-	record := asset.SshRecord{
+func (s *SShSession) saveRecord(c *Connection) {
+	record := asset.SShRecord{
 		Key:         c.Key,
 		UserName:    c.UserName,
 		HostName:    c.HostName,

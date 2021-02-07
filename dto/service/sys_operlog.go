@@ -9,7 +9,7 @@ import (
 )
 
 // 获取操作日志
-func (s *MysqlService) GetOperLogs(req *request.OperLogListReq) ([]system.SysOperLog, error) {
+func (s *MysqlService) GetOperLogs(req *request.OperLogReq) ([]system.SysOperLog, error) {
 	var err error
 	list := make([]system.SysOperLog, 0)
 	query := common.Mysql

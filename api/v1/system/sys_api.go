@@ -13,7 +13,7 @@ import (
 // 获取接口列表
 func GetApis(c *gin.Context) {
 	// 绑定参数
-	var req request.ApiListReq
+	var req request.ApiReq
 	err := c.Bind(&req)
 	if err != nil {
 		response.FailWithCode(response.ParmError)

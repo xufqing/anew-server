@@ -58,7 +58,7 @@ type Connection struct {
 	// 接入时间
 	ConnectTime models.LocalTime
 	// ssh session 对象
-	SshClient *ssh.Client
+	SShClient *ssh.Client
 	// sftp session 对象
 	SFTPClient *sftp.Client
 	// 录像文件名称
@@ -69,18 +69,18 @@ func (c *Connection) close() {
 	if c.Conn != nil {
 		c.Conn.Close()
 	}
-	if c.SshClient != nil {
-		c.SshClient.Close()
+	if c.SShClient != nil {
+		c.SShClient.Close()
 	}
 	if c.SFTPClient != nil {
-		c.SshClient.Close()
+		c.SShClient.Close()
 	}
 	if c.Key != "" {
 		hub.delete(c.Key)
 	}
 }
 
-// 启动Ssh连接仓库
+// 启动SSh连接仓库
 func StartConnectionHub() {
 	// 初始化仓库
 	hub.Clients = make(map[string]*Connection)
@@ -106,7 +106,7 @@ func (h *ConnectionHub) delete(key string) {
 }
 
 // websocket
-func SshTunnel(c *gin.Context) {
+func SShTunnel(c *gin.Context) {
 	hostId := utils.Str2Uint(c.Query("host_id"))
 	s := service.New()
 	host, err := s.GetHostById(hostId)
@@ -168,8 +168,8 @@ func SshTunnel(c *gin.Context) {
 	addr := fmt.Sprintf("%s:%s", host.IpAddress, host.Port)
 	sshClient, err := ssh.Dial("tcp", addr, conf)
 	if err != nil {
-		client.Conn.WriteMessage(websocket.TextMessage, utils.Str2Bytes(fmt.Sprintf("Ssh无法连接: %s", err.Error())))
-		common.Log.Errorf("Ssh无法连接: %s", err.Error())
+		client.Conn.WriteMessage(websocket.TextMessage, utils.Str2Bytes(fmt.Sprintf("SSH无法连接: %s", err.Error())))
+		common.Log.Errorf("SSH无法连接: %s", err.Error())
 		return
 	}
 	sftpClient, err := sftp.NewClient(sshClient)
@@ -177,13 +177,13 @@ func SshTunnel(c *gin.Context) {
 		common.Log.Errorf("SFTP无法连接: %s", err.Error())
 		return
 	}
-	client.SshClient = sshClient
+	client.SShClient = sshClient
 	client.SFTPClient = sftpClient
 	// 创建ssh session
-	sshSession, err := NewSshSession(cols, rows, sshClient)
+	sshSession, err := NewSShSession(cols, rows, sshClient)
 	if err != nil {
-		client.Conn.WriteMessage(websocket.TextMessage, utils.Str2Bytes(fmt.Sprintf("Ssh Session创建失败: %s", err.Error())))
-		common.Log.Error("Ssh Session创建失败: %s", err.Error())
+		client.Conn.WriteMessage(websocket.TextMessage, utils.Str2Bytes(fmt.Sprintf("SSH Session创建失败: %s", err.Error())))
+		common.Log.Error("SSH Session创建失败: %s", err.Error())
 		return
 	}
 	defer sshSession.Session.Close()

@@ -3,7 +3,7 @@ package request
 import "anew-server/dto/response"
 
 // 获取菜单列表结构体
-type MenuListReq struct {
+type MenuReq struct {
 	Title      string `json:"title" form:"title"`
 	Path       string `json:"path" form:"path"`
 	Status     *bool  `json:"status" form:"status"`

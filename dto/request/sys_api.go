@@ -3,7 +3,7 @@ package request
 import "anew-server/dto/response"
 
 // 获取接口列表结构体
-type ApiListReq struct {
+type ApiReq struct {
 	Name              string `json:"name" form:"name"`
 	Method            string `json:"method" form:"method"`
 	Path              string `json:"path" form:"path"`

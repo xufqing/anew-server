@@ -25,7 +25,7 @@ type CastV2Header struct {
 
 func NewCastV2(meta CastV2Header,file string) (*CastV2Header, *os.File) {
 	var c CastV2Header
-	f,_ :=os.OpenFile(common.Conf.Ssh.RecordDir + "/" + file,os.O_RDWR|os.O_CREATE|os.O_APPEND,0644)
+	f,_ :=os.OpenFile(common.Conf.SSh.RecordDir + "/" + file,os.O_RDWR|os.O_CREATE|os.O_APPEND,0644)
 	c.Version = 2
 	c.Width = meta.Width
 	c.Height = meta.Height

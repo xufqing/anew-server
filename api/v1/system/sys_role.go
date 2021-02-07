@@ -14,7 +14,7 @@ import (
 // 获取角色列表
 func GetRoles(c *gin.Context) {
 	// 绑定参数
-	var req request.RoleListReq
+	var req request.RoleReq
 	err := c.Bind(&req)
 	if err != nil {
 		response.FailWithCode(response.ParmError)
