@@ -24,6 +24,7 @@ func (s *MysqlService) GetAssetGroups(req *request.AssetGroupReq) ([]asset.Asset
 	if creator != "" {
 		db = db.Where("creator LIKE ?", fmt.Sprintf("%%%s%%", creator))
 	}
+
 	// 查询条数
 	err = db.Find(&list).Count(&req.PageInfo.Total).Error
 	if err == nil {
@@ -38,6 +39,16 @@ func (s *MysqlService) GetAssetGroups(req *request.AssetGroupReq) ([]asset.Asset
 			//	Limit(limit).Offset(offset).Find(&list).Error
 			err = db.Preload("Hosts").Limit(limit).Offset(offset).Find(&list).Error
 		}
+	}
+	if req.NotNull {
+		// 过滤出非空的主机组
+		newList := make([]asset.AssetGroup, 0)
+		for _, i := range list {
+			if len(i.Hosts) > 0 {
+				newList = append(newList, i)
+			}
+		}
+		return newList, err
 	}
 	return list, err
 }

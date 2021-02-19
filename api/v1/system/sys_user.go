@@ -289,7 +289,7 @@ func UserAvatarUpload(c *gin.Context) {
 	// 将头像url保存到数据库
 	//query := common.Mysql.Where("username = ?", username).First(&user)
 	var oldUser system.SysUser
-	err = common.Mysql.Model(&oldUser).Where("username = ?", username).Update("avatar", "/"+imgPath).Error
+	err = common.Mysql.Model(&oldUser).Where("username = ?", username).Update("avatar", "/api/avatar?path="+fileName).Error
 	if err != nil {
 		response.FailWithMsg(err.Error())
 	}

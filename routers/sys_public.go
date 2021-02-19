@@ -9,5 +9,6 @@ import (
 func InitPublicRouter(r *gin.RouterGroup) (R gin.IRoutes) {
 	// 测试api可用，ping
 	r.GET("/ping", api.Ping)
+	r.GET("/avatar",api.ShowUserAvatar)
 	return r
 }

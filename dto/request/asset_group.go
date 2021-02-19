@@ -7,21 +7,22 @@ import (
 type AssetGroupReq struct {
 	Name              string `json:"name" form:"name"`
 	Creator           string `json:"creator" form:"creator"`
+	NotNull           bool   `json:"not_null" form:"not_null"`
 	response.PageInfo        // 分页参数
 }
 
 type CreateAssetGroupReq struct {
 	Name    string `json:"name" validate:"required"`
 	Creator string `json:"creator"`
-	Desc      string           `json:"desc"`
+	Desc    string `json:"desc"`
 	Hosts   []uint `json:"hosts"`
 }
 
 // 修改分组
 type UpdateAssetGroupReq struct {
-	Name   string `json:"name" validate:"required"`
-	Desc      string           `json:"desc"`
-	Hosts  []uint `json:"hosts"`
+	Name  string `json:"name" validate:"required"`
+	Desc  string `json:"desc"`
+	Hosts []uint `json:"hosts"`
 }
 
 // 翻译需要校验的字段名称
