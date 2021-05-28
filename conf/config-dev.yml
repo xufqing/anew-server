@@ -15,13 +15,13 @@ mysql:
   # 用户名
   username: anew
   # 密码
-  password: anew@123
+  password: fabao123
   # 数据库名
   database: anew_db
   # 主机地址
-  host: 192.168.56.100
+  host: 112.74.50.144
   # 端口
-  port: 3306
+  port: 3466
   # 连接字符串查询参数
   query: charset=utf8&parseTime=True&loc=Local&timeout=10000ms
   # 是否打印SQL日志
@@ -35,13 +35,13 @@ mysql:
 
 redis:
   # 地址
-  host: 192.168.56.100
+  host: 120.77.180.152
   # 密码
   password: fabao123
   # 数据库index
   db: 0
   # 端口
-  port: 6379
+  port: 36379
 
 # casbin配置
 casbin:

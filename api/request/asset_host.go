@@ -1,17 +1,19 @@
 package request
 
-import "anew-server/service/response"
+import (
+	response2 "anew-server/api/response"
+)
 
 // 获取接口列表结构体
 type HostReq struct {
-	HostName          string `json:"host_name" form:"host_name"`
-	IpAddress         string `json:"ip_address" form:"ip_address"`
-	OSVersion         string `json:"os_version" form:"os_version"`
-	HostType          string `json:"host_type" form:"host_type"`
-	AuthType          string `json:"auth_type" form:"auth_type"`
-	Creator           string `json:"creator" form:"creator"`
-	GroupID           string `json:"group_id" form:"group_id"`
-	response.PageInfo        // 分页参数
+	HostName           string `json:"host_name" form:"host_name"`
+	IpAddress          string `json:"ip_address" form:"ip_address"`
+	OSVersion          string `json:"os_version" form:"os_version"`
+	HostType           string `json:"host_type" form:"host_type"`
+	AuthType           string `json:"auth_type" form:"auth_type"`
+	Creator            string `json:"creator" form:"creator"`
+	GroupID            string `json:"group_id" form:"group_id"`
+	response2.PageInfo        // 分页参数
 }
 
 // 创建接口结构体

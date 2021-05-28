@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	"anew-server/dto/request"
-	"anew-server/dto/response"
-	"anew-server/dto/service"
+	request2 "anew-server/api/request"
+	response2 "anew-server/api/response"
+	service2 "anew-server/dao"
 	"anew-server/pkg/common"
 	"anew-server/pkg/redis"
 	"anew-server/pkg/utils"
@@ -14,7 +14,7 @@ import (
 )
 
 // 创建一个userInfo全局变量来返回用户信息
-var loginInfo response.LoginResp
+var loginInfo response2.LoginResp
 
 func InitAuth() (*jwt.GinJWTMiddleware, error) {
 	return jwt.New(&jwt.GinJWTMiddleware{
@@ -38,7 +38,7 @@ func InitAuth() (*jwt.GinJWTMiddleware, error) {
 
 func payloadFunc(data interface{}) jwt.MapClaims {
 	if v, ok := data.(map[string]interface{}); ok {
-		var user response.LoginResp
+		var user response2.LoginResp
 		// 将用户json转为结构体
 		utils.JsonI2Struct(v["user"], &user)
 		return jwt.MapClaims{
@@ -59,11 +59,11 @@ func identityHandler(c *gin.Context) interface{} {
 }
 
 func login(c *gin.Context) (interface{}, error) {
-	var req request.RegisterAndLoginReq
+	var req request2.RegisterAndLoginReq
 	// 请求json绑定
 	_ = c.ShouldBindJSON(&req)
 	// 创建服务
-	s := service.New()
+	s := service2.New()
 	// 密码校验
 	user, err := s.LoginCheck(req.Username, req.Password)
 	if err != nil {
@@ -79,7 +79,7 @@ func login(c *gin.Context) (interface{}, error) {
 
 func authorizator(data interface{}, c *gin.Context) bool {
 	if v, ok := data.(map[string]interface{}); ok {
-		var user response.LoginResp
+		var user response2.LoginResp
 		// 将用户json转为结构体
 		utils.JsonI2Struct(v["user"], &user)
 		// 将用户保存到context, api调用时取数据方便
@@ -91,15 +91,15 @@ func authorizator(data interface{}, c *gin.Context) bool {
 
 func unauthorized(c *gin.Context, code int, message string) {
 	common.Log.Debug(fmt.Sprintf("JWT认证失败, 错误码%d, 错误信息%s", code, message))
-	if message == response.LoginCheckErrorMsg {
-		response.FailWithMsg(response.LoginCheckErrorMsg)
+	if message == response2.LoginCheckErrorMsg {
+		response2.FailWithMsg(response2.LoginCheckErrorMsg)
 		return
-	} else if message == response.UserForbiddenMsg {
-		response.FailWithCode(response.UserForbidden)
+	} else if message == response2.UserForbiddenMsg {
+		response2.FailWithCode(response2.UserForbidden)
 		return
 	}
 
-	response.FailWithCode(response.Unauthorized)
+	response2.FailWithCode(response2.Unauthorized)
 }
 
 func loginResponse(c *gin.Context, code int, token string, expires time.Time) {
@@ -122,9 +122,9 @@ func loginResponse(c *gin.Context, code int, token string, expires time.Time) {
 	}
 	loginInfo.Token = cacheToken
 	loginInfo.Expires = cacheExpires
-	response.SuccessWithData(loginInfo)
+	response2.SuccessWithData(loginInfo)
 }
 
 func logoutResponse(c *gin.Context, code int) {
-	response.Success()
+	response2.Success()
 }

@@ -1,7 +1,7 @@
-package service
+package dao
 
 import (
-	"anew-server/dao/request"
+	request2 "anew-server/api/request"
 	"anew-server/models/system"
 	"anew-server/pkg/common"
 	"fmt"
@@ -9,7 +9,7 @@ import (
 )
 
 // 获取操作日志
-func (s *MysqlService) GetOperLogs(req *request.OperLogReq) ([]system.SysOperLog, error) {
+func (s *MysqlService) GetOperLogs(req *request2.OperLogReq) ([]system.SysOperLog, error) {
 	var err error
 	list := make([]system.SysOperLog, 0)
 	query := common.Mysql

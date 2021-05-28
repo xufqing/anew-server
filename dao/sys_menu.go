@@ -1,8 +1,8 @@
-package service
+package dao
 
 import (
-	"anew-server/dao/request"
-	"anew-server/dao/response"
+	request2 "anew-server/api/request"
+	response2 "anew-server/api/response"
 	"anew-server/models/system"
 	"anew-server/pkg/utils"
 	"errors"
@@ -39,10 +39,10 @@ func (s *MysqlService) GetMenus() []system.SysMenu {
 
 
 // 生成菜单树
-func GenMenuTree(parent *response.MenuTreeResp, menus []system.SysMenu) []response.MenuTreeResp {
-	tree := make(response.MenuTreeRespList, 0)
+func GenMenuTree(parent *response2.MenuTreeResp, menus []system.SysMenu) []response2.MenuTreeResp {
+	tree := make(response2.MenuTreeRespList, 0)
 	// 转为MenuTreeResponseStruct
-	var resp []response.MenuTreeResp
+	var resp []response2.MenuTreeResp
 	utils.Struct2StructByJson(menus, &resp)
 	// parentId默认为0, 表示根菜单
 	var parentId uint
@@ -66,7 +66,7 @@ func GenMenuTree(parent *response.MenuTreeResp, menus []system.SysMenu) []respon
 
 
 // 创建菜单
-func (s *MysqlService) CreateMenu(req *request.CreateMenuReq) (err error) {
+func (s *MysqlService) CreateMenu(req *request2.CreateMenuReq) (err error) {
 	var menu system.SysMenu
 	utils.Struct2StructByJson(req, &menu)
 	// 创建数据
@@ -75,7 +75,7 @@ func (s *MysqlService) CreateMenu(req *request.CreateMenuReq) (err error) {
 }
 
 // 更新菜单
-func (s *MysqlService) UpdateMenuById(id uint, req request.UpdateMenuReq) (err error) {
+func (s *MysqlService) UpdateMenuById(id uint, req request2.UpdateMenuReq) (err error) {
 	if id == req.ParentId {
 		return errors.New("不能自关联")
 	}

@@ -32,5 +32,5 @@ var CustomError = map[int]string{
 	InternalServerError: InternalServerErrorMsg,
 	AuthError:           LoginCheckErrorMsg,
 	ParmError:           ParmErrorMsg,
-	UserForbidden:UserForbiddenMsg,
+	UserForbidden:       UserForbiddenMsg,
 }

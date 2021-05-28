@@ -2,12 +2,12 @@ package asset
 
 import (
 	system2 "anew-server/api/v1/system"
-	"anew-server/dto/service"
 	"anew-server/models"
 	"anew-server/models/system"
 	"anew-server/pkg/common"
 	"anew-server/pkg/sshx"
 	"anew-server/pkg/utils"
+	service2 "anew-server/dao"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -108,7 +108,7 @@ func (h *ConnectionHub) delete(key string) {
 // websocket
 func SShTunnel(c *gin.Context) {
 	hostId := utils.Str2Uint(c.Query("host_id"))
-	s := service.New()
+	s := service2.New()
 	host, err := s.GetHostById(hostId)
 	if err != nil {
 		common.Log.Error(err.Error())

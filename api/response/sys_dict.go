@@ -5,8 +5,8 @@ package response
 type DictTreeResp struct {
 	Id       uint           `json:"id"`
 	ParentId uint           `json:"parent_id"`
-	Key     string         `json:"key"`
-	Value     string         `json:"value"`
+	Key     string          `json:"key"`
+	Value     string        `json:"value"`
 	Desc     string         `json:"desc"`
 	Creator  string         `json:"creator"`
 	Status   bool           `json:"status"`

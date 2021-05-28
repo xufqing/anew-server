@@ -1,7 +1,7 @@
 package api
 
 import (
-	"anew-server/dto/response"
+	response2 "anew-server/api/response"
 	"anew-server/pkg/common"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -10,7 +10,7 @@ import (
 
 // 检查服务器是否通畅
 func Ping(c *gin.Context) {
-	response.Success()
+	response2.Success()
 }
 
 func ShowUserAvatar(c *gin.Context) {

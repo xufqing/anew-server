@@ -1,18 +1,18 @@
 package request
 
 import (
-	"anew-server/service/response"
+	response2 "anew-server/api/response"
 	"time"
 )
 
 // 获取操作日志列表结构体
 type OperLogReq struct {
-	Name            string `json:"name" form:"name"`
-	Method            string `json:"method" form:"method"`
-	Path              string `json:"path" form:"path"`
-	Username          string `json:"username" form:"username"`
-	Ip                string `json:"ip" form:"ip"`
-	response.PageInfo        // 分页参数
+	Name               string `json:"name" form:"name"`
+	Method             string `json:"method" form:"method"`
+	Path               string `json:"path" form:"path"`
+	Username           string `json:"username" form:"username"`
+	Ip                 string `json:"ip" form:"ip"`
+	response2.PageInfo        // 分页参数
 }
 
 // 翻译需要校验的字段名称

@@ -1,7 +1,7 @@
-package service
+package dao
 
 import (
-	"anew-server/dao/request"
+	request2 "anew-server/api/request"
 	"anew-server/models/system"
 	"anew-server/pkg/utils"
 	"errors"
@@ -12,7 +12,7 @@ import (
 )
 
 
-func (s *MysqlService) GetApis(req *request.ApiReq) ([]system.SysApi, error) {
+func (s *MysqlService) GetApis(req *request2.ApiReq) ([]system.SysApi, error) {
 	var err error
 	list := make([]system.SysApi, 0)
 	query := s.db.Table(new(system.SysApi).TableName())
@@ -50,7 +50,7 @@ func (s *MysqlService) GetApis(req *request.ApiReq) ([]system.SysApi, error) {
 }
 
 // 创建接口
-func (s *MysqlService) CreateApi(req *request.CreateApiReq) (err error) {
+func (s *MysqlService) CreateApi(req *request2.CreateApiReq) (err error) {
 	var api system.SysApi
 	utils.Struct2StructByJson(req, &api)
 	// 创建数据

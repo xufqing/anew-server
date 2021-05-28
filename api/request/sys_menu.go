@@ -1,14 +1,16 @@
 package request
 
-import "anew-server/service/response"
+import (
+	response2 "anew-server/api/response"
+)
 
 // 获取菜单列表结构体
 type MenuReq struct {
-	Title      string `json:"title" form:"title"`
-	Path       string `json:"path" form:"path"`
-	Status     *bool  `json:"status" form:"status"`
-	Creator    string `json:"creator" form:"creator"`
-	response.PageInfo          // 分页参数
+	Title              string `json:"title" form:"title"`
+	Path               string `json:"path" form:"path"`
+	Status             *bool  `json:"status" form:"status"`
+	Creator            string `json:"creator" form:"creator"`
+	response2.PageInfo        // 分页参数
 }
 
 // 创建菜单结构体

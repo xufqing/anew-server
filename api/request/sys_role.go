@@ -1,14 +1,16 @@
 package request
 
-import "anew-server/service/response"
+import (
+	response2 "anew-server/api/response"
+)
 
 // 请求角色列表结构体
 type RoleReq struct {
-	Name              string `json:"name" form:"name"`
-	Keyword           string `json:"keyword" form:"keyword"`
-	Status            *bool  `json:"status" form:"status"`
-	Creator           string `json:"creator" form:"creator"`
-	response.PageInfo        // 分页参数
+	Name               string `json:"name" form:"name"`
+	Keyword            string `json:"keyword" form:"keyword"`
+	Status             *bool  `json:"status" form:"status"`
+	Creator            string `json:"creator" form:"creator"`
+	response2.PageInfo        // 分页参数
 }
 
 // 更新角色权限的结构体

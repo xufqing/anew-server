@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"anew-server/dto/response"
+	response2 "anew-server/api/response"
 	"anew-server/pkg/common"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -13,21 +13,21 @@ func Exception(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
 			// 判断是否正常http响应结果放通
-			if resp, ok := err.(response.RespInfo); ok {
-				response.JSON(c, response.Ok, resp)
+			if resp, ok := err.(response2.RespInfo); ok {
+				response2.JSON(c, response2.Ok, resp)
 				c.Abort()
 				return
 			}
 			// 将异常写入日志
 			common.Log.Error(fmt.Sprintf("[Exception]未知异常: %v\n堆栈信息: %v", err, string(debug.Stack())))
 			// 服务器异常
-			resp := response.RespInfo{
-				Code:    response.InternalServerError,
+			resp := response2.RespInfo{
+				Code:    response2.InternalServerError,
 				Data:    map[string]interface{}{},
-				Message: response.CustomError[response.InternalServerError],
+				Message: response2.CustomError[response2.InternalServerError],
 			}
 			// 以json方式写入响应
-			response.JSON(c, response.Ok, resp)
+			response2.JSON(c, response2.Ok, resp)
 			c.Abort()
 			return
 		}

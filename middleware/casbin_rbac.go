@@ -1,8 +1,8 @@
 package middleware
 
 import (
+	response2 "anew-server/api/response"
 	"anew-server/api/v1/system"
-	"anew-server/dto/response"
 	system2 "anew-server/models/system"
 	"anew-server/pkg/common"
 	"github.com/gin-gonic/gin"
@@ -24,7 +24,7 @@ func CasbinMiddleware(c *gin.Context) {
 	// 检查策略
 	pass, _ := e.Enforce(sub, obj, act)
 	if !pass {
-		response.FailWithCode(response.Forbidden)
+		response2.FailWithCode(response2.Forbidden)
 	}
 	// 处理请求
 	c.Next()

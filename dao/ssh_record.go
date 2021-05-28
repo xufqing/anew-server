@@ -1,7 +1,7 @@
-package service
+package dao
 
 import (
-	"anew-server/dao/request"
+	request2 "anew-server/api/request"
 	"anew-server/models/asset"
 	"anew-server/pkg/common"
 	"fmt"
@@ -9,7 +9,7 @@ import (
 )
 
 // 获取操作日志
-func (s *MysqlService) GetSSHRecords(req *request.SShRecordReq) ([]asset.SShRecord, error) {
+func (s *MysqlService) GetSSHRecords(req *request2.SShRecordReq) ([]asset.SShRecord, error) {
 	var err error
 	list := make([]asset.SShRecord, 0)
 	query := common.Mysql

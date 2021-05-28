@@ -1,16 +1,18 @@
 package request
 
-import "anew-server/service/response"
+import (
+	response2 "anew-server/api/response"
+)
 
 // 获取接口列表结构体
 type ApiReq struct {
-	Name              string `json:"name" form:"name"`
-	Method            string `json:"method" form:"method"`
-	Path              string `json:"path" form:"path"`
-	Category          string `json:"category" form:"category"`
-	Creator           string `json:"creator" form:"creator"`
-	Tree              bool   `json:"tree" form:"tree"`
-	response.PageInfo        // 分页参数
+	Name               string `json:"name" form:"name"`
+	Method             string `json:"method" form:"method"`
+	Path               string `json:"path" form:"path"`
+	Category           string `json:"category" form:"category"`
+	Creator            string `json:"creator" form:"creator"`
+	Tree               bool   `json:"tree" form:"tree"`
+	response2.PageInfo        // 分页参数
 }
 
 // 创建接口结构体

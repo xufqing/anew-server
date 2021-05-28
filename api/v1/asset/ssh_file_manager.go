@@ -1,7 +1,7 @@
 package asset
 
 import (
-	"anew-server/dto/response"
+	response2 "anew-server/api/response"
 	"anew-server/models"
 	"anew-server/pkg/utils"
 	"bytes"
@@ -19,16 +19,16 @@ func GetPathFromSSh(c *gin.Context) {
 	urlPath := c.Query("path")
 	key := c.Query("key")
 	if key == "" {
-		response.FailWithCode(response.ParmError)
+		response2.FailWithCode(response2.ParmError)
 		return
 	}
 	conn, err := hub.get(key)
 	if err != nil {
-		response.FailWithMsg(fmt.Sprintf("获取SSh连接失败: %s", err))
+		response2.FailWithMsg(fmt.Sprintf("获取SSh连接失败: %s", err))
 		return
 	}
 	if conn.SShClient == nil {
-		response.FailWithMsg("主机未连接")
+		response2.FailWithMsg("主机未连接")
 		return
 	}
 	if urlPath == "" {
@@ -39,12 +39,12 @@ func GetPathFromSSh(c *gin.Context) {
 	}
 	lsInfo, err := conn.SFTPClient.ReadDir(urlPath)
 	if err != nil {
-		response.FailWithMsg(fmt.Sprintf("获取文件信息错误：%s", err))
+		response2.FailWithMsg(fmt.Sprintf("获取文件信息错误：%s", err))
 		return
 	}
-	var files = make([]response.FileInfo, 0)
+	var files = make([]response2.FileInfo, 0)
 	for i := range lsInfo {
-		file := response.FileInfo{
+		file := response2.FileInfo{
 			Name:  lsInfo[i].Name(),
 			Path:  path.Join(urlPath, lsInfo[i].Name()),
 			IsDir: lsInfo[i].IsDir(),
@@ -57,38 +57,38 @@ func GetPathFromSSh(c *gin.Context) {
 		}
 		files = append(files, file)
 	}
-	response.SuccessWithData(files)
+	response2.SuccessWithData(files)
 }
 
 func UploadFileToSSh(c *gin.Context) {
 	urlPath := c.Query("path")
 	key := c.Query("key")
 	if key == "" || urlPath == "" {
-		response.FailWithCode(response.ParmError)
+		response2.FailWithCode(response2.ParmError)
 		return
 	}
 	// 读取文件
 	file, err := c.FormFile("file")
 	if err != nil {
-		response.FailWithMsg("无法读取文件")
+		response2.FailWithMsg("无法读取文件")
 		return
 	}
 	filename := file.Filename
 	remoteFile := path.Join(urlPath, filename)
 	conn, err := hub.get(key)
 	if err != nil {
-		response.FailWithMsg(fmt.Sprintf("获取SSh连接失败: %s", err))
+		response2.FailWithMsg(fmt.Sprintf("获取SSh连接失败: %s", err))
 		return
 	}
 	dstFile, err := conn.SFTPClient.Create(remoteFile)
 	if err != nil {
-		response.FailWithMsg(fmt.Sprintf("sftp创建流失败：%s", err))
+		response2.FailWithMsg(fmt.Sprintf("sftp创建流失败：%s", err))
 	}
 	defer dstFile.Close()
 	// 将文件流传到sftp
 	src, err := file.Open()
 	if err != nil {
-		response.FailWithMsg("打开文件失败")
+		response2.FailWithMsg("打开文件失败")
 		return
 	}
 	buf := make([]byte, 1024)
@@ -99,29 +99,29 @@ func UploadFileToSSh(c *gin.Context) {
 		}
 		_, _ = dstFile.Write(buf)
 	}
-	response.Success()
+	response2.Success()
 }
 
 func DownloadFileFromSSh(c *gin.Context) {
 	urlPath := c.Query("path")
 	key := c.Query("key")
 	if key == "" || urlPath == "" {
-		response.FailWithCode(response.ParmError)
+		response2.FailWithCode(response2.ParmError)
 		return
 	}
 	conn, err := hub.get(key)
 	if err != nil {
-		response.FailWithMsg(fmt.Sprintf("获取SSh连接失败: %s", err))
+		response2.FailWithMsg(fmt.Sprintf("获取SSh连接失败: %s", err))
 		return
 	}
 	dstFile, err := conn.SFTPClient.Open(urlPath)
 	if err != nil {
-		response.FailWithMsg(fmt.Sprintf("sftp打开文件失败：%s", err))
+		response2.FailWithMsg(fmt.Sprintf("sftp打开文件失败：%s", err))
 	}
 	defer dstFile.Close()
 	var buff bytes.Buffer
 	if _, err := dstFile.WriteTo(&buff); err != nil {
-		response.FailWithMsg(fmt.Sprintf("写入文件流失败：%s", err))
+		response2.FailWithMsg(fmt.Sprintf("写入文件流失败：%s", err))
 	}
 	_, fileName := filepath.Split(urlPath)
 	c.Header("content-disposition", `attachment; filename=`+fileName)
@@ -133,17 +133,17 @@ func DeleteFileInSSh(c *gin.Context) {
 	urlPath := c.Query("path")
 	key := c.Query("key")
 	if key == "" || urlPath == "" {
-		response.FailWithCode(response.ParmError)
+		response2.FailWithCode(response2.ParmError)
 		return
 	}
 	conn, err := hub.get(key)
 	if err != nil {
-		response.FailWithMsg(fmt.Sprintf("获取SSh连接失败: %s", err))
+		response2.FailWithMsg(fmt.Sprintf("获取SSh连接失败: %s", err))
 		return
 	}
 	if err := conn.SFTPClient.Remove(urlPath); err != nil {
-		response.FailWithMsg(err.Error())
+		response2.FailWithMsg(err.Error())
 		return
 	}
-	response.Success()
+	response2.Success()
 }

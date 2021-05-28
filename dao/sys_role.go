@@ -1,8 +1,8 @@
-package service
+package dao
 
 import (
-	"anew-server/dao/request"
-	"anew-server/dao/response"
+	request2 "anew-server/api/request"
+	response2 "anew-server/api/response"
 	"anew-server/models/system"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
@@ -14,7 +14,7 @@ import (
 )
 
 // 获取所有角色
-func (s *MysqlService) GetRoles(req *request.RoleReq) ([]system.SysRole, error) {
+func (s *MysqlService) GetRoles(req *request2.RoleReq) ([]system.SysRole, error) {
 	var err error
 	list := make([]system.SysRole, 0)
 	db := common.Mysql
@@ -53,10 +53,10 @@ func (s *MysqlService) GetRoles(req *request.RoleReq) ([]system.SysRole, error) 
 }
 
 // 根据角色ID获取角色权限：菜单和接口
-func (s *MysqlService) GetPermsByRoleId(roleId uint) (response.RolePermsResp, error) {
+func (s *MysqlService) GetPermsByRoleId(roleId uint) (response2.RolePermsResp, error) {
 	var role system.SysRole
 	//var apis []models.SysApi
-	var resp response.RolePermsResp
+	var resp response2.RolePermsResp
 	err := s.db.Preload("Menus", "status = ?", true).Where("id = ?", roleId).First(&role).Error
 	if err != nil {
 		return resp, err
@@ -90,7 +90,7 @@ func (s *MysqlService) GetPermsByRoleId(roleId uint) (response.RolePermsResp, er
 }
 
 // 创建角色
-func (s *MysqlService) CreateRole(req *request.CreateRoleReq) (err error) {
+func (s *MysqlService) CreateRole(req *request2.CreateRoleReq) (err error) {
 	var role system.SysRole
 	utils.Struct2StructByJson(req, &role)
 	// 创建数据

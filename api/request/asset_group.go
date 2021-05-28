@@ -1,14 +1,14 @@
 package request
 
 import (
-	"anew-server/service/response"
+	response2 "anew-server/api/response"
 )
 
 type AssetGroupReq struct {
-	Name              string `json:"name" form:"name"`
-	Creator           string `json:"creator" form:"creator"`
-	NotNull           bool   `json:"not_null" form:"not_null"`
-	response.PageInfo        // 分页参数
+	Name               string `json:"name" form:"name"`
+	Creator            string `json:"creator" form:"creator"`
+	NotNull            bool   `json:"not_null" form:"not_null"`
+	response2.PageInfo        // 分页参数
 }
 
 type CreateAssetGroupReq struct {
