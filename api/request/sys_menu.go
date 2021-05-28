@@ -1,6 +1,6 @@
 package request
 
-import "anew-server/dto/response"
+import "anew-server/service/response"
 
 // 获取菜单列表结构体
 type MenuReq struct {

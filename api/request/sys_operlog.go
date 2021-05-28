@@ -1,7 +1,7 @@
 package request
 
 import (
-	"anew-server/dto/response"
+	"anew-server/service/response"
 	"time"
 )
 

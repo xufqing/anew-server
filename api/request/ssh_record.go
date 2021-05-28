@@ -1,7 +1,7 @@
 package request
 
 import (
-	"anew-server/dto/response"
+	"anew-server/service/response"
 )
 
 // 获取操作日志列表结构体

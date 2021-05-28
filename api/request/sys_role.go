@@ -1,6 +1,6 @@
 package request
 
-import "anew-server/dto/response"
+import "anew-server/service/response"
 
 // 请求角色列表结构体
 type RoleReq struct {

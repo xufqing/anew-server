@@ -1,7 +1,7 @@
 package service
 
 import (
-	"anew-server/dto/request"
+	"anew-server/dao/request"
 	"anew-server/models/system"
 	"anew-server/pkg/utils"
 	"errors"
