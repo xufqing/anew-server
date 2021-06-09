@@ -83,6 +83,6 @@ upload:
   single-max-size: 32
 
 # SSH配置
-ssh:
-  # ssh录像保存路径
-  record-dir: ssh-record
+SSH:
+  # SSH录像保存路径
+  record-dir: SSH-record

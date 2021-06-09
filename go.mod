@@ -16,6 +16,7 @@ require (
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/pkg/sftp v1.12.0
+	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/shirou/gopsutil v3.21.4+incompatible // indirect
 	github.com/spf13/viper v1.7.1
 	go.uber.org/multierr v1.6.0 // indirect

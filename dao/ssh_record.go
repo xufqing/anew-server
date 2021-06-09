@@ -9,9 +9,9 @@ import (
 )
 
 // 获取操作日志
-func (s *MysqlService) GetSSHRecords(req *request2.SShRecordReq) ([]asset.SShRecord, error) {
+func (s *MysqlService) GetSSHRecords(req *request2.SSHRecordReq) ([]asset.SSHRecord, error) {
 	var err error
-	list := make([]asset.SShRecord, 0)
+	list := make([]asset.SSHRecord, 0)
 	query := common.Mysql
 	key := strings.TrimSpace(req.Key)
 	if key != "" {
@@ -44,8 +44,14 @@ func (s *MysqlService) GetSSHRecords(req *request2.SShRecordReq) ([]asset.SShRec
 	}
 	return list, err
 }
+func (s *MysqlService) GetSSHRecordByConnectID(connect_id string) (asset.SSHRecord,error) {
+	var record asset.SSHRecord
+	var err error
+	err = s.db.Where("connect_id = ?", connect_id).First(&record).Error
+	return record, err
 
+}
 // 批量删除记录
 func (s *MysqlService) DeleteSSHRecordByIds(ids []uint) (err error) {
-	return s.db.Where("id IN (?)", ids).Delete(asset.SShRecord{}).Error
+	return s.db.Where("id IN (?)", ids).Delete(asset.SSHRecord{}).Error
 }

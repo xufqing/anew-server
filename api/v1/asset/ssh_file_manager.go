@@ -1,12 +1,14 @@
 package asset
 
 import (
-	response2 "anew-server/api/response"
+	"anew-server/api/response"
 	"anew-server/models"
+	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
 	"bytes"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/sftp"
 	"net/http"
 	"os"
 	"path"
@@ -15,36 +17,43 @@ import (
 )
 
 // 获取目录数据
-func GetPathFromSSh(c *gin.Context) {
+func GetPathFromSSH(c *gin.Context) {
 	urlPath := c.Query("path")
 	key := c.Query("key")
 	if key == "" {
-		response2.FailWithCode(response2.ParmError)
+		response.FailWithCode(response.ParmError)
 		return
 	}
-	conn, err := hub.get(key)
+	connObj, err := SteamMap.Get(key)
 	if err != nil {
-		response2.FailWithMsg(fmt.Sprintf("获取SSh连接失败: %s", err))
+		response.FailWithMsg(fmt.Sprintf("获取SSH连接失败: %s", err))
 		return
 	}
-	if conn.SShClient == nil {
-		response2.FailWithMsg("主机未连接")
+	if connObj.Terminal.Client == nil {
+		response.FailWithMsg("SSH主机未连接")
 		return
 	}
 	if urlPath == "" {
-		session, _ := conn.SShClient.NewSession()
+		session, _ := connObj.Terminal.Client.NewSession()
 		res, _ := session.CombinedOutput("echo ${HOME}")
 		urlPath = strings.Replace(utils.Bytes2Str(res), "\n", "", -1)
 		defer session.Close()
 	}
-	lsInfo, err := conn.SFTPClient.ReadDir(urlPath)
+	sftpClient, err := sftp.NewClient(connObj.Terminal.Client)
 	if err != nil {
-		response2.FailWithMsg(fmt.Sprintf("获取文件信息错误：%s", err))
+		common.Log.Errorf("SFTP无法连接: %s", err.Error())
 		return
 	}
-	var files = make([]response2.FileInfo, 0)
+	defer sftpClient.Close()
+	
+	lsInfo, err := sftpClient.ReadDir(urlPath)
+	if err != nil {
+		response.FailWithMsg(fmt.Sprintf("获取文件信息错误：%s", err))
+		return
+	}
+	var files = make([]response.FileInfo, 0)
 	for i := range lsInfo {
-		file := response2.FileInfo{
+		file := response.FileInfo{
 			Name:  lsInfo[i].Name(),
 			Path:  path.Join(urlPath, lsInfo[i].Name()),
 			IsDir: lsInfo[i].IsDir(),
@@ -57,38 +66,44 @@ func GetPathFromSSh(c *gin.Context) {
 		}
 		files = append(files, file)
 	}
-	response2.SuccessWithData(files)
+	response.SuccessWithData(files)
 }
 
-func UploadFileToSSh(c *gin.Context) {
+func UploadFileToSSH(c *gin.Context) {
 	urlPath := c.Query("path")
 	key := c.Query("key")
 	if key == "" || urlPath == "" {
-		response2.FailWithCode(response2.ParmError)
+		response.FailWithCode(response.ParmError)
 		return
 	}
 	// 读取文件
 	file, err := c.FormFile("file")
 	if err != nil {
-		response2.FailWithMsg("无法读取文件")
+		response.FailWithMsg("无法读取文件")
 		return
 	}
 	filename := file.Filename
 	remoteFile := path.Join(urlPath, filename)
-	conn, err := hub.get(key)
+	connObj, err := SteamMap.Get(key)
 	if err != nil {
-		response2.FailWithMsg(fmt.Sprintf("获取SSh连接失败: %s", err))
+		response.FailWithMsg(fmt.Sprintf("获取SSH连接失败: %s", err))
 		return
 	}
-	dstFile, err := conn.SFTPClient.Create(remoteFile)
+	sftpClient, err := sftp.NewClient(connObj.Terminal.Client)
 	if err != nil {
-		response2.FailWithMsg(fmt.Sprintf("sftp创建流失败：%s", err))
+		common.Log.Errorf("SFTP无法连接: %s", err.Error())
+		return
+	}
+	defer sftpClient.Close()
+	dstFile, err := sftpClient.Create(remoteFile)
+	if err != nil {
+		response.FailWithMsg(fmt.Sprintf("sftp创建流失败：%s", err))
 	}
 	defer dstFile.Close()
 	// 将文件流传到sftp
 	src, err := file.Open()
 	if err != nil {
-		response2.FailWithMsg("打开文件失败")
+		response.FailWithMsg("打开文件失败")
 		return
 	}
 	buf := make([]byte, 1024)
@@ -99,29 +114,35 @@ func UploadFileToSSh(c *gin.Context) {
 		}
 		_, _ = dstFile.Write(buf)
 	}
-	response2.Success()
+	response.Success()
 }
 
-func DownloadFileFromSSh(c *gin.Context) {
+func DownloadFileFromSSH(c *gin.Context) {
 	urlPath := c.Query("path")
 	key := c.Query("key")
 	if key == "" || urlPath == "" {
-		response2.FailWithCode(response2.ParmError)
+		response.FailWithCode(response.ParmError)
 		return
 	}
-	conn, err := hub.get(key)
+	connObj, err := SteamMap.Get(key)
 	if err != nil {
-		response2.FailWithMsg(fmt.Sprintf("获取SSh连接失败: %s", err))
+		response.FailWithMsg(fmt.Sprintf("获取SSH连接失败: %s", err))
 		return
 	}
-	dstFile, err := conn.SFTPClient.Open(urlPath)
+	sftpClient, err := sftp.NewClient(connObj.Terminal.Client)
 	if err != nil {
-		response2.FailWithMsg(fmt.Sprintf("sftp打开文件失败：%s", err))
+		common.Log.Errorf("SFTP无法连接: %s", err.Error())
+		return
+	}
+	defer sftpClient.Close()
+	dstFile, err := sftpClient.Open(urlPath)
+	if err != nil {
+		response.FailWithMsg(fmt.Sprintf("sftp打开文件失败：%s", err))
 	}
 	defer dstFile.Close()
 	var buff bytes.Buffer
 	if _, err := dstFile.WriteTo(&buff); err != nil {
-		response2.FailWithMsg(fmt.Sprintf("写入文件流失败：%s", err))
+		response.FailWithMsg(fmt.Sprintf("写入文件流失败：%s", err))
 	}
 	_, fileName := filepath.Split(urlPath)
 	c.Header("content-disposition", `attachment; filename=`+fileName)
@@ -129,21 +150,27 @@ func DownloadFileFromSSh(c *gin.Context) {
 }
 
 // 删除文件
-func DeleteFileInSSh(c *gin.Context) {
+func DeleteFileInSSH(c *gin.Context) {
 	urlPath := c.Query("path")
 	key := c.Query("key")
 	if key == "" || urlPath == "" {
-		response2.FailWithCode(response2.ParmError)
+		response.FailWithCode(response.ParmError)
 		return
 	}
-	conn, err := hub.get(key)
+	connObj, err := SteamMap.Get(key)
 	if err != nil {
-		response2.FailWithMsg(fmt.Sprintf("获取SSh连接失败: %s", err))
+		response.FailWithMsg(fmt.Sprintf("获取SSH连接失败: %s", err))
 		return
 	}
-	if err := conn.SFTPClient.Remove(urlPath); err != nil {
-		response2.FailWithMsg(err.Error())
+	sftpClient, err := sftp.NewClient(connObj.Terminal.Client)
+	if err != nil {
+		common.Log.Errorf("SFTP无法连接: %s", err.Error())
 		return
 	}
-	response2.Success()
+	defer sftpClient.Close()
+	if err := sftpClient.Remove(urlPath); err != nil {
+		response.FailWithMsg(err.Error())
+		return
+	}
+	response.Success()
 }

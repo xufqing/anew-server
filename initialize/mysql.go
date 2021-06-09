@@ -63,7 +63,7 @@ func autoMigrate() {
 		new(system.SysDict),
 		new(system.SysOperLog),
 		new(asset.AssetHost),
-		new(asset.SShRecord),
+		new(asset.SSHRecord),
 		new(asset.AssetGroup),
 	)
 }

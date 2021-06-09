@@ -30,8 +30,8 @@ type CreateHostReq struct {
 	Creator       string `json:"creator" form:"creator"`
 }
 
-// SSh结构体
-type SShTunnelReq struct {
+// SSH结构体
+type SSHTunnelReq struct {
 	HostId uint   `json:"hostId" form:"host_id"`
 	Width  int    `json:"width" form:"width"`
 	Hight  int    `json:"hight" form:"hight"`

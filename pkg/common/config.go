@@ -14,7 +14,7 @@ type Configuration struct {
 	Jwt    JwtConfiguration    `mapstructure:"jwt" json:"jwt"`
 	Upload UploadConfiguration `mapstructure:"upload" json:"upload"`
 	Casbin CasbinConfiguration `mapstructure:"casbin" json:"casbin"`
-	SSh    SShConfiguration    `mapstructure:"ssh" json:"ssh"`
+	SSH    SSHConfiguration    `mapstructure:"SSH" json:"SSH"`
 }
 
 type SystemConfiguration struct {
@@ -70,6 +70,6 @@ type UploadConfiguration struct {
 	SingleMaxSize uint   `mapstructure:"single-max-size" json:"singleMaxSize"`
 }
 
-type SShConfiguration struct {
+type SSHConfiguration struct {
 	RecordDir string `mapstructure:"record-dir" json:"recordDir"`
 }

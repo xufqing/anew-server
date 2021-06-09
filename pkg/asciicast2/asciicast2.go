@@ -1,20 +1,15 @@
 package asciicast2
 
 import (
-	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
+	"bytes"
 	"encoding/json"
-	"os"
-	"time"
 )
-
-const V2OutputEvent = "o"
-const V2InputEvent = "i"
 
 type CastV2Header struct {
 	Version      uint               `json:"version"`
-	Width        int               `json:"width"`
-	Height       int               `json:"height"`
+	Width        int                `json:"width"`
+	Height       int                `json:"height"`
 	Timestamp    int64              `json:"timestamp,omitempty"`
 	Duration     float64            `json:"duration,omitempty"`
 	Title        string             `json:"title,omitempty"`
@@ -23,9 +18,8 @@ type CastV2Header struct {
 	outputStream *json.Encoder
 }
 
-func NewCastV2(meta CastV2Header,file string) (*CastV2Header, *os.File) {
+func NewCastV2(meta CastV2Header, stream *bytes.Buffer) (*CastV2Header, *bytes.Buffer) {
 	var c CastV2Header
-	f,_ :=os.OpenFile(common.Conf.SSh.RecordDir + "/" + file,os.O_RDWR|os.O_CREATE|os.O_APPEND,0644)
 	c.Version = 2
 	c.Width = meta.Width
 	c.Height = meta.Height
@@ -33,17 +27,17 @@ func NewCastV2(meta CastV2Header,file string) (*CastV2Header, *os.File) {
 	c.Timestamp = meta.Timestamp
 	c.Duration = c.Duration
 	c.Env = meta.Env
-	c.outputStream = json.NewEncoder(f)
+	c.outputStream = json.NewEncoder(stream)
 	c.outputStream.Encode(c)
-	return &c, f
+	return &c, stream
 }
 
-func (c *CastV2Header) Record(t time.Time, data []byte) {
+func (c *CastV2Header) Record(t float64, data []byte, event string) {
 	out := make([]interface{}, 3)
-	timeNow := time.Since(t).Seconds()
-	out[0] = timeNow
-	out[1] = V2OutputEvent
+	//timeNow := time.Since(t).Seconds()
+	out[0] = t
+	out[1] = event // i：input；o：output
 	out[2] = utils.Bytes2Str(data)
-	c.Duration = timeNow // 写回结构体,暂时不知道干嘛用
+	c.Duration = t
 	c.outputStream.Encode(out)
 }

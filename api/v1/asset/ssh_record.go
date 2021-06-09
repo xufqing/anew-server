@@ -1,68 +1,71 @@
 package asset
 
 import (
-	request2 "anew-server/api/request"
-	response2 "anew-server/api/response"
-	service2 "anew-server/dao"
-	"anew-server/models/asset"
-	"anew-server/pkg/common"
+	"anew-server/api/request"
+	"anew-server/api/response"
+	"anew-server/dao"
+	"anew-server/pkg/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
-// 获取ssh记录列表
-func GetSShRecords(c *gin.Context) {
+// 获取SSH记录列表
+func GetSSHRecords(c *gin.Context) {
 	// 绑定参数
-	var req request2.SShRecordReq
+	var req request.SSHRecordReq
 	reqErr := c.Bind(&req)
 	if reqErr != nil {
-		response2.FailWithCode(response2.ParmError)
+		response.FailWithCode(response.ParmError)
 		return
 	}
-	var sshRecord []asset.SShRecord
 	var err error
 	// 创建服务
-	s := service2.New()
-	sshRecord, err = s.GetSSHRecords(&req)
+	s := dao.New()
+	records, err := s.GetSSHRecords(&req)
 	if err != nil {
-		response2.FailWithMsg(err.Error())
+		response.FailWithMsg(err.Error())
 		return
 	}
 	// 转为ResponseStruct, 隐藏部分字段
-	//var respStruct []response.OperationLogListResp
-	//utils.Struct2StructByJson(operationLogs, &respStruct)
+	var respStruct []response.SSHRecordListResp
+	utils.Struct2StructByJson(records, &respStruct)
 	// 返回分页数据
-	var resp response2.PageData
+	var resp response.PageData
 	// 设置分页参数
 	resp.PageInfo = req.PageInfo
 	// 设置数据列表
-	resp.DataList = sshRecord
-	response2.SuccessWithData(resp)
+	resp.DataList = respStruct
+	response.SuccessWithData(resp)
 }
 
 // 批量删除操作日志
-func BatchDeleteSShRecordByIds(c *gin.Context) {
-	var req request2.IdsReq
+func BatchDeleteSSHRecordByIds(c *gin.Context) {
+	var req request.IdsReq
 	err := c.Bind(&req)
 	if err != nil {
-		response2.FailWithCode(response2.ParmError)
+		response.FailWithCode(response.ParmError)
 		return
 	}
 	// 创建服务
-	s := service2.New()
+	s := dao.New()
 	// 删除数据
 	err = s.DeleteSSHRecordByIds(req.Ids)
 	if err != nil {
-		response2.FailWithMsg(err.Error())
+		response.FailWithMsg(err.Error())
 		return
 	}
-	response2.Success()
+	response.Success()
 }
 
-func DownloadSShRecord(c *gin.Context) {
-	record := c.Query("record")
-	file := common.Conf.SSh.RecordDir + "/" + record
-	c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", record))
+func PlaySSHRecord(c *gin.Context) {
+	connect_id := c.Query("record")
+	s := dao.New()
+	record,err := s.GetSSHRecordByConnectID(connect_id)
+	if err != nil {
+		response.FailWithMsg(err.Error())
+		return
+	}
+	c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s.cast", connect_id))
 	c.Writer.Header().Set("Content-Type", "application/x-asciicast")
-	c.File(file)
+	c.String(200,record.Records)
 }

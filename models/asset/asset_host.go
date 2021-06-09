@@ -7,7 +7,7 @@ type AssetHost struct {
 	models.Model
 	HostName   string `gorm:"comment:'主机名';size:128" json:"host_name"`
 	IpAddress  string `gorm:"comment:'主机地址';size:128" json:"ip_address"`
-	Port       string `gorm:"comment:'SSh端口';size:64" json:"port"`
+	Port       string `gorm:"comment:'SSH端口';size:64" json:"port"`
 	OsVersion  string `gorm:"comment:'系统版本';size:128" json:"os_version"`
 	HostType   string `gorm:"comment:'主机类型';size:64" json:"host_type"`
 	AuthType   string `gorm:"comment:'认证类型'" json:"auth_type"`

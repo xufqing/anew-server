@@ -18,13 +18,20 @@ type HostListResp struct {
 }
 
 type ConnectionResp struct {
-	Key            string           `json:"key"`
-	UserName       string           `json:"user_name"`
-	Name           string           `json:"name"`
-	HostName       string           `json:"host_name"`
-	IpAddress      string           `json:"ip_address"`
-	Port           string           `json:"port"`
+	ConnectID   string           `json:"connect_id"`
+	UserName    string           `json:"user_name"`
+	HostName    string           `json:"host_name"`
+	IpAddress   string           `json:"ip_address"`
 	ConnectTime models.LocalTime `json:"connect_time"`
+}
+
+type SSHRecordListResp struct {
+	ConnectID   string           `json:"connect_id"`
+	UserName    string           `json:"user_name"`
+	HostName    string           `json:"host_name"`
+	IpAddress   string           `json:"ip_address"`
+	ConnectTime models.LocalTime `json:"connect_time"`
+	LogoutTime  models.LocalTime `json:"logout_time"`
 }
 
 type FileInfo struct {
@@ -32,7 +39,7 @@ type FileInfo struct {
 	Path   string           `json:"path"`
 	IsDir  bool             `json:"isDir"`
 	Mode   string           `json:"mode"`
-	Size   string            `json:"size"`
+	Size   string           `json:"size"`
 	Mtime  models.LocalTime `json:"mtime"` // 修改时间
 	IsLink bool             `json:"isLink"`
 }
