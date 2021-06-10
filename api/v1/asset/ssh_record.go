@@ -60,12 +60,12 @@ func BatchDeleteSSHRecordByIds(c *gin.Context) {
 func PlaySSHRecord(c *gin.Context) {
 	connect_id := c.Query("record")
 	s := dao.New()
-	record,err := s.GetSSHRecordByConnectID(connect_id)
+	record, err := s.GetSSHRecordByConnectID(connect_id)
 	if err != nil {
 		response.FailWithMsg(err.Error())
 		return
 	}
 	c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s.cast", connect_id))
 	c.Writer.Header().Set("Content-Type", "application/x-asciicast")
-	c.String(200,record.Records)
+	c.String(200, record.Records)
 }

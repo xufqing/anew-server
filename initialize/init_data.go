@@ -1,7 +1,7 @@
 package initialize
 
 import (
-	service2 "anew-server/dao"
+	dao "anew-server/dao"
 	"anew-server/models"
 	"anew-server/models/system"
 	"anew-server/pkg/common"
@@ -927,7 +927,7 @@ func InitData() {
 		err := common.Mysql.Where("id = ?", api.Id).First(&oldApi).Error
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			common.Mysql.Create(&api)
-			s := service2.New()
+			s := dao.New()
 			// 管理员拥有所有API权限role[0]
 			//_, err = s.CreateRoleCasbin(system.SysRoleCasbin{
 			//	Keyword: roles[0].Keyword,

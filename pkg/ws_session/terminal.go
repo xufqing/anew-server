@@ -10,7 +10,7 @@ import (
 
 type Terminal struct {
 	Client       *ssh.Client
-	TERM          string
+	TERM         string
 	session      *ssh.Session
 	config       Config
 	stdout       io.Reader
@@ -27,8 +27,8 @@ type Config struct {
 	Password      string // 密码连接
 	PrivateKey    string // 私钥连接
 	KeyPassphrase string // 私钥密码
-	Width         int // pty width
-	Height        int // pty height
+	Width         int    // pty width
+	Height        int    // pty height
 }
 
 func (t *Terminal) SetCloseHandler(h func() error) {
@@ -69,7 +69,7 @@ func (t *Terminal) Close() (err error) {
 	return
 }
 func getTerm() (term string) {
-	 if term = os.Getenv("xterm"); term == "" {
+	if term = os.Getenv("xterm"); term == "" {
 		term = "xterm-256color"
 	}
 	return
@@ -142,7 +142,7 @@ func NewTerminal(config Config) (*Terminal, error) {
 	}
 
 	s := Terminal{
-		TERM: getTerm(),
+		TERM:    getTerm(),
 		Client:  client,
 		config:  config,
 		session: session,

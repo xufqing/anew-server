@@ -2,24 +2,24 @@ package request
 
 // 创建部门结构体
 type CreateDeptReq struct {
-	Name      string `json:"name" validate:"required"`
-	Sort       int    `json:"sort"`
-	ParentId   uint   `json:"parent_id"`
-	Creator    string `json:"creator"`
+	Name     string `json:"name" validate:"required"`
+	Sort     int    `json:"sort"`
+	ParentId uint   `json:"parent_id"`
+	Creator  string `json:"creator"`
 }
 
 // 修改部门
 type UpdateDeptReq struct {
 	Name     string `json:"name" validate:"required"`
 	Status   *bool  `json:"status"`
-	Sort       int    `json:"sort"`
-	ParentId   uint   `json:"parent_id"`
+	Sort     int    `json:"sort"`
+	ParentId uint   `json:"parent_id"`
 }
 
 type DeptListReq struct {
-	Name              string `json:"name" form:"name"`
-	Creator           string `json:"creator" form:"creator"`
-	Status            *bool  `json:"status" form:"status"`
+	Name    string `json:"name" form:"name"`
+	Creator string `json:"creator" form:"creator"`
+	Status  *bool  `json:"status" form:"status"`
 }
 
 // 翻译需要校验的字段名称

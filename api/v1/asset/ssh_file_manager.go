@@ -45,7 +45,7 @@ func GetPathFromSSH(c *gin.Context) {
 		return
 	}
 	defer sftpClient.Close()
-	
+
 	lsInfo, err := sftpClient.ReadDir(urlPath)
 	if err != nil {
 		response.FailWithMsg(fmt.Sprintf("获取文件信息错误：%s", err))

@@ -1,8 +1,8 @@
 package dao
 
 import (
-	request2 "anew-server/api/request"
-	response2 "anew-server/api/response"
+	"anew-server/api/request"
+	"anew-server/api/response"
 	"anew-server/models/system"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
@@ -13,21 +13,21 @@ import (
 )
 
 // 登录校验,返回指定信息
-func (s *MysqlService) LoginCheck(username string, password string) (*response2.LoginResp, error) {
+func (s *MysqlService) LoginCheck(username string, password string) (*response.LoginResp, error) {
 	var u system.SysUser
 	// 查询用户及其角色
 	err := s.db.Preload("Role", "status = ?", true).Where("username = ?", username).First(&u).Error
 	if err != nil {
-		return nil, errors.New(response2.LoginCheckErrorMsg)
+		return nil, errors.New(response.LoginCheckErrorMsg)
 	}
 	if !*u.Status {
-		return nil, errors.New(response2.UserForbiddenMsg)
+		return nil, errors.New(response.UserForbiddenMsg)
 	}
 	// 校验密码
 	if ok := utils.ComparePwd(password, u.Password); !ok {
-		return nil, errors.New(response2.LoginCheckErrorMsg)
+		return nil, errors.New(response.LoginCheckErrorMsg)
 	}
-	var loginInfo response2.LoginResp
+	var loginInfo response.LoginResp
 	utils.Struct2StructByJson(u, &loginInfo)
 	loginInfo.CurrentAuthority = []string{u.Role.Keyword}
 	return &loginInfo, err
@@ -53,7 +53,7 @@ func (s *MysqlService) CheckUser(username string) error {
 }
 
 // 创建用户
-func (s *MysqlService) CreateUser(req *request2.CreateUserReq) (err error) {
+func (s *MysqlService) CreateUser(req *request.CreateUserReq) (err error) {
 	var user system.SysUser
 	err = s.CheckUser(req.Username)
 	if err != nil {
@@ -68,7 +68,7 @@ func (s *MysqlService) CreateUser(req *request2.CreateUserReq) (err error) {
 }
 
 // 更新用户基本信息
-func (s *MysqlService) UpdateUserBaseInfoById(id uint, req request2.UpdateUserBaseInfoReq) (err error) {
+func (s *MysqlService) UpdateUserBaseInfoById(id uint, req request.UpdateUserBaseInfoReq) (err error) {
 	var oldUser system.SysUser
 	//query := s.db.Table(oldUser.TableName()).Where("id = ?", id).First(&oldUser)
 	query := s.db.First(&oldUser).Where("id = ?", id)
@@ -83,7 +83,7 @@ func (s *MysqlService) UpdateUserBaseInfoById(id uint, req request2.UpdateUserBa
 }
 
 // 更新用户
-func (s *MysqlService) UpdateUserById(id uint, req request2.UpdateUserReq) (err error) {
+func (s *MysqlService) UpdateUserById(id uint, req request.UpdateUserReq) (err error) {
 	var oldUser system.SysUser
 	query := s.db.Table(oldUser.TableName()).Where("id = ?", id).First(&oldUser)
 	// query := s.db.First(&oldUser).Where("id = ?", id)
@@ -98,10 +98,10 @@ func (s *MysqlService) UpdateUserById(id uint, req request2.UpdateUserReq) (err 
 	// 比对增量字段,使用map确保gorm可更新零值
 	var m map[string]interface{}
 	utils.CompareDifferenceStructByJson(oldUser, req, &m)
-	delete(m,"password")
+	delete(m, "password")
 	if password != "" {
 		// 更新密码
-		err = query.Update("password",password).Updates(m).Error
+		err = query.Update("password", password).Updates(m).Error
 	} else {
 		// 更新指定列
 		err = query.Updates(m).Error
@@ -110,7 +110,7 @@ func (s *MysqlService) UpdateUserById(id uint, req request2.UpdateUserReq) (err 
 }
 
 // 获取用户
-func (s *MysqlService) GetUsers(req *request2.UserListReq) ([]system.SysUser, error) {
+func (s *MysqlService) GetUsers(req *request.UserListReq) ([]system.SysUser, error) {
 	var err error
 	list := make([]system.SysUser, 0)
 	db := common.Mysql

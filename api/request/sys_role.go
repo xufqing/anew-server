@@ -1,22 +1,22 @@
 package request
 
 import (
-	response2 "anew-server/api/response"
+	response "anew-server/api/response"
 )
 
 // 请求角色列表结构体
 type RoleReq struct {
-	Name               string `json:"name" form:"name"`
-	Keyword            string `json:"keyword" form:"keyword"`
-	Status             *bool  `json:"status" form:"status"`
-	Creator            string `json:"creator" form:"creator"`
-	response2.PageInfo        // 分页参数
+	Name              string `json:"name" form:"name"`
+	Keyword           string `json:"keyword" form:"keyword"`
+	Status            *bool  `json:"status" form:"status"`
+	Creator           string `json:"creator" form:"creator"`
+	response.PageInfo        // 分页参数
 }
 
 // 更新角色权限的结构体
 type UpdateRolePermsReq struct {
 	MenusId []uint `json:"menus_id" form:"menus_id"` // 传多个id
-	ApisId []uint `json:"apis_id" form:"apis_id"` // 传多个id
+	ApisId  []uint `json:"apis_id" form:"apis_id"`   // 传多个id
 }
 
 // 创建角色结构体

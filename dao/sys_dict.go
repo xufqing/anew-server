@@ -1,8 +1,8 @@
 package dao
 
 import (
-	request2 "anew-server/api/request"
-	response2 "anew-server/api/response"
+	"anew-server/api/request"
+	"anew-server/api/response"
 	"anew-server/models/system"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
@@ -13,10 +13,10 @@ import (
 )
 
 // 获取所有字典信息
-func (s *MysqlService) GetDicts(req *request2.DictListReq) []system.SysDict {
+func (s *MysqlService) GetDicts(req *request.DictListReq) []system.SysDict {
 	Dicts := make([]system.SysDict, 0)
 	db := common.Mysql
-	typeKey:=strings.TrimSpace(req.TypeKey)
+	typeKey := strings.TrimSpace(req.TypeKey)
 	if typeKey != "" {
 		var dist system.SysDict
 		db = db.Preload("Dicts", "status = ?", true).Where("`key` LIKE ?", fmt.Sprintf("%%%s%%", typeKey)).First(&dist)
@@ -47,9 +47,9 @@ func (s *MysqlService) GetDicts(req *request2.DictListReq) []system.SysDict {
 }
 
 // 生成字典树
-func GenDictTree(parent *response2.DictTreeResp, Dicts []system.SysDict) []response2.DictTreeResp {
-	tree := make([]response2.DictTreeResp, 0)
-	var resp []response2.DictTreeResp
+func GenDictTree(parent *response.DictTreeResp, Dicts []system.SysDict) []response.DictTreeResp {
+	tree := make([]response.DictTreeResp, 0)
+	var resp []response.DictTreeResp
 	utils.Struct2StructByJson(Dicts, &resp)
 	// parentId默认为0, 表示根菜单
 	var parentId uint
@@ -69,7 +69,7 @@ func GenDictTree(parent *response2.DictTreeResp, Dicts []system.SysDict) []respo
 }
 
 // 创建字典
-func (s *MysqlService) CreateDict(req *request2.CreateDictReq) (err error) {
+func (s *MysqlService) CreateDict(req *request.CreateDictReq) (err error) {
 	var Dict system.SysDict
 	utils.Struct2StructByJson(req, &Dict)
 	// 创建数据
@@ -78,7 +78,7 @@ func (s *MysqlService) CreateDict(req *request2.CreateDictReq) (err error) {
 }
 
 // 更新字典
-func (s *MysqlService) UpdateDictById(id uint, req request2.UpdateDictReq) (err error) {
+func (s *MysqlService) UpdateDictById(id uint, req request.UpdateDictReq) (err error) {
 	if id == req.ParentId {
 		return errors.New("不能自关联")
 	}

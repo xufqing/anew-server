@@ -8,7 +8,7 @@ import (
 const (
 	ATTR_EXPR = "expr" // 过期时间
 	ATTR_NX   = "nx"   // redis锁
-	ATTR_XX = "xx" // redis xx锁
+	ATTR_XX   = "xx"   // redis xx锁
 )
 
 type empty struct {

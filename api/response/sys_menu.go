@@ -24,4 +24,3 @@ func (hs MenuTreeRespList) Less(i, j int) bool {
 func (hs MenuTreeRespList) Swap(i, j int) {
 	hs[i], hs[j] = hs[j], hs[i]
 }
-

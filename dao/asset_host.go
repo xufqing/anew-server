@@ -1,7 +1,7 @@
 package dao
 
 import (
-	request2 "anew-server/api/request"
+	"anew-server/api/request"
 	"anew-server/models/asset"
 	"anew-server/pkg/utils"
 	"errors"
@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func (s *MysqlService) GetHosts(req *request2.HostReq) ([]asset.AssetHost, error) {
+func (s *MysqlService) GetHosts(req *request.HostReq) ([]asset.AssetHost, error) {
 	var err error
 	list := make([]asset.AssetHost, 0)
 	query := s.db.Table(new(asset.AssetHost).TableName())
@@ -62,7 +62,7 @@ func (s *MysqlService) GetHosts(req *request2.HostReq) ([]asset.AssetHost, error
 }
 
 // 创建
-func (s *MysqlService) CreateHost(req *request2.CreateHostReq) (err error) {
+func (s *MysqlService) CreateHost(req *request.CreateHostReq) (err error) {
 	var host asset.AssetHost
 	utils.Struct2StructByJson(req, &host)
 	// 创建数据

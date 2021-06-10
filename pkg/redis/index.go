@@ -16,6 +16,6 @@ type StringOperation struct {
 func NewStringOperation() *StringOperation {
 	return &StringOperation{
 		redis: common.Redis,
-		ctx:context.Background(),
+		ctx:   context.Background(),
 	}
 }

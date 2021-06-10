@@ -1,7 +1,7 @@
 package request
 
 import (
-	response2 "anew-server/api/response"
+	response "anew-server/api/response"
 )
 
 // User login structure
@@ -18,13 +18,13 @@ type ChangePwdReq struct {
 
 // 用户列表请求结构体
 type UserListReq struct {
-	Username           string `json:"username" form:"username"`
-	Mobile             string `json:"mobile" form:"mobile"`
-	Name               string `json:"name" form:"name"`
-	Status             *bool  `json:"status" form:"status"`
-	Creator            string `json:"creator" form:"creator"`
-	DeptId             uint   `json:"dept_id" form:"dept_id"`
-	response2.PageInfo        // 分页参数
+	Username          string `json:"username" form:"username"`
+	Mobile            string `json:"mobile" form:"mobile"`
+	Name              string `json:"name" form:"name"`
+	Status            *bool  `json:"status" form:"status"`
+	Creator           string `json:"creator" form:"creator"`
+	DeptId            uint   `json:"dept_id" form:"dept_id"`
+	response.PageInfo        // 分页参数
 }
 
 // 创建用户结构体

@@ -1,8 +1,8 @@
 package dao
 
 import (
-	request2 "anew-server/api/request"
-	response2 "anew-server/api/response"
+	"anew-server/api/request"
+	"anew-server/api/response"
 	"anew-server/models/system"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
@@ -14,7 +14,7 @@ import (
 )
 
 // 获取所有部门信息
-func (s *MysqlService) GetDepts(req *request2.DeptListReq) []system.SysDept {
+func (s *MysqlService) GetDepts(req *request.DeptListReq) []system.SysDept {
 	depts := make([]system.SysDept, 0)
 	db := common.Mysql
 	name := strings.TrimSpace(req.Name)
@@ -38,9 +38,9 @@ func (s *MysqlService) GetDepts(req *request2.DeptListReq) []system.SysDept {
 }
 
 // 生成部门树
-func GenDeptTree(parent *response2.DeptTreeResp, depts []system.SysDept) []response2.DeptTreeResp {
-	tree := make(response2.DeptTreeResppList, 0)
-	var resp []response2.DeptTreeResp
+func GenDeptTree(parent *response.DeptTreeResp, depts []system.SysDept) []response.DeptTreeResp {
+	tree := make(response.DeptTreeResppList, 0)
+	var resp []response.DeptTreeResp
 	utils.Struct2StructByJson(depts, &resp)
 	// parentId默认为0, 表示根菜单
 	var parentId uint
@@ -61,9 +61,8 @@ func GenDeptTree(parent *response2.DeptTreeResp, depts []system.SysDept) []respo
 	return tree
 }
 
-
 // 创建部门
-func (s *MysqlService) CreateDept(req *request2.CreateDeptReq) (err error) {
+func (s *MysqlService) CreateDept(req *request.CreateDeptReq) (err error) {
 	var dept system.SysDept
 	utils.Struct2StructByJson(req, &dept)
 	// 创建数据
@@ -72,7 +71,7 @@ func (s *MysqlService) CreateDept(req *request2.CreateDeptReq) (err error) {
 }
 
 // 更新部门
-func (s *MysqlService) UpdateDeptById(id uint, req request2.UpdateDeptReq) (err error) {
+func (s *MysqlService) UpdateDeptById(id uint, req request.UpdateDeptReq) (err error) {
 	if id == req.ParentId {
 		return errors.New("不能自关联")
 	}
@@ -93,13 +92,13 @@ func (s *MysqlService) UpdateDeptById(id uint, req request2.UpdateDeptReq) (err 
 func (s *MysqlService) DeleteDeptByIds(ids []uint) (err error) {
 	var dept system.SysDept
 	// 先解除父级关联
-	err = s.db.Table(dept.TableName()).Where("parent_id IN (?)", ids).Update("parent_id",0).Error
-	if err != nil{
+	err = s.db.Table(dept.TableName()).Where("parent_id IN (?)", ids).Update("parent_id", 0).Error
+	if err != nil {
 		return err
 	}
 	// 再删除
 	err = s.db.Where("id IN (?)", ids).Delete(&dept).Error
-	if err != nil{
+	if err != nil {
 		return err
 	}
 	return

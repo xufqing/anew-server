@@ -11,7 +11,7 @@ type SSHRecord struct {
 	IpAddress   string           `gorm:"comment:'主机地址';size:128" json:"ip_address"`
 	ConnectTime models.LocalTime `gorm:"comment:'接入时间'" json:"connect_time"`
 	LogoutTime  models.LocalTime `gorm:"comment:'注销时间'" json:"logout_time"`
-	Records     string           `json:"records" gorm:"type:blob;comment:'输入命令(二进制存储)';size:128"`
+	Records     string           `json:"records" gorm:"type:longblob;comment:'操作记录(二进制存储)';size:128"`
 }
 
 func (m SSHRecord) TableName() string {

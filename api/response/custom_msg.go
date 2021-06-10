@@ -10,7 +10,7 @@ const (
 	ParmError           = 406
 	InternalServerError = 500
 	AuthError           = 1000
-	UserForbidden = 1001
+	UserForbidden       = 1001
 )
 
 const (
@@ -21,7 +21,7 @@ const (
 	ForbiddenMsg           = "无权访问该资源"
 	InternalServerErrorMsg = "服务器内部错误"
 	ParmErrorMsg           = "参数绑定失败, 请检查数据类型"
-	UserForbiddenMsg          = "用户已被禁用"
+	UserForbiddenMsg       = "用户已被禁用"
 )
 
 var CustomError = map[int]string{

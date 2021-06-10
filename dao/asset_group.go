@@ -1,7 +1,7 @@
 package dao
 
 import (
-	request2 "anew-server/api/request"
+	"anew-server/api/request"
 	"anew-server/models/asset"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
@@ -12,7 +12,7 @@ import (
 )
 
 // 获取所有组
-func (s *MysqlService) GetAssetGroups(req *request2.AssetGroupReq) ([]asset.AssetGroup, error) {
+func (s *MysqlService) GetAssetGroups(req *request.AssetGroupReq) ([]asset.AssetGroup, error) {
 	var err error
 	list := make([]asset.AssetGroup, 0)
 	db := common.Mysql
@@ -54,7 +54,7 @@ func (s *MysqlService) GetAssetGroups(req *request2.AssetGroupReq) ([]asset.Asse
 }
 
 // 创建分组
-func (s *MysqlService) CreateAssetGroup(req *request2.CreateAssetGroupReq) (err error) {
+func (s *MysqlService) CreateAssetGroup(req *request.CreateAssetGroupReq) (err error) {
 	var group asset.AssetGroup
 	hostsId := req.Hosts
 	req.Hosts = nil
@@ -74,7 +74,7 @@ func (s *MysqlService) CreateAssetGroup(req *request2.CreateAssetGroupReq) (err 
 }
 
 // 更新分组
-func (s *MysqlService) UpdateAssetGroupById(id uint, req request2.UpdateAssetGroupReq) (err error) {
+func (s *MysqlService) UpdateAssetGroupById(id uint, req request.UpdateAssetGroupReq) (err error) {
 	var oldGroup asset.AssetGroup
 	query := s.db.Model(oldGroup).Where("id = ?", id).First(&oldGroup)
 	if query.Error == gorm.ErrRecordNotFound {

@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	response2 "anew-server/api/response"
+	"anew-server/api/response"
 	"anew-server/api/v1/system"
 	"anew-server/models"
 	system2 "anew-server/models/system"
@@ -121,13 +121,12 @@ func OperationLog(c *gin.Context) {
 		if exists {
 			data = utils.Struct2Json(resp)
 			// 是自定义的响应类型
-			if item, ok := resp.(response2.RespInfo); ok {
+			if item, ok := resp.(response.RespInfo); ok {
 				log.Status = item.Code
 			}
 		} else {
 			data = "无"
 		}
-		// gzip压缩
 		log.Data = data
 		// 异步, 写入数据库
 		go common.Mysql.Create(&log)

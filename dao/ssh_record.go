@@ -1,7 +1,7 @@
 package dao
 
 import (
-	request2 "anew-server/api/request"
+	"anew-server/api/request"
 	"anew-server/models/asset"
 	"anew-server/pkg/common"
 	"fmt"
@@ -9,7 +9,7 @@ import (
 )
 
 // 获取操作日志
-func (s *MysqlService) GetSSHRecords(req *request2.SSHRecordReq) ([]asset.SSHRecord, error) {
+func (s *MysqlService) GetSSHRecords(req *request.SSHRecordReq) ([]asset.SSHRecord, error) {
 	var err error
 	list := make([]asset.SSHRecord, 0)
 	query := common.Mysql
@@ -44,13 +44,14 @@ func (s *MysqlService) GetSSHRecords(req *request2.SSHRecordReq) ([]asset.SSHRec
 	}
 	return list, err
 }
-func (s *MysqlService) GetSSHRecordByConnectID(connect_id string) (asset.SSHRecord,error) {
+func (s *MysqlService) GetSSHRecordByConnectID(connect_id string) (asset.SSHRecord, error) {
 	var record asset.SSHRecord
 	var err error
 	err = s.db.Where("connect_id = ?", connect_id).First(&record).Error
 	return record, err
 
 }
+
 // 批量删除记录
 func (s *MysqlService) DeleteSSHRecordByIds(ids []uint) (err error) {
 	return s.db.Where("id IN (?)", ids).Delete(asset.SSHRecord{}).Error

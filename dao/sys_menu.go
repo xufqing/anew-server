@@ -1,8 +1,8 @@
 package dao
 
 import (
-	request2 "anew-server/api/request"
-	response2 "anew-server/api/response"
+	"anew-server/api/request"
+	"anew-server/api/response"
 	"anew-server/models/system"
 	"anew-server/pkg/utils"
 	"errors"
@@ -37,12 +37,11 @@ func (s *MysqlService) GetMenus() []system.SysMenu {
 	return menus
 }
 
-
 // 生成菜单树
-func GenMenuTree(parent *response2.MenuTreeResp, menus []system.SysMenu) []response2.MenuTreeResp {
-	tree := make(response2.MenuTreeRespList, 0)
+func GenMenuTree(parent *response.MenuTreeResp, menus []system.SysMenu) []response.MenuTreeResp {
+	tree := make(response.MenuTreeRespList, 0)
 	// 转为MenuTreeResponseStruct
-	var resp []response2.MenuTreeResp
+	var resp []response.MenuTreeResp
 	utils.Struct2StructByJson(menus, &resp)
 	// parentId默认为0, 表示根菜单
 	var parentId uint
@@ -63,10 +62,8 @@ func GenMenuTree(parent *response2.MenuTreeResp, menus []system.SysMenu) []respo
 	return tree
 }
 
-
-
 // 创建菜单
-func (s *MysqlService) CreateMenu(req *request2.CreateMenuReq) (err error) {
+func (s *MysqlService) CreateMenu(req *request.CreateMenuReq) (err error) {
 	var menu system.SysMenu
 	utils.Struct2StructByJson(req, &menu)
 	// 创建数据
@@ -75,7 +72,7 @@ func (s *MysqlService) CreateMenu(req *request2.CreateMenuReq) (err error) {
 }
 
 // 更新菜单
-func (s *MysqlService) UpdateMenuById(id uint, req request2.UpdateMenuReq) (err error) {
+func (s *MysqlService) UpdateMenuById(id uint, req request.UpdateMenuReq) (err error) {
 	if id == req.ParentId {
 		return errors.New("不能自关联")
 	}
@@ -96,19 +93,17 @@ func (s *MysqlService) UpdateMenuById(id uint, req request2.UpdateMenuReq) (err 
 func (s *MysqlService) DeleteMenuByIds(ids []uint) (err error) {
 	var menu system.SysMenu
 	// 先解除父级关联
-	err = s.db.Table(menu.TableName()).Where("parent_id IN (?)", ids).Update("parent_id",0).Error
-	if err != nil{
+	err = s.db.Table(menu.TableName()).Where("parent_id IN (?)", ids).Update("parent_id", 0).Error
+	if err != nil {
 		return err
 	}
 	// 再删除
 	err = s.db.Where("id IN (?)", ids).Delete(&menu).Error
-	if err != nil{
+	if err != nil {
 		return err
 	}
 	return
 }
-
-
 
 // 获取全部菜单, 非菜单树
 func (s *MysqlService) getAllMenu() []system.SysMenu {

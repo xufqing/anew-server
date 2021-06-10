@@ -20,9 +20,9 @@ type wsMsg struct {
 
 // 数据的时间线
 type RecordData struct {
-	Event string    `json:"event"` // 输入输出事件
+	Event string  `json:"event"` // 输入输出事件
 	Time  float64 `json:"time"`  // 时间差
-	Data  []byte    `json:"data"`  // 数据
+	Data  []byte  `json:"data"`  // 数据
 }
 
 type Meta struct {
@@ -144,7 +144,7 @@ func (r *WebsocketStream) Write2Log() error {
 				"SHELL": "/bin/bash", "TERM": r.Meta.TERM,
 			},
 		}
-		cast,buffer := asciicast2.NewCastV2(meta, b)
+		cast, buffer := asciicast2.NewCastV2(meta, b)
 		for _, v := range recorders {
 			cast.Record(v.Time, v.Data, v.Event)
 		}

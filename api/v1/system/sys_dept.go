@@ -1,9 +1,9 @@
 package system
 
 import (
-	request2 "anew-server/api/request"
-	response2 "anew-server/api/response"
-	service2 "anew-server/dao"
+	"anew-server/api/request"
+	"anew-server/api/response"
+	"anew-server/dao"
 	"anew-server/models/system"
 	"anew-server/pkg/common"
 	"anew-server/pkg/utils"
@@ -13,23 +13,23 @@ import (
 // 查询所有部门
 func GetDepts(c *gin.Context) {
 	// 绑定参数
-	var req request2.DeptListReq
+	var req request.DeptListReq
 	err := c.Bind(&req)
 	if err != nil {
-		response2.FailWithCode(response2.ParmError)
+		response.FailWithCode(response.ParmError)
 		return
 	}
 	// 创建服务
-	s := service2.New()
+	s := dao.New()
 	depts := s.GetDepts(&req)
-	if (req.Name != "" || req.Status != nil){
-		var newResp []response2.DictTreeResp
+	if req.Name != "" || req.Status != nil {
+		var newResp []response.DictTreeResp
 		utils.Struct2StructByJson(depts, &newResp)
-		response2.SuccessWithData(newResp)
+		response.SuccessWithData(newResp)
 	} else {
-		var resp []response2.DeptTreeResp
-		resp = service2.GenDeptTree(nil,depts)
-		response2.SuccessWithData(resp)
+		var resp []response.DeptTreeResp
+		resp = dao.GenDeptTree(nil, depts)
+		response.SuccessWithData(resp)
 	}
 }
 
@@ -37,72 +37,72 @@ func GetDepts(c *gin.Context) {
 func CreateDept(c *gin.Context) {
 	user := GetCurrentUserFromCache(c)
 	// 绑定参数
-	var req request2.CreateDeptReq
+	var req request.CreateDeptReq
 	err := c.Bind(&req)
 	if err != nil {
-		response2.FailWithCode(response2.ParmError)
+		response.FailWithCode(response.ParmError)
 		return
 	}
 
 	// 参数校验
 	err = common.NewValidatorError(common.Validate.Struct(req), req.FieldTrans())
 	if err != nil {
-		response2.FailWithMsg(err.Error())
+		response.FailWithMsg(err.Error())
 		return
 	}
 	// 记录当前创建人信息
 	req.Creator = user.(system.SysUser).Name
 	// 创建服务
-	s := service2.New()
+	s := dao.New()
 	err = s.CreateDept(&req)
 	if err != nil {
-		response2.FailWithMsg(err.Error())
+		response.FailWithMsg(err.Error())
 		return
 	}
-	response2.Success()
+	response.Success()
 }
 
 // 更新部门
 func UpdateDeptById(c *gin.Context) {
 	// 绑定参数
-	var req request2.UpdateDeptReq
+	var req request.UpdateDeptReq
 	err := c.Bind(&req)
 	if err != nil {
-		response2.FailWithCode(response2.ParmError)
+		response.FailWithCode(response.ParmError)
 		return
 	}
 	deptId := utils.Str2Uint(c.Param("deptId"))
 	if deptId == 0 {
-		response2.FailWithMsg("部门编号不正确")
+		response.FailWithMsg("部门编号不正确")
 		return
 	}
 	// 创建服务
-	s := service2.New()
+	s := dao.New()
 	// 更新数据
 	err = s.UpdateDeptById(deptId, req)
 	if err != nil {
-		response2.FailWithMsg(err.Error())
+		response.FailWithMsg(err.Error())
 		return
 	}
-	response2.Success()
+	response.Success()
 }
 
 // 批量删除部门
 func BatchDeleteDeptByIds(c *gin.Context) {
-	var req request2.IdsReq
+	var req request.IdsReq
 	err := c.Bind(&req)
 	if err != nil {
-		response2.FailWithCode(response2.ParmError)
+		response.FailWithCode(response.ParmError)
 		return
 	}
 
 	// 创建服务
-	s := service2.New()
+	s := dao.New()
 	// 删除数据
 	err = s.DeleteDeptByIds(req.Ids)
 	if err != nil {
-		response2.FailWithMsg(err.Error())
+		response.FailWithMsg(err.Error())
 		return
 	}
-	response2.Success()
+	response.Success()
 }

@@ -30,7 +30,6 @@ var (
 	Translator ut.Translator
 	// Casbin 管理器
 	Casbin *casbin.SyncedEnforcer
-
 )
 
 // 全局常量
@@ -40,7 +39,6 @@ const (
 	SecLocalTimeFormat  = "2006-01-02 15:04:05"
 	DateLocalTimeFormat = "2006-01-02"
 )
-
 
 // 只返回一个错误即可
 func NewValidatorError(err error, custom map[string]string) (e error) {

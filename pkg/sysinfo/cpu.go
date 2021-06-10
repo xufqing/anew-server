@@ -7,9 +7,9 @@ import (
 
 type CpuInfo struct {
 	ModelName string    `json:"modelName"`
-	Usage  []float64  // CPU 使用率
-	Cores  int        // CPU 核数
-	CpuNum int        // CPU 个数
+	Usage     []float64 // CPU 使用率
+	Cores     int       // CPU 核数
+	CpuNum    int       // CPU 个数
 }
 
 func GetCpu() CpuInfo {

@@ -12,9 +12,9 @@ func (s *MysqlService) GetRoleCasbins(c system.SysRoleCasbin) []system.SysRoleCa
 	cs := make([]system.SysRoleCasbin, 0)
 	for _, policy := range policies {
 		cs = append(cs, system.SysRoleCasbin{
-			Keyword:    policy[0],
-			Path:       policy[1],
-			Method:     policy[2],
+			Keyword: policy[0],
+			Path:    policy[1],
+			Method:  policy[2],
 		})
 	}
 	return cs
