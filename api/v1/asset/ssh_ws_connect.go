@@ -115,8 +115,8 @@ func Connect(c *gin.Context) {
 		_ = ws.Close()
 		return
 	}
-
-	stream := ws_session.NewWebSocketSteam(terminal, ws, ws_session.Meta{
+	wsConn :=ws_session.NewWsConn(ws)
+	stream := ws_session.NewWebSocketSteam(terminal, wsConn, ws_session.Meta{
 		TERM:      terminal.TERM,
 		Width:     terminalConfig.Width,
 		Height:    terminalConfig.Height,
@@ -133,23 +133,26 @@ func Connect(c *gin.Context) {
 		_ = ws.Close()
 		return
 	}
-
+	// 断开ws和ssh的操作
 	stream.Terminal.SetCloseHandler(func() error {
 		// 记录用户的操作
 		if err := stream.Write2Log(); err != nil {
 			return err
 		}
-		SteamMap.Remove(uid)
-		return ws.Close()
+		return stream.Conn.Close()
 	})
 
 	stream.Conn.SetCloseHandler(func(code int, text string) error {
 		SteamMap.Remove(uid)
 		return terminal.Close()
 	})
+
 	SteamMap.Set(uid, stream)
 	// 发送websocketKey给前端
+	stream.Conn.Mu.Lock()
 	stream.Conn.WriteMessage(websocket.TextMessage, utils.Str2Bytes("Anew-Sec-WebSocket-Key:"+uid+"\r\n"))
+	stream.Conn.Mu.Unlock()
+
 	go func() {
 		for {
 			// 每5秒
@@ -160,8 +163,8 @@ func Connect(c *gin.Context) {
 				_ = timer.Stop()
 				break
 			}
-			// 如果有 20 分钟没有数据流动，则断开连接
-			if time.Now().Unix()-stream.UpdatedAt.Unix() > 60*20 {
+			// 如果有 10 分钟没有数据流动，则断开连接
+			if time.Now().Unix()-stream.UpdatedAt.Unix() > 60*10 {
 				_ = stream.Conn.WriteMessage(websocket.BinaryMessage, utils.Str2Bytes("检测到终端闲置，已断开连接..."))
 				_ = stream.Conn.Close()
 				_ = timer.Stop()

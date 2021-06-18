@@ -25,7 +25,7 @@ func GetOperLogs(c *gin.Context) {
 	var operationLogs []system.SysOperLog
 	var err error
 	// 创建缓存对象
-	cache := cacheService.New(redis.NewStringOperation(), time.Second*20, cacheService.SERILIZER_JSON)
+	cache := cacheService.New(redis.NewStringOperation(), time.Second*30, cacheService.SERILIZER_JSON)
 	key := "operationLog:" + req.Name + ":" + req.Method + ":" + req.Username + ":" + req.Ip + ":" + req.Path + ":" +
 		strconv.Itoa(int(req.Current)) + ":" + strconv.Itoa(int(req.PageSize)) + ":" + strconv.Itoa(int(req.Total))
 

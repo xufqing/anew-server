@@ -17,6 +17,14 @@ type wsMsg struct {
 	Cols int    `json:"cols"`
 	Rows int    `json:"rows"`
 }
+type wsConn struct {
+	Mu sync.RWMutex
+	*websocket.Conn
+}
+
+func NewWsConn(conn *websocket.Conn) *wsConn {
+	return &wsConn{Conn: conn}
+}
 
 // 数据的时间线
 type RecordData struct {
@@ -38,7 +46,7 @@ type Meta struct {
 type WebsocketStream struct {
 	sync.RWMutex
 	Terminal    *Terminal        // ssh客户端
-	Conn        *websocket.Conn  // socket 连接
+	Conn        *wsConn  // socket 连接
 	messageType int              // 发送的数据类型
 	recorder    []*RecordData    // 操作记录
 	CreatedAt   models.LocalTime // 创建时间
@@ -47,7 +55,7 @@ type WebsocketStream struct {
 	written     bool             // 是否已写入记录, 一个流只允许写入一次
 }
 
-func NewWebSocketSteam(terminal *Terminal, connection *websocket.Conn, meta Meta) *WebsocketStream {
+func NewWebSocketSteam(terminal *Terminal, connection *wsConn, meta Meta) *WebsocketStream {
 	return &WebsocketStream{
 		Terminal:    terminal,
 		Conn:        connection,
@@ -116,7 +124,15 @@ func (r *WebsocketStream) Write(p []byte) (n int, err error) {
 		Data:  data,
 	})
 	defer r.Unlock()
+	if r.Conn != nil {
+
+	}
+	// 超时
+	r.Conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+	// 实测因ws发送随机key到前端容易造成恐慌，加锁
+	r.Conn.Mu.Lock()
 	err = r.Conn.WriteMessage(r.messageType, p)
+	r.Conn.Mu.Unlock()
 	r.UpdatedAt = models.LocalTime{
 		Time: time.Now(),
 	} // 更新时间
