@@ -18,10 +18,15 @@ func GetSSHRecords(c *gin.Context) {
 		response.FailWithCode(response.ParmError)
 		return
 	}
+	hostId := utils.Str2Uint(c.Param("hostId"))
+	if hostId == 0 {
+		response.FailWithMsg("主机编号不正确")
+		return
+	}
 	var err error
 	// 创建服务
 	s := dao.New()
-	records, err := s.GetSSHRecords(&req)
+	records, err := s.GetSSHRecords(hostId,&req)
 	if err != nil {
 		response.FailWithMsg(err.Error())
 		return

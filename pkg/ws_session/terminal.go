@@ -85,7 +85,6 @@ func (t *Terminal) Connect(stdin io.Reader, stdout io.Writer, stderr io.Writer) 
 	if err = t.session.RequestPty(t.TERM, t.config.Height, t.config.Width, modes); err != nil {
 		return err
 	}
-
 	t.session.Stdin = stdin
 	t.session.Stderr = stderr
 	t.session.Stdout = stdout
@@ -96,9 +95,10 @@ func (t *Terminal) Connect(stdin io.Reader, stdout io.Writer, stderr io.Writer) 
 
 	quit := make(chan int)
 	go func() {
+		i := 0
 		_ = t.session.Wait()
 		_ = t.Close()
-		quit <- 1
+		quit <- (i + 1)
 	}()
 
 	return nil

@@ -67,14 +67,6 @@ func (sm *streamMap) Remove(key string) {
 	return
 }
 
-func (sm *streamMap) ForEach(cb func(key string, value *ws_session.WebsocketStream)) {
-	sm.RLock()
-	defer sm.RUnlock()
-	for k, v := range sm.innerMap {
-		cb(k, v)
-	}
-}
-
 // 连接 WebSocket
 func Connect(c *gin.Context) {
 	hostId := utils.Str2Uint(c.Query("host_id"))
@@ -115,15 +107,15 @@ func Connect(c *gin.Context) {
 		_ = ws.Close()
 		return
 	}
-	wsConn :=ws_session.NewWsConn(ws)
+	wsConn := ws_session.NewWsConn(ws)
 	stream := ws_session.NewWebSocketSteam(terminal, wsConn, ws_session.Meta{
 		TERM:      terminal.TERM,
 		Width:     terminalConfig.Width,
 		Height:    terminalConfig.Height,
-		ConnectID: uid,
+		ConnectId: uid,
 		UserName:  user.(system.SysUser).Username,
-		IpAddress: host.IpAddress,
 		HostName:  host.HostName,
+		HostId:    host.Id,
 	})
 
 	err = stream.Terminal.Connect(stream, stream, stream)
@@ -139,19 +131,17 @@ func Connect(c *gin.Context) {
 		if err := stream.Write2Log(); err != nil {
 			return err
 		}
-		return stream.Conn.Close()
+		return stream.Conn.Ws.Close()
 	})
 
-	stream.Conn.SetCloseHandler(func(code int, text string) error {
+	stream.Conn.Ws.SetCloseHandler(func(code int, text string) error {
 		SteamMap.Remove(uid)
 		return terminal.Close()
 	})
 
 	SteamMap.Set(uid, stream)
 	// 发送websocketKey给前端
-	stream.Conn.Mu.Lock()
 	stream.Conn.WriteMessage(websocket.TextMessage, utils.Str2Bytes("Anew-Sec-WebSocket-Key:"+uid+"\r\n"))
-	stream.Conn.Mu.Unlock()
 
 	go func() {
 		for {
@@ -165,8 +155,9 @@ func Connect(c *gin.Context) {
 			}
 			// 如果有 10 分钟没有数据流动，则断开连接
 			if time.Now().Unix()-stream.UpdatedAt.Unix() > 60*10 {
+				stream.Conn.WriteMessage(websocket.TextMessage, utils.Str2Bytes("检测到终端闲置，已断开连接...\r\n"))
 				_ = stream.Conn.WriteMessage(websocket.BinaryMessage, utils.Str2Bytes("检测到终端闲置，已断开连接..."))
-				_ = stream.Conn.Close()
+				_ = stream.Conn.Ws.Close()
 				_ = timer.Stop()
 				break
 			}

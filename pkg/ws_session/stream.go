@@ -17,13 +17,22 @@ type wsMsg struct {
 	Cols int    `json:"cols"`
 	Rows int    `json:"rows"`
 }
+
 type wsConn struct {
-	Mu sync.RWMutex
-	*websocket.Conn
+	sync.RWMutex
+	Ws *websocket.Conn
+}
+
+func (c *wsConn) WriteMessage(messageType int, data []byte) error {
+	// 加锁解决恐慌
+	c.Lock()
+	err := c.Ws.WriteMessage(messageType, data)
+	c.Unlock()
+	return err
 }
 
 func NewWsConn(conn *websocket.Conn) *wsConn {
-	return &wsConn{Conn: conn}
+	return &wsConn{Ws: conn}
 }
 
 // 数据的时间线
@@ -38,15 +47,15 @@ type Meta struct {
 	Width     int
 	Height    int
 	UserName  string
-	ConnectID string
-	IpAddress string
+	ConnectId string
+	HostId    uint
 	HostName  string
 }
 
 type WebsocketStream struct {
 	sync.RWMutex
 	Terminal    *Terminal        // ssh客户端
-	Conn        *wsConn  // socket 连接
+	Conn        *wsConn          // socket 连接
 	messageType int              // 发送的数据类型
 	recorder    []*RecordData    // 操作记录
 	CreatedAt   models.LocalTime // 创建时间
@@ -73,7 +82,7 @@ func NewWebSocketSteam(terminal *Terminal, connection *wsConn, meta Meta) *Webso
 
 func (r *WebsocketStream) Read(p []byte) (n int, err error) {
 	// 处理前端发送过来的消息
-	t, message, err := r.Conn.ReadMessage()
+	t, message, err := r.Conn.Ws.ReadMessage()
 	var msgObj wsMsg
 	json_err := json.Unmarshal(message, &msgObj)
 	if json_err == nil {
@@ -128,11 +137,8 @@ func (r *WebsocketStream) Write(p []byte) (n int, err error) {
 
 	}
 	// 超时
-	r.Conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
-	// 实测因ws发送随机key到前端容易造成恐慌，加锁
-	r.Conn.Mu.Lock()
+	r.Conn.Ws.SetWriteDeadline(time.Now().Add(10 * time.Second))
 	err = r.Conn.WriteMessage(r.messageType, p)
-	r.Conn.Mu.Unlock()
 	r.UpdatedAt = models.LocalTime{
 		Time: time.Now(),
 	} // 更新时间
@@ -155,7 +161,7 @@ func (r *WebsocketStream) Write2Log() error {
 			Width:     r.Meta.Width,
 			Height:    r.Meta.Height,
 			Timestamp: time.Now().Unix(),
-			Title:     r.Meta.ConnectID,
+			Title:     r.Meta.ConnectId,
 			Env: &map[string]string{
 				"SHELL": "/bin/bash", "TERM": r.Meta.TERM,
 			},
@@ -165,15 +171,15 @@ func (r *WebsocketStream) Write2Log() error {
 			cast.Record(v.Time, v.Data, v.Event)
 		}
 		record := asset.SSHRecord{
-			ConnectID:   r.Meta.ConnectID,
+			ConnectID:   r.Meta.ConnectId,
 			HostName:    r.Meta.HostName,
-			IpAddress:   r.Meta.IpAddress,
 			UserName:    r.Meta.UserName,
 			Records:     buffer.String(),
 			ConnectTime: r.CreatedAt,
 			LogoutTime: models.LocalTime{
 				Time: time.Now(),
 			},
+			HostId: r.Meta.HostId,
 		}
 		common.Mysql.Create(&record)
 	}

@@ -79,7 +79,7 @@ func GetHostInfo(c *gin.Context) {
 	}
 	hostId := utils.Str2Uint(c.Param("hostId"))
 	if hostId == 0 {
-		response.FailWithMsg("接口编号不正确")
+		response.FailWithMsg("主机编号不正确")
 		return
 	}
 	// 创建服务

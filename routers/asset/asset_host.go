@@ -23,7 +23,7 @@ func InitHostRouter(r *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) (R
 		router.DELETE("/ssh/rm", asset.DeleteFileInSSH)
 		router.GET("/connection/list", asset.GetConnections)
 		router.DELETE("/connection/delete", asset.DeleteConnectionByKey)
-		router.GET("/record/list", asset.GetSSHRecords)
+		router.GET("/record/list/:hostId", asset.GetSSHRecords)
 		router.DELETE("/record/delete", asset.BatchDeleteSSHRecordByIds)
 		router.GET("/record/play", asset.PlaySSHRecord)
 		router.GET("/group/list", asset.GetAssetGroups)

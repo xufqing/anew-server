@@ -11,10 +11,9 @@ func GetConnections(c *gin.Context) {
 	var resp []response.ConnectionResp
 	for client, _ := range SteamMap.innerMap {
 		var connStruct response.ConnectionResp
-		connStruct.ConnectID = SteamMap.innerMap[client].Meta.ConnectID
+		connStruct.ConnectID = SteamMap.innerMap[client].Meta.ConnectId
 		connStruct.UserName = SteamMap.innerMap[client].Meta.UserName
 		connStruct.HostName = SteamMap.innerMap[client].Meta.HostName
-		connStruct.IpAddress = SteamMap.innerMap[client].Meta.IpAddress
 		connStruct.ConnectTime = SteamMap.innerMap[client].CreatedAt
 		resp = append(resp, connStruct)
 	}
