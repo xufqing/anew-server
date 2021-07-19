@@ -13,9 +13,10 @@ import (
 )
 
 type wsMsg struct {
-	Type string `json:"type"`
-	Cols int    `json:"cols"`
-	Rows int    `json:"rows"`
+	Type  string `json:"type"`
+	Cols  int    `json:"cols"`
+	Rows  int    `json:"rows"`
+	Close bool   `json: "close"`
 }
 
 type wsConn struct {
@@ -95,6 +96,13 @@ func (r *WebsocketStream) Read(p []byte) (n int, err error) {
 				}
 			}
 			return
+		case "closePty":
+			if msgObj.Close {
+				if err := r.Terminal.Close(); err != nil {
+					common.Log.Debugf("Close pty failed:\t", err)
+				}
+			}
+			return
 		}
 	}
 	r.Lock()
@@ -121,6 +129,8 @@ func (r *WebsocketStream) Write(p []byte) (n int, err error) {
 		switch msgObj.Type {
 		// 忽略自定义消息
 		case "resizePty":
+			return
+		case "closePty":
 			return
 		}
 	}

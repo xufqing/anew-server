@@ -100,7 +100,6 @@ func (t *Terminal) Connect(stdin io.Reader, stdout io.Writer, stderr io.Writer) 
 		_ = t.Close()
 		quit <- (i + 1)
 	}()
-
 	return nil
 }
 

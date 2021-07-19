@@ -131,6 +131,7 @@ func Connect(c *gin.Context) {
 		if err := stream.Write2Log(); err != nil {
 			return err
 		}
+		SteamMap.Remove(uid)
 		return stream.Conn.Ws.Close()
 	})
 
