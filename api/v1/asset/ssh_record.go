@@ -72,5 +72,5 @@ func PlaySSHRecord(c *gin.Context) {
 	}
 	c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s.cast", connect_id))
 	c.Writer.Header().Set("Content-Type", "application/x-asciicast")
-	c.String(200, record.Records)
+	c.String(200, utils.Bytes2Str(utils.ZlibUnCompress(record.Records)))
 }

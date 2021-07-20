@@ -5,6 +5,7 @@ import (
 	"anew-server/models/asset"
 	"anew-server/pkg/asciicast2"
 	"anew-server/pkg/common"
+	"anew-server/pkg/utils"
 	"bytes"
 	"encoding/json"
 	"github.com/gorilla/websocket"
@@ -180,18 +181,21 @@ func (r *WebsocketStream) Write2Log() error {
 		for _, v := range recorders {
 			cast.Record(v.Time, v.Data, v.Event)
 		}
-		record := asset.SSHRecord{
-			ConnectID:   r.Meta.ConnectId,
-			HostName:    r.Meta.HostName,
-			UserName:    r.Meta.UserName,
-			Records:     buffer.String(),
-			ConnectTime: r.CreatedAt,
-			LogoutTime: models.LocalTime{
-				Time: time.Now(),
-			},
-			HostId: r.Meta.HostId,
+		compressData := utils.ZlibCompress(buffer.Bytes())
+		if len(compressData) > 320 {
+			record := asset.SSHRecord{
+				ConnectID:   r.Meta.ConnectId,
+				HostName:    r.Meta.HostName,
+				UserName:    r.Meta.UserName,
+				Records:     compressData,
+				ConnectTime: r.CreatedAt,
+				LogoutTime: models.LocalTime{
+					Time: time.Now(),
+				},
+				HostId: r.Meta.HostId,
+			}
+			common.Mysql.Create(&record)
 		}
-		common.Mysql.Create(&record)
 	}
 	r.written = true
 	return nil

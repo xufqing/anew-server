@@ -50,6 +50,7 @@ func GetOperLogs(c *gin.Context) {
 	resp.PageInfo = req.PageInfo
 	// 设置数据列表
 	resp.DataList = respStruct
+	// 解压缩
 	response.SuccessWithData(resp)
 }
 
