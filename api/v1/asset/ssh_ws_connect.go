@@ -82,6 +82,7 @@ func Connect(c *gin.Context) {
 	// 获取当前登录用户
 	user := system2.GetCurrentUserFromCache(c)
 	uid := uuid.NewV4().String()
+
 	//获取SSH配置
 	terminalConfig := ws_session.Config{
 		User:          host.User,

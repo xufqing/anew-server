@@ -65,6 +65,12 @@ func (s *MysqlService) GetHosts(req *request.HostReq) ([]asset.AssetHost, error)
 func (s *MysqlService) CreateHost(req *request.CreateHostReq) (err error) {
 	var host asset.AssetHost
 	utils.Struct2StructByJson(req, &host)
+	if host.Password != "" {
+		host.Password = utils.AesEncryptCBC2Hex(host.Password)
+	}
+	if host.KeyPassphrase != "" {
+		host.KeyPassphrase = utils.AesEncryptCBC2Hex(host.KeyPassphrase)
+	}
 	// 创建数据
 	err = s.db.Create(&host).Error
 	return
@@ -77,10 +83,15 @@ func (s *MysqlService) UpdateHostById(id uint, req gin.H) (err error) {
 	if query.Error == gorm.ErrRecordNotFound {
 		return errors.New("记录不存在")
 	}
-
 	// 比对增量字段
 	var m asset.AssetHost
 	utils.CompareDifferenceStructByJson(oldHost, req, &m)
+	if m.Password != "" {
+		m.Password = utils.AesEncryptCBC2Hex(m.Password)
+	}
+	if m.KeyPassphrase != "" {
+		m.KeyPassphrase = utils.AesEncryptCBC2Hex(m.KeyPassphrase)
+	}
 	// 更新指定列
 	err = query.Updates(m).Error
 	return

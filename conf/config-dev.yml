@@ -4,10 +4,10 @@ system:
   url-path-prefix: api
   # gin模式 debug|release
   app-mode: debug
-  # 开启全局事务管理器
-  transaction: true
   # 操作日志key
   operation-log-key: operlog_response
+  # 服务端密钥长度必须是16、24、32位字符串其中一种
+  key: NxD3S0yuCc9udD6D
   # 程序监听端口
   port: 9000
 
@@ -68,8 +68,6 @@ logs:
 jwt:
   # jwt标识
   realm: anew
-  # 服务端密钥
-  key: vFr3RRkxlBG0ggRYLG
   # token过期时间, 小时
   timeout: 4
   # token更新时间, 小时

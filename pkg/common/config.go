@@ -19,9 +19,9 @@ type Configuration struct {
 type SystemConfiguration struct {
 	UrlPathPrefix   string `mapstructure:"url-path-prefix" json:"urlPathPrefix"`
 	AppMode         string `mapstructure:"app-mode" json:"appMode"`
-	Transaction     bool   `mapstructure:"transaction" json:"transaction"`
 	Port            int    `mapstructure:"port" json:"port"`
 	OperationLogKey string `mapstructure:"operation-log-key" json:"operationLogKey"`
+	Key             string `mapstructure:"key" json:"key"`
 }
 
 type LogsConfiguration struct {
@@ -59,7 +59,6 @@ type CasbinConfiguration struct {
 
 type JwtConfiguration struct {
 	Realm      string `mapstructure:"realm" json:"realm"`
-	Key        string `mapstructure:"key" json:"key"`
 	Timeout    int    `mapstructure:"timeout" json:"timeout"`
 	MaxRefresh int    `mapstructure:"max-refresh" json:"maxRefresh"`
 }

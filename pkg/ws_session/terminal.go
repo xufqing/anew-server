@@ -2,10 +2,14 @@ package ws_session
 
 import (
 	"anew-server/pkg/common"
+	"anew-server/pkg/utils"
+	"fmt"
 	"golang.org/x/crypto/ssh"
 	"io"
+	"io/ioutil"
 	"net"
 	"os"
+	"path/filepath"
 )
 
 type Terminal struct {
@@ -113,13 +117,13 @@ func NewTerminal(config Config) (*Terminal, error) {
 	}
 
 	if config.PrivateKey != "" {
-		if pk, err := ssh.ParsePrivateKey([]byte(config.PrivateKey)); err != nil {
+		if pk, err := getPrivateKey(config.PrivateKey, utils.AesDecryptCBC2Hex(config.KeyPassphrase)); err != nil {
 			return nil, err
 		} else {
-			authMethods = append(authMethods, ssh.PublicKeys(pk))
+			authMethods = append(authMethods, pk)
 		}
 	} else {
-		authMethods = append(authMethods, ssh.Password(config.Password))
+		authMethods = append(authMethods, ssh.Password(utils.AesDecryptCBC2Hex(config.Password)))
 	}
 
 	sshConfig.Auth = authMethods
@@ -148,4 +152,24 @@ func NewTerminal(config Config) (*Terminal, error) {
 	}
 
 	return &s, nil
+}
+
+func getPrivateKey(privateKeyPath string, privateKeyPassphrase string) (ssh.AuthMethod, error) {
+	if !utils.FileExist(privateKeyPath) {
+		privateKeyPath = filepath.Join(os.Getenv("HOME"), ".ssh/id_rsa")
+	}
+	key, err := ioutil.ReadFile(privateKeyPath)
+	if err != nil {
+		return nil, fmt.Errorf("unable to parse private key: %v", err)
+	}
+	var signer ssh.Signer
+	if privateKeyPassphrase != "" {
+		signer, err = ssh.ParsePrivateKeyWithPassphrase(key, []byte(privateKeyPassphrase))
+	} else {
+		signer, err = ssh.ParsePrivateKey(key)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("parse private key failed: %v", err)
+	}
+	return ssh.PublicKeys(signer), nil
 }
