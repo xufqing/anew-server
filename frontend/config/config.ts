@@ -32,14 +32,22 @@ export default defineConfig({
           path: '/user/login',
           layout: false,
           name: 'login',
-          component: './auth/Login',
+          component: './auth/login',
         },
         {
           path: '/user',
           redirect: '/user/login',
         },
+      ],
+    },
+    {
+      path: '/account',
+      name: 'account',
+      routes: [
         {
-          component: '404',
+          path: '/account/settings',
+          name: 'settings',
+          component: './account/settings',
         },
       ],
     },

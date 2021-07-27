@@ -6,7 +6,7 @@ import type { RequestConfig, RunTimeLayoutConfig } from 'umi';
 import { history } from 'umi';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
-import { GetUserInfo } from './services/anew/user';
+import { getUserInfo } from './services/anew/user';
 import { GetMenuTree } from './services/anew/menu';
 
 // const isDev = process.env.NODE_ENV === 'development';
@@ -27,7 +27,7 @@ export async function getInitialState(): Promise<{
 }> {
   const fetchUserInfo = async () => {
     try {
-      const currentUser: API.UserInfo = await (await GetUserInfo()).data;
+      const currentUser: API.UserInfo = await (await getUserInfo()).data;
       return currentUser;
     } catch (error) {
       history.push(loginPath);
