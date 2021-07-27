@@ -1,27 +1,23 @@
 package request
 
-import (
-	response "anew-server/api/response"
-)
-
-// 获取接口列表结构体
-type ApiReq struct {
-	Name              string `json:"name" form:"name"`
-	Method            string `json:"method" form:"method"`
-	Path              string `json:"path" form:"path"`
-	Category          string `json:"category" form:"category"`
-	Creator           string `json:"creator" form:"creator"`
-	Tree              bool   `json:"tree" form:"tree"`
-	response.PageInfo        // 分页参数
-}
-
 // 创建接口结构体
 type CreateApiReq struct {
 	Name     string `json:"name" form:"name" validate:"required"`
-	Method   string `json:"method" validate:"required"`
-	Path     string `json:"path" validate:"required"`
-	Category string `json:"category" validate:"required"`
+	Method   string `json:"method"`
+	Path     string `json:"path"`
+	PermsTag string `json:"perms_tag" validate:"required"`
 	Creator  string `json:"creator" form:"creator"`
+	ParentId uint   `json:"parent_id"`
+	Desc     string `json:"desc"`
+}
+
+// 修改接口结构体
+type UpdateApiReq struct {
+	Name     string `json:"name" form:"name" validate:"required"`
+	Method   string `json:"method"`
+	Path     string `json:"path"`
+	PermsTag string `json:"perms_tag" validate:"required"`
+	ParentId uint   `json:"parent_id"`
 	Desc     string `json:"desc"`
 }
 
@@ -29,8 +25,6 @@ type CreateApiReq struct {
 func (s CreateApiReq) FieldTrans() map[string]string {
 	m := make(map[string]string, 0)
 	m["Name"] = "接口名称"
-	m["Method"] = "请求方式"
-	m["Path"] = "访问路径"
-	m["Category"] = "所属类别"
+	m["PermsTag"] = "权限标识"
 	return m
 }

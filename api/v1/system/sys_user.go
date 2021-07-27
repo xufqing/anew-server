@@ -9,6 +9,7 @@ import (
 	"anew-server/pkg/common"
 	"anew-server/pkg/redis"
 	"anew-server/pkg/utils"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"os"
 	"path"
@@ -18,33 +19,33 @@ import (
 
 // 获取当前请求用户信息,非缓存获取
 func GetCurrentUser(c *gin.Context) system.SysUser {
-	user, exists := c.Get("user")
+	userId, exists := c.Get("userId")
 	var newUser system.SysUser
 	if !exists {
 		return newUser
 	}
-	u, _ := user.(response.LoginResp)
+	uid, _ := userId.(uint)
 	// 创建服务
 	s := dao.New()
-	newUser, _ = s.GetUserById(u.Id)
+	newUser, _ = s.GetUserById(uid)
 	return newUser
 }
 
 // 获取当前请求用户信息
 func GetCurrentUserFromCache(c *gin.Context) interface{} {
-	user, exists := c.Get("user")
+	userId, exists := c.Get("userId")
 	var newUser system.SysUser
 	if !exists {
 		return newUser
 	}
-	u, _ := user.(response.LoginResp)
+	uid, _ := userId.(uint)
 	// 创建缓存对象
 	cache := cacheService.New(redis.NewStringOperation(), time.Second*15, cacheService.SERILIZER_JSON)
-	key := "user:" + u.Username
+	key := "user:" + fmt.Sprintf("%d", uid)
 	cache.DBGetter = func() interface{} {
 		// 创建mysql服务
 		s := dao.New()
-		newUser, _ = s.GetUserById(u.Id)
+		newUser, _ = s.GetUserById(uid)
 		return newUser
 	}
 
@@ -58,6 +59,10 @@ func GetUserInfo(c *gin.Context) {
 	// 转为UserInfoResponseStruct, 隐藏部分字段
 	var resp response.UserInfoResp
 	utils.Struct2StructByJson(user, &resp)
+	s := dao.New()
+	tags, _ := s.GetPermsTagByRoleId(resp.Role.Id)
+	tags = append([]string{resp.Role.Keyword}, tags...)
+	resp.Perms = tags
 	response.SuccessWithData(resp)
 }
 

@@ -52,6 +52,31 @@ func (s *MysqlService) GetRoles(req *request.RoleReq) ([]system.SysRole, error) 
 	return list, err
 }
 
+// 根据橘色ID获取橘色权限：权限标识
+func (s *MysqlService) GetPermsTagByRoleId(roleId uint) ([]string, error) {
+	allApi := make([]system.SysApi, 0)
+	tags := make([]string, 0)
+	// 查询全部api
+	err := s.db.Find(&allApi).Error
+	if err == nil {
+		casbins, err := s.GetCasbinListByRoleId(roleId)
+		if err == nil {
+			for _, api := range allApi {
+				path := api.Path
+				method := api.Method
+				for _, casbin := range casbins {
+					// 该api有权限
+					if path == casbin.V1 && method == casbin.V2 {
+						tags = append(tags, api.PermsTag)
+						break
+					}
+				}
+			}
+		}
+	}
+	return tags, err
+}
+
 // 根据角色ID获取角色权限：菜单和接口
 func (s *MysqlService) GetPermsByRoleId(roleId uint) (response.RolePermsResp, error) {
 	var role system.SysRole

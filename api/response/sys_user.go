@@ -5,14 +5,9 @@ import (
 )
 
 // User login response structure
-type LoginResp struct {
-	Id               uint     `json:"id"`
-	Username         string   `json:"username"`
-	Avatar           string   `json:"avatar"`
-	Name             string   `json:"name"`
+type TokenResp struct {
 	Token            string   `json:"token"`            // jwt令牌
 	Expires          string   `json:"expires"`          // 过期时间, 秒
-	CurrentAuthority []string `json:"currentAuthority"` // 返回前端的权限数据
 }
 
 // 用户返回角色信息
@@ -40,6 +35,7 @@ type UserInfoResp struct {
 	Email    string       `json:"email"`
 	Dept     UserDeptResp `json:"dept"`
 	Role     UserRoleResp `json:"role"`
+	Perms    []string     `json:"perms"`
 }
 
 // 用户列表信息响应, 字段含义见models.SysUser

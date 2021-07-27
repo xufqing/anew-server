@@ -2,50 +2,18 @@ package dao
 
 import (
 	"anew-server/api/request"
+	"anew-server/api/response"
 	"anew-server/models/system"
 	"anew-server/pkg/utils"
 	"errors"
-	"fmt"
-	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"strings"
 )
 
-func (s *MysqlService) GetApis(req *request.ApiReq) ([]system.SysApi, error) {
+func (s *MysqlService) GetApis() ([]system.SysApi, error) {
 	var err error
-	list := make([]system.SysApi, 0)
-	query := s.db.Table(new(system.SysApi).TableName())
-	name := strings.TrimSpace(req.Name)
-	if name != "" {
-		query = query.Where("name LIKE ?", fmt.Sprintf("%%%s%%", name))
-	}
-	method := strings.TrimSpace(req.Method)
-	if method != "" {
-		query = query.Where("method LIKE ?", fmt.Sprintf("%%%s%%", method))
-	}
-	path := strings.TrimSpace(req.Path)
-	if path != "" {
-		query = query.Where("path LIKE ?", fmt.Sprintf("%%%s%%", path))
-	}
-	category := strings.TrimSpace(req.Category)
-	if category != "" {
-		query = query.Where("category LIKE ?", fmt.Sprintf("%%%s%%", category))
-	}
-
-	// 查询条数
-	err = query.Find(&list).Count(&req.PageInfo.Total).Error
-	if err == nil {
-		if req.PageInfo.All {
-			// 不使用分页
-			err = query.Find(&list).Error
-		} else {
-			// 获取分页参数
-			limit, offset := req.GetLimit()
-			err = query.Limit(limit).Offset(offset).Find(&list).Error
-		}
-	}
-
-	return list, err
+	apis := make([]system.SysApi, 0)
+	s.db.Find(&apis)
+	return apis, err
 }
 
 // 创建接口
@@ -58,7 +26,10 @@ func (s *MysqlService) CreateApi(req *request.CreateApiReq) (err error) {
 }
 
 // 更新接口
-func (s *MysqlService) UpdateApiById(id uint, req gin.H) (err error) {
+func (s *MysqlService) UpdateApiById(id uint, req request.UpdateApiReq) (err error) {
+	if id == req.ParentId {
+		return errors.New("不能自关联")
+	}
 	var oldApi system.SysApi
 	query := s.db.Table(oldApi.TableName()).Where("id = ?", id).First(&oldApi)
 	if query.Error == gorm.ErrRecordNotFound {
@@ -75,6 +46,35 @@ func (s *MysqlService) UpdateApiById(id uint, req gin.H) (err error) {
 
 // 批量删除接口
 func (s *MysqlService) DeleteApiByIds(ids []uint) (err error) {
+	var api system.SysApi
+	// 先解除父级关联
+	err = s.db.Table(api.TableName()).Where("parent_id IN (?)", ids).Update("parent_id", 0).Error
+	if err != nil {
+		return err
+	}
+	// 再删除
+	err = s.db.Where("id IN (?)", ids).Delete(&api).Error
+	if err != nil {
+		return err
+	}
+	return
+}
 
-	return s.db.Where("id IN (?)", ids).Delete(system.SysApi{}).Error
+// 生成接口树
+func GenApiTree(parent *response.ApiListResp, apis []system.SysApi) []response.ApiListResp {
+	tree := make([]response.ApiListResp, 0)
+	var resp []response.ApiListResp
+	utils.Struct2StructByJson(apis, &resp)
+	var parentId uint
+	if parent != nil {
+		parentId = parent.Id
+	}
+	for _, api := range resp {
+		if api.ParentId == parentId {
+			api.Children = GenApiTree(&api, apis)
+			tree = append(tree, api)
+		}
+	}
+	// 排序
+	return tree
 }

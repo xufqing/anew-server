@@ -22,8 +22,9 @@ func CasbinMiddleware(c *gin.Context) {
 	// 获取casbin策略管理器
 	e := common.Casbin
 	// 检查策略
-	pass, _ := e.Enforce(sub, obj, act)
-	if !pass {
+	ok, _ := e.Enforce(sub, obj, act)
+
+	if !ok {
 		response.FailWithCode(response.Forbidden)
 	}
 	// 处理请求

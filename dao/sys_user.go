@@ -13,7 +13,7 @@ import (
 )
 
 // 登录校验,返回指定信息
-func (s *MysqlService) LoginCheck(username string, password string) (*response.LoginResp, error) {
+func (s *MysqlService) LoginCheck(username string, password string) (*system.SysUser, error) {
 	var u system.SysUser
 	// 查询用户及其角色
 	err := s.db.Preload("Role", "status = ?", true).Where("username = ?", username).First(&u).Error
@@ -27,10 +27,7 @@ func (s *MysqlService) LoginCheck(username string, password string) (*response.L
 	if ok := utils.ComparePwd(password, u.Password); !ok {
 		return nil, errors.New(response.LoginCheckErrorMsg)
 	}
-	var loginInfo response.LoginResp
-	utils.Struct2StructByJson(u, &loginInfo)
-	loginInfo.CurrentAuthority = []string{u.Role.Keyword}
-	return &loginInfo, err
+	return &u, err
 }
 
 // 获取单个用户
@@ -70,8 +67,8 @@ func (s *MysqlService) CreateUser(req *request.CreateUserReq) (err error) {
 // 更新用户基本信息
 func (s *MysqlService) UpdateUserBaseInfoById(id uint, req request.UpdateUserBaseInfoReq) (err error) {
 	var oldUser system.SysUser
-	//query := s.db.Table(oldUser.TableName()).Where("id = ?", id).First(&oldUser)
-	query := s.db.First(&oldUser).Where("id = ?", id)
+	query := s.db.Table(oldUser.TableName()).Where("id = ?", id).First(&oldUser)
+	//query := s.db.First(&oldUser).Where("id = ?", id)
 	if query.Error == gorm.ErrInvalidField {
 		return errors.New("记录不存在")
 	}
