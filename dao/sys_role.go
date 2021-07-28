@@ -52,7 +52,7 @@ func (s *MysqlService) GetRoles(req *request.RoleReq) ([]system.SysRole, error) 
 	return list, err
 }
 
-// 根据橘色ID获取橘色权限：权限标识
+// 根据角色ID获取角色权限：权限标识
 func (s *MysqlService) GetPermsTagByRoleId(roleId uint) ([]string, error) {
 	allApi := make([]system.SysApi, 0)
 	tags := make([]string, 0)
