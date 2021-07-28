@@ -5,15 +5,17 @@ import React, { useState, useRef } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import CreateForm from './components/CreateForm';
-// import UpdateForm from './components/UpdateForm';
+import UpdateForm from './components/UpdateForm';
 import { queryUsers, deleteUser } from '@/services/anew/user';
+import { useAccess, Access } from 'umi';
 
 const UserList: React.FC = () => {
 
     const [createVisible, setCreateVisible] = useState<boolean>(false);
-    const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
-    const [formValues, setFormValues] = useState({});
+    const [updateVisible, setUpdateVisible] = useState<boolean>(false);
     const actionRef = useRef<ActionType>();
+    const [formValues, setFormValues] = useState<API.UserList>();
+    const access = useAccess();
 
     const handleDelete = (record: API.Ids) => {
         if (!record) return;
@@ -59,9 +61,6 @@ const UserList: React.FC = () => {
             dataIndex: 'role',
             search: false,
             render: (_, record: API.UserList) => {
-                // let roleList = [];
-                // record.roles.map(({ name }) => roleList.push(name));
-                // return roleList && roleList.length > 0 ? roleList.join('、') : '无';
                 return record.role.name;
             },
         },
@@ -97,22 +96,26 @@ const UserList: React.FC = () => {
             valueType: 'option',
             render: (_, record: API.UserList) => (
                 <>
-                    <Tooltip title="修改">
-                        <FormOutlined
-                            style={{ fontSize: '17px', color: '#52c41a' }}
-                            onClick={() => {
-                                setFormValues(record);
-                                handleUpdateModalVisible(true);
-                            }}
-                        />
-                    </Tooltip>
+                    <Access accessible={access.hasPerms(['admin', 'user:update'])}>
+                        <Tooltip title="修改">
+                            <FormOutlined
+                                style={{ fontSize: '17px', color: '#52c41a' }}
+                                onClick={() => {
+                                    setFormValues(record);
+                                    setUpdateVisible(true);
+                                }}
+                            />
+                        </Tooltip>
+                    </Access>
                     <Divider type="vertical" />
-                    <Tooltip title="删除">
-                        <DeleteOutlined
-                            style={{ fontSize: '17px', color: 'red' }}
-                            onClick={() => handleDelete({ ids: [record.id] })}
-                        />
-                    </Tooltip>
+                    <Access accessible={access.hasPerms(['admin', 'user:delete'])}>
+                        <Tooltip title="删除">
+                            <DeleteOutlined
+                                style={{ fontSize: '17px', color: 'red' }}
+                                onClick={() => handleDelete({ ids: [record.id] })}
+                            />
+                        </Tooltip>
+                    </Access>
                 </>
             ),
         },
@@ -120,22 +123,27 @@ const UserList: React.FC = () => {
 
     return (
         <PageHeaderWrapper>
-            <ProTable
+            {/* 权限控制显示内容 */}
+            {access.hasPerms(['admin', 'user:list']) && <ProTable
                 actionRef={actionRef}
                 rowKey="id"
                 toolBarRender={(action, { selectedRows }) => [
-                    <Button key="1" type="primary" onClick={() => setCreateVisible(true)}>
-                        <PlusOutlined /> 新建
-                    </Button>,
-                    selectedRows && selectedRows.length > 0 && (
-                        <Button
-                            key="2"
-                            type="primary"
-                            onClick={() => handleDelete({ ids: selectedRows.map((item) => item.id) })}
-                            danger
-                        >
-                            <DeleteOutlined /> 删除
+                    <Access accessible={access.hasPerms(['admin', 'user:create'])}>
+                        <Button key="1" type="primary" onClick={() => setCreateVisible(true)}>
+                            <PlusOutlined /> 新建
                         </Button>
+                    </Access>,
+                    selectedRows && selectedRows.length > 0 && (
+                        <Access accessible={access.hasPerms(['admin', 'user:delete'])}>
+                            <Button
+                                key="2"
+                                type="primary"
+                                onClick={() => handleDelete({ ids: selectedRows.map((item) => item.id) })}
+                                danger
+                            >
+                                <DeleteOutlined /> 删除
+                            </Button>
+                        </Access>
                     ),
                 ]}
                 tableAlertRender={({ selectedRowKeys, selectedRows }) => (
@@ -151,10 +159,10 @@ const UserList: React.FC = () => {
                         项&nbsp;&nbsp;
                     </div>
                 )}
-                request={(params) => queryUsers({ ...params }).then((res) => res.data)}
+                request={async (params) => queryUsers({ params }).then((res) => res.data)}
                 columns={columns}
                 rowSelection={{}}
-            />
+            />}
             {createVisible && (
                 <CreateForm
                     actionRef={actionRef}
@@ -162,16 +170,14 @@ const UserList: React.FC = () => {
                     modalVisible={createVisible}
                 />
             )}
-            {/* {updateModalVisible && (
+            {updateVisible && (
                 <UpdateForm
                     actionRef={actionRef}
-                    onCancel={() => {
-                        handleUpdateModalVisible(false);
-                    }}
-                    modalVisible={updateModalVisible}
+                    onChange={setUpdateVisible}
+                    modalVisible={updateVisible}
                     values={formValues}
                 />
-            )} */}
+            )}
         </PageHeaderWrapper>
     );
 };

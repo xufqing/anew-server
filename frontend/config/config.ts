@@ -3,6 +3,7 @@ import { defineConfig } from 'umi';
 import defaultSettings from './defaultSettings';
 import proxy from './proxy';
 const { REACT_APP_ENV } = process.env;
+
 export default defineConfig({
   hash: true,
   antd: {},
@@ -62,6 +63,7 @@ export default defineConfig({
         {
           path: '/system/user',
           name: 'user',
+          access: 'hasPerms(["admin","user:list"])',
           component: './system/user',
         },
         {

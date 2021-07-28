@@ -24,8 +24,8 @@ declare namespace API {
     new_password: string;
   };
 
-  type CreateUserParams = {
-    username: string,
+  type UserParams = {
+    username?: string,
     password: string,
     mobile?: string,
     avatar?: string,
@@ -33,8 +33,7 @@ declare namespace API {
     email?: string,
     dept_id?: number,
     role_id: number,
-    creator: string,
-
+    creator?: string,
   }
 
   type UserInfo = {
