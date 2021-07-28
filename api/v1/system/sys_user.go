@@ -223,7 +223,8 @@ func ChangePwd(c *gin.Context) {
 	}
 	// 获取当前用户
 	user := GetCurrentUserFromCache(c)
-	query := common.Mysql.Where("username = ?", user.(system.SysUser).Username).First(&user)
+	var oldUser system.SysUser
+	query := common.Mysql.Where("username = ?", user.(system.SysUser).Username).First(&oldUser)
 	// 查询用户
 	err = query.Error
 	if err != nil {
