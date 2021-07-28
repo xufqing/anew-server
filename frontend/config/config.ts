@@ -1,6 +1,5 @@
 // https://umijs.org/config/
 import { defineConfig } from 'umi';
-import { join } from 'path';
 import defaultSettings from './defaultSettings';
 import proxy from './proxy';
 const { REACT_APP_ENV } = process.env;
@@ -49,12 +48,29 @@ export default defineConfig({
           name: 'settings',
           component: './account/settings',
         },
+        {
+          path: '/account',
+          redirect: '/account/settings',
+        },
       ],
     },
+    // system
     {
-      path: '/',
-      redirect: '/index',
+      path: '/system',
+      name: 'system',
+      routes: [
+        {
+          path: '/system/user',
+          name: 'user',
+          component: './system/user',
+        },
+        {
+          path: '/system',
+          redirect: '/system/user',
+        },
+      ],
     },
+
     {
       component: '404',
     },
@@ -74,24 +90,25 @@ export default defineConfig({
   },
   // Fast Refresh 热更新
   fastRefresh: {},
-  openAPI: [
-    {
-      requestLibPath: "import { request } from 'umi'",
-      // 或者使用在线的版本
-      // schemaPath: "https://gw.alipayobjects.com/os/antfincdn/M%24jrzTTYJN/oneapi.json"
-      schemaPath: join(__dirname, 'oneapi.json'),
-      mock: false,
-    },
-    {
-      requestLibPath: "import { request } from 'umi'",
-      schemaPath: 'https://gw.alipayobjects.com/os/antfincdn/CA1dOm%2631B/openapi.json',
-      projectName: 'swagger',
-    },
-  ],
+  // openAPI: [
+  //   {
+  //     requestLibPath: "import { request } from 'umi'",
+  //     // 或者使用在线的版本
+  //     // schemaPath: "https://gw.alipayobjects.com/os/antfincdn/M%24jrzTTYJN/oneapi.json"
+  //     schemaPath: join(__dirname, 'oneapi.json'),
+  //     mock: false,
+  //   },
+  //   {
+  //     requestLibPath: "import { request } from 'umi'",
+  //     schemaPath: 'https://gw.alipayobjects.com/os/antfincdn/CA1dOm%2631B/openapi.json',
+  //     projectName: 'swagger',
+  //   },
+  // ],
   nodeModulesTransform: {
     type: 'none',
   },
-  mfsu: {},
+  // mfsu启用后有部分样式丢失，据说bug，等umi修复
+  // mfsu: {},
   webpack5: {},
   exportStatic: {},
 });

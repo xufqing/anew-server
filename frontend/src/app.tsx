@@ -166,14 +166,13 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
         history.push(loginPath);
       }
     },
-    iconfontUrl: '//at.alicdn.com/t/font_2704278_kqnmerpzglk.js',
     menu: {
       // 每当 initialState?.currentUser?.userid 发生修改时重新执行 request
       params: {
         userId: initialState?.currentUser?.id,
       },
       request: async (params, defaultMenuData) => {
-        // initialState.currentUser 中包含了所有用户信息
+        if(!params.userId) return []
         const menuData = await (await GetMenuTree()).data;
         return menuData;
       },

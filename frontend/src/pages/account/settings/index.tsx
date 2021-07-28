@@ -1,36 +1,23 @@
 import { GridContent } from '@ant-design/pro-layout';
-import { UserOutlined, EditOutlined, UploadOutlined, MailOutlined, MobileOutlined, UsergroupAddOutlined, TeamOutlined } from '@ant-design/icons';
-import React, { useState, useEffect } from 'react';
+import { UploadOutlined } from '@ant-design/icons';
+import React from 'react';
 import { useModel } from 'umi';
 import { Card, Col, Button, Upload, Row, Tabs, message } from 'antd';
 import BaseForm from './components/BaseForm';
 import type { RcFile, UploadChangeParam } from 'antd/lib/upload';
-//import ChangePasswordFrom from './components/ChangePasswordFrom';
-//import IconFont from '@/components/IconFont';
-//import { querycurrentUser } from './service';
+import ChangePasswordFrom from './components/ChangePasswordFrom';
 import styles from './settings.less';
+import { createFromIconfontCN } from '@ant-design/icons';
+
+const IconFont = createFromIconfontCN();
 
 const Settings: React.FC = () => {
-    const { initialState } = useModel('@@initialState');
+    const { initialState, setInitialState } = useModel('@@initialState');
 
     if (!initialState || !initialState.currentUser) {
         return null;
     }
-
     const { currentUser } = initialState;
-    const [uploadLoading, setUploadLoading] = useState(false);
-    //const [currentUser, setcurrentUser] = useState({});
-
-    //   useEffect(() => {
-    //     getInfo();
-    //   }, []);
-
-
-    //   const getInfo = () => {
-    //     querycurrentUser().then((res) => {
-    //       setcurrentUser(res.data);
-    //     });
-    //   };
 
     const beforeUpload = (file: RcFile) => {
         const isJpgOrPng =
@@ -47,15 +34,15 @@ const Settings: React.FC = () => {
 
     const handleChange = (info: UploadChangeParam) => {
         if (info.file.status === 'uploading') {
-            setUploadLoading(true);
+            //setUploadLoading(true);
             return;
         }
         if (info.file.status === 'done') {
             message.success('上传成功');
-            // let currentUser = JSON.parse(localStorage.getItem('user')) || {};
-            // currentUser.avatar = info.file.response.data.url;
-            // localStorage.setItem('user', JSON.stringify(currentUser));
-            //getInfo();
+            let userInfo = {};
+            Object.assign(userInfo, initialState?.currentUser);
+            (userInfo as API.UserInfo).avatar = info.file.response.data.url;
+            setInitialState({ ...initialState, currentUser: userInfo as API.UserInfo });
         }
     };
 
@@ -97,42 +84,60 @@ const Settings: React.FC = () => {
                                 <div className={styles.detail}>
                                     <div>
                                         <p style={{ marginRight: '15px' }}>
-                                            <UserOutlined />
+                                            <IconFont
+                                                type="icon-yonghuming"
+                                                style={{ fontSize: '16px', marginRight: 8 }}
+                                            />
                                             用户名
                                         </p>
                                         {currentUser.username}
                                     </div>
                                     <div>
                                         <p style={{ marginRight: '29px' }}>
-                                            <EditOutlined />
+                                            <IconFont
+                                                type="icon-xingming"
+                                                style={{ fontSize: '16px', marginRight: 8 }}
+                                            />
                                             姓名
                                         </p>
                                         {currentUser.name}
                                     </div>
                                     <div>
                                         <p style={{ marginRight: '29px' }}>
-                                            <MailOutlined />
+                                            <IconFont
+                                                type="icon-youxiang"
+                                                style={{ fontSize: '16px', marginRight: 8 }}
+                                            />
                                             邮箱
                                         </p>
                                         {currentUser.email}
                                     </div>
                                     <div>
                                         <p style={{ marginRight: '29px' }}>
-                                            <MobileOutlined />
+                                            <IconFont
+                                                type="icon-shouji54"
+                                                style={{ fontSize: '16px', marginRight: 8 }}
+                                            />
                                             手机
                                         </p>
                                         {currentUser.mobile}
                                     </div>
                                     <div>
                                         <p style={{ marginRight: '29px' }}>
-                                            <UsergroupAddOutlined />
+                                            <IconFont
+                                                type="icon-jiaose"
+                                                style={{ fontSize: '16px', marginRight: 8 }}
+                                            />
                                             角色
                                         </p>
                                         {currentUser.role?.name}
                                     </div>
                                     <div>
                                         <p style={{ marginRight: '29px' }}>
-                                            <TeamOutlined />
+                                            <IconFont
+                                                type="icon-bumen"
+                                                style={{ fontSize: '16px', marginRight: 8 }}
+                                            />
                                             部门
                                         </p>
                                         {currentUser.dept?.name}
@@ -148,7 +153,7 @@ const Settings: React.FC = () => {
                                     <BaseForm values={currentUser} />
                                 </Tabs.TabPane>
                                 <Tabs.TabPane tab="修改密码" key="changePwd">
-                                    {/* <ChangePasswordFrom /> */}
+                                    <ChangePasswordFrom />
                                 </Tabs.TabPane>
                             </Tabs>
                         </Card>

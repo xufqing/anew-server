@@ -1,27 +1,30 @@
 import React from 'react';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { updateUserInfo } from '@/services/anew/user';
+import { useModel } from 'umi';
 import { message } from 'antd';
 
+
 export type BaseFormProps = {
-    getInfo?: (value?: API.UserInfo) => void;
     values?: API.UserInfo;
 };
 
 const BaseForm: React.FC<BaseFormProps> = (props) => {
-    const { values, getInfo } = props;
-
+    const { values } = props;
+    const { initialState, setInitialState } = useModel('@@initialState');
 
     return (
         <ProForm
-            onFinish={async (v) => {
-                await updateUserInfo(v, values?.id?.toString()).then((res) => {
+            onFinish={async (v: API.UserInfo) => {
+                await updateUserInfo(v, values?.id).then((res) => {
                     if (res.code === 200 && res.status === true) {
                         message.success(res.message);
-                        // let currentUser = JSON.parse(localStorage.getItem('user')) || {};
-                        // currentUser.name = v.name;
-                        // localStorage.setItem('user', JSON.stringify(currentUser));
-                        // getInfo();
+                        let userInfo = {};
+                        Object.assign(userInfo, initialState?.currentUser);
+                        (userInfo as API.UserInfo).name = v.name;
+                        (userInfo as API.UserInfo).mobile = v.mobile;
+                        (userInfo as API.UserInfo).email = v.email
+                        setInitialState({ ...initialState, currentUser: userInfo as API.UserInfo });
                     }
                 });
             }}
@@ -30,6 +33,7 @@ const BaseForm: React.FC<BaseFormProps> = (props) => {
                 <ProFormText
                     name="name"
                     label="姓名"
+                    width="md"
                     rules={[{ required: true }]}
                     initialValue={values?.name}
                 />
