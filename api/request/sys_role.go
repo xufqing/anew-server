@@ -8,7 +8,6 @@ import (
 type RoleReq struct {
 	Name              string `json:"name" form:"name"`
 	Keyword           string `json:"keyword" form:"keyword"`
-	Status            *bool  `json:"status" form:"status"`
 	Creator           string `json:"creator" form:"creator"`
 	response.PageInfo        // 分页参数
 }

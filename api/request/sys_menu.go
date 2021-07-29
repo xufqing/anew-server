@@ -8,7 +8,6 @@ import (
 type MenuReq struct {
 	Title             string `json:"title" form:"title"`
 	Path              string `json:"path" form:"path"`
-	Status            *bool  `json:"status" form:"status"`
 	Creator           string `json:"creator" form:"creator"`
 	response.PageInfo        // 分页参数
 }
@@ -29,7 +28,6 @@ type UpdateMenuReq struct {
 	Icon     string `json:"icon"`
 	Path     string `json:"path"`
 	Sort     int    `json:"sort"`
-	Status   *bool  `json:"status"`
 	ParentId uint   `json:"parent_id"`
 }
 

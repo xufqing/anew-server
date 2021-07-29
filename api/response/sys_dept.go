@@ -6,7 +6,6 @@ type DeptTreeResp struct {
 	ParentId uint           `json:"parent_id"`
 	Name     string         `json:"name"`
 	Creator  string         `json:"creator"`
-	Status   bool           `json:"status"`
 	Sort     int            `json:"sort"`
 	Children []DeptTreeResp `json:"children,omitempty"` //tag:omitempty 为空的值不显示
 }

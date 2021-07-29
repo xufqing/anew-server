@@ -9,7 +9,6 @@ type MenuTreeResp struct {
 	Path     string         `json:"path"`
 	Creator  string         `json:"creator"`
 	Sort     int            `json:"sort"`
-	Status   bool           `json:"status"`
 	Children []MenuTreeResp `json:"children,omitempty"` //tag:omitempty 为空的值不显示
 }
 type MenuTreeRespList []MenuTreeResp

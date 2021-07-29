@@ -9,6 +9,5 @@ type DictTreeResp struct {
 	Value    string         `json:"value"`
 	Desc     string         `json:"desc"`
 	Creator  string         `json:"creator"`
-	Status   bool           `json:"status"`
 	Children []DictTreeResp `json:"children,omitempty"` //tag:omitempty 为空的值不显示
 }

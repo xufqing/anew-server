@@ -30,13 +30,6 @@ func (s *MysqlService) GetRoles(req *request.RoleReq) ([]system.SysRole, error) 
 	if creator != "" {
 		db = db.Where("creator LIKE ?", fmt.Sprintf("%%%s%%", creator))
 	}
-	if req.Status != nil {
-		if *req.Status {
-			db = db.Where("status = ?", 1)
-		} else {
-			db = db.Where("status = ?", 0)
-		}
-	}
 	// 查询条数
 	err = db.Find(&list).Count(&req.PageInfo.Total).Error
 	if err == nil {

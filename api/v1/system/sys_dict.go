@@ -22,7 +22,7 @@ func GetDicts(c *gin.Context) {
 	// 创建服务
 	s := dao.New()
 	dicts := s.GetDicts(&req)
-	if req.Key != "" || req.Value != "" || req.Status != nil || req.TypeKey != "" {
+	if req.Key != "" || req.Value != "" || req.TypeKey != "" {
 		var newResp []response.DictTreeResp
 		utils.Struct2StructByJson(dicts, &newResp)
 		response.SuccessWithData(newResp)

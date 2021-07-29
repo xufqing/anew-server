@@ -25,14 +25,6 @@ func (s *MysqlService) GetDepts(req *request.DeptListReq) []system.SysDept {
 	if creator != "" {
 		db = db.Where("creator LIKE ?", fmt.Sprintf("%%%s%%", creator))
 	}
-	status := req.Status
-	if status != nil {
-		if *status {
-			db = db.Where("status = ?", 1)
-		} else {
-			db = db.Where("status = ?", 0)
-		}
-	}
 	db.Order("sort").Find(&depts)
 	return depts
 }

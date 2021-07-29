@@ -1,9 +1,5 @@
 package response
 
-import (
-	"anew-server/models"
-)
-
 // 角色返回权限信息
 type RolePermsResp struct {
 	Id      uint   `json:"id"`
@@ -19,7 +15,5 @@ type RoleListResp struct {
 	Name      string           `json:"name"`
 	Keyword   string           `json:"keyword"`
 	Desc      string           `json:"desc"`
-	Status    *bool            `json:"status"`
 	Creator   string           `json:"creator"`
-	CreatedAt models.LocalTime `json:"created_at"`
 }

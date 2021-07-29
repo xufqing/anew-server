@@ -14,7 +14,6 @@ import (
 func InitData() {
 	// 1. 初始化角色
 	creator := "系统创建"
-	status := true
 	roles := []system.SysRole{
 		{
 			Model: models.Model{
@@ -23,7 +22,6 @@ func InitData() {
 			Name:    "管理员",
 			Keyword: "admin",
 			Desc:    "系统管理员",
-			Status:  &status,
 			Creator: creator,
 		},
 		{
@@ -33,7 +31,6 @@ func InitData() {
 			Name:    "访客",
 			Keyword: "guest",
 			Desc:    "外来访问人员",
-			Status:  &status,
 			Creator: creator,
 		},
 	}
@@ -55,7 +52,6 @@ func InitData() {
 			Icon:     "icon-yibiaopan",
 			Path:     "workbench",
 			Sort:     0,
-			Status:   &status,
 			ParentId: 0,
 			Creator:  creator,
 			Roles:    roles,
@@ -68,7 +64,6 @@ func InitData() {
 			Icon:     "icon-yibiaopan",
 			Path:     "dashboard",
 			Sort:     0,
-			Status:   &status,
 			ParentId: 1,
 			Creator:  creator,
 			Roles:    roles,
@@ -81,7 +76,6 @@ func InitData() {
 			Icon:     "icon-yibiaopan",
 			Path:     "myprojet",
 			Sort:     0,
-			Status:   &status,
 			ParentId: 1,
 			Creator:  creator,
 			Roles:    roles,
@@ -94,7 +88,6 @@ func InitData() {
 			Icon:     "icon-zichan",
 			Path:     "asset",
 			Sort:     1,
-			Status:   &status,
 			ParentId: 0,
 			Creator:  creator,
 		},
@@ -105,7 +98,6 @@ func InitData() {
 			Name:     "主机管理",
 			Path:     "host",
 			Sort:     1,
-			Status:   &status,
 			ParentId: 12,
 			Creator:  creator,
 		},
@@ -116,7 +108,6 @@ func InitData() {
 			Name:     "主机分组",
 			Path:     "group",
 			Sort:     2,
-			Status:   &status,
 			ParentId: 12,
 			Creator:  creator,
 		},
@@ -127,7 +118,6 @@ func InitData() {
 			Name:     "连接管理",
 			Path:     "connection",
 			Sort:     3,
-			Status:   &status,
 			ParentId: 12,
 			Creator:  creator,
 		},
@@ -139,7 +129,6 @@ func InitData() {
 			Icon:     "icon-shezhi",
 			Path:     "system",
 			Sort:     999,
-			Status:   &status,
 			ParentId: 0,
 			Creator:  creator,
 		},
@@ -150,7 +139,6 @@ func InitData() {
 			Name:     "用户管理",
 			Path:     "user",
 			Sort:     10,
-			Status:   &status,
 			ParentId: 4,
 			Creator:  creator,
 		},
@@ -161,7 +149,6 @@ func InitData() {
 			Name:     "部门管理",
 			Path:     "dept",
 			Sort:     11,
-			Status:   &status,
 			ParentId: 4,
 			Creator:  creator,
 		},
@@ -172,7 +159,6 @@ func InitData() {
 			Name:     "菜单管理",
 			Path:     "menu",
 			Sort:     12,
-			Status:   &status,
 			ParentId: 4,
 			Creator:  creator,
 		},
@@ -183,7 +169,6 @@ func InitData() {
 			Name:     "角色管理",
 			Path:     "role",
 			Sort:     13,
-			Status:   &status,
 			ParentId: 4,
 			Creator:  creator,
 		},
@@ -194,7 +179,6 @@ func InitData() {
 			Name:     "接口管理",
 			Path:     "api",
 			Sort:     14,
-			Status:   &status,
 			ParentId: 4,
 			Creator:  creator,
 		},
@@ -205,7 +189,6 @@ func InitData() {
 			Name:     "数据字典",
 			Path:     "dict",
 			Sort:     15,
-			Status:   &status,
 			ParentId: 4,
 			Creator:  creator,
 		},
@@ -216,7 +199,6 @@ func InitData() {
 			Name:     "操作日志",
 			Path:     "operlog",
 			Sort:     16,
-			Status:   &status,
 			ParentId: 4,
 			Creator:  creator,
 			Roles: []system.SysRole{

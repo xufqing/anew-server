@@ -22,8 +22,8 @@ func GetDepts(c *gin.Context) {
 	// 创建服务
 	s := dao.New()
 	depts := s.GetDepts(&req)
-	if req.Name != "" || req.Status != nil {
-		var newResp []response.DictTreeResp
+	if req.Name != "" {
+		var newResp []response.DeptTreeResp
 		utils.Struct2StructByJson(depts, &newResp)
 		response.SuccessWithData(newResp)
 	} else {
@@ -35,7 +35,6 @@ func GetDepts(c *gin.Context) {
 
 // 创建部门
 func CreateDept(c *gin.Context) {
-	user := GetCurrentUserFromCache(c)
 	// 绑定参数
 	var req request.CreateDeptReq
 	err := c.Bind(&req)
@@ -50,6 +49,7 @@ func CreateDept(c *gin.Context) {
 		response.FailWithMsg(err.Error())
 		return
 	}
+	user := GetCurrentUserFromCache(c)
 	// 记录当前创建人信息
 	req.Creator = user.(system.SysUser).Name
 	// 创建服务

@@ -15,7 +15,6 @@ type UpdateDictReq struct {
 	Value    string `json:"value" validate:"required"`
 	Desc     string `json:"desc"`
 	ParentId uint   `json:"parent_id"`
-	Status   *bool  `json:"status"`
 }
 
 type DictListReq struct {
@@ -23,7 +22,6 @@ type DictListReq struct {
 	Value   string `json:"value" form:"value"`
 	Desc    string `json:"desc" form:"desc"`
 	Creator string `json:"creator" form:"creator"`
-	Status  *bool  `json:"status" form:"status"`
 	TypeKey string `json:"type_key" form:"type_key"`
 }
 
