@@ -143,13 +143,6 @@ export const request: RequestConfig = {
 };
 
 
-// const loopMenuItem = (menus: MenuDataItem[]): MenuDataItem[] =>
-// menus.map(({ icon, children, ...item }) => ({
-//   ...item,
-//   icon: icon && IconMap[icon as string],
-//   children: children && loopMenuItem(children),
-// }));
-
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState }) => {
   return {

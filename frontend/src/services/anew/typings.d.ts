@@ -36,6 +36,29 @@ declare namespace API {
     creator?: string,
   }
 
+  type DeptParams = {
+    parent_id?: number,
+    name: string,
+    sort?: number,
+    status?: boolean,
+  }
+
+  type MenuParams = {
+    name: string,
+    icon?: string,
+    path?: string,
+    sort?: number,
+    status?: boolean,
+    parent_id?: number,
+  }
+
+  type RoleParams = {
+    id: number,
+    name: string,
+    keyword?: string,
+    desc?: string,
+  };
+
   type UserInfo = {
     id: number,
     username: string,
@@ -66,13 +89,31 @@ declare namespace API {
 
   type DeptList = {
     id: number,
-    parent_id: number,
+    parent_id?: number,
     name: string,
-    sort: number,
-    status: boolean,
-    creator: string,
-    title?: string,
-    value?: number,
-    children: DeptList[],
+    sort?: number,
+    status?: boolean,
+    creator?: string,
+    children?: DeptList[],
+  };
+
+  type MenuList = {
+    id: number,
+    parent_id?: number,
+    name: string,
+    icon?: string,
+    path?: string,
+    sort?: number,
+    creator?: string,
+    children?: MenuList[],
+  };
+
+
+  type RoleList = {
+    id: number,
+    name: string,
+    keyword?: string,
+    desc?: string,
+    creator?: string,
   };
 }

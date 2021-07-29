@@ -67,6 +67,22 @@ export default defineConfig({
           component: './system/user',
         },
         {
+          path: '/system/dept',
+          name: 'dept',
+          access: 'hasPerms(["admin","dept:list"])',
+          component: './system/dept',
+        },
+        {
+          path: '/system/menu',
+          name: 'menu',
+          component: './system/menu',
+        },
+        {
+          path: '/system/role',
+          name: 'role',
+          component: './system/role',
+        },
+        {
           path: '/system',
           redirect: '/system/user',
         },

@@ -7,15 +7,13 @@ import { message, TreeSelect, Form } from 'antd';
 import type { ActionType } from '@ant-design/pro-table';
 
 // 处理返回的树数据
-const loopTreeItem = (tree: API.DeptList[]) => {
-    tree.map(({ id, name, children, ...item }) => ({
+const loopTreeItem = (tree: API.DeptList[]): API.DeptList[] =>
+    tree.map(({ children, ...item }) => ({
         ...item,
-        title: name,
-        value: id,
+        title: item.name,
+        value: item.id,
         children: children && loopTreeItem(children),
     }));
-    return tree;
-}
 
 export type CreateFormProps = {
     modalVisible: boolean;
@@ -29,9 +27,10 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
 
     useEffect(() => {    
         queryDepts().then((res) => {
+            const top: API.DeptList = { id: 0, name: '暂无所属' };
+            res.data.unshift(top)
             const depts = loopTreeItem(res.data);
-            var top: API.DeptList[] = [{ id: 0, parent_id: 0, name: '', sort: 0, status: true, creator: '', title: '暂无所属', value: 0, children: [] }];
-            setTreeData(top.concat(depts));
+            setTreeData(depts);
         });
     }, []);
 
