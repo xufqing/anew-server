@@ -31,7 +31,7 @@ export default defineConfig({
         {
           path: '/user/login',
           layout: false,
-          name: 'login',
+          name: '登录',
           component: './auth/login',
         },
         {
@@ -46,7 +46,7 @@ export default defineConfig({
       routes: [
         {
           path: '/account/settings',
-          name: 'settings',
+          name: '账户设置',
           component: './account/settings',
         },
         {
@@ -62,25 +62,33 @@ export default defineConfig({
       routes: [
         {
           path: '/system/user',
-          name: 'user',
-          access: 'hasPerms(["admin","user:list"])',
+          name: '用户管理',
           component: './system/user',
         },
         {
           path: '/system/dept',
-          name: 'dept',
-          access: 'hasPerms(["admin","dept:list"])',
+          name: '部门管理',
           component: './system/dept',
         },
         {
           path: '/system/menu',
-          name: 'menu',
+          name: '菜单管理',
           component: './system/menu',
         },
         {
           path: '/system/role',
-          name: 'role',
+          name: '角色管理',
           component: './system/role',
+        },
+        {
+          path: '/system/api',
+          name: '接口管理',
+          component: './system/api',
+        },
+        {
+          path: '/system/dict',
+          name: '字典管理',
+          component: './system/dict',
         },
         {
           path: '/system',

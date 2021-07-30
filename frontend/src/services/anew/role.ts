@@ -1,4 +1,5 @@
 import { request } from 'umi';
+import type { CheckboxValueType } from 'antd/lib/checkbox/Group'
 
 export async function queryRoles(options?: { [key: string]: any }) {
   return request<API.Result>('/api/v1/role/list', {
@@ -48,10 +49,15 @@ export async function getRolePermsByID(id?: number, options?: { [key: string]: a
   });
 }
 
+export type PermsProps = {
+  menus_id: React.Key[];
+  apis_id: CheckboxValueType[];
+}
 
-export async function updatePermsRole(id?: number, options?: { [key: string]: any }) {
+export async function updatePermsRole(body: PermsProps, id?: number, options?: { [key: string]: any }) {
   return request(`/api/v1/role/perms/update/${id}`, {
     method: 'PATCH',
+    data: body,
     ...(options || {}),
   });
 }

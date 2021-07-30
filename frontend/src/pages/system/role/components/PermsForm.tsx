@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { updatePermsRole } from '../service';
 import { queryMenus } from '@/services/anew/menu';
-import { queryApis } from '@/services/anew/apis';
-import { getRolePermsByID } from '@/services/anew/role';
+import { queryApis } from '@/services/anew/api';
+import { getRolePermsByID, updatePermsRole } from '@/services/anew/role';
 import { DrawerForm } from '@ant-design/pro-form';
 import { message, Tree, Checkbox, Col, Row, Divider } from 'antd';
 import type { ActionType } from '@ant-design/pro-table';
-
+import type { CheckboxValueType } from 'antd/lib/checkbox/Group'
 
 const loopTreeItem = (tree: API.MenuList[]): API.MenuList[] =>
     tree.map(({ children, ...item }) => ({
         ...item,
         title: item.name,
-        value: item.id,
+        key: item.id,
         children: children && loopTreeItem(children),
     }));
 
@@ -26,10 +25,10 @@ export type PermsFormProps = {
 
 const PermsForm: React.FC<PermsFormProps> = (props) => {
     const { actionRef, modalVisible, onChange, values } = props;
-    const [menuData, setMenuData] = useState<API.MenuList>();
-    const [apiData, setApiData] = useState<API.MenuList>();
-    const [checkedKeys, setCheckedKeys] = useState([]);
-    const [checkedList, setCheckedList] = useState([]);
+    const [menuData, setMenuData] = useState<API.MenuList[]>([]);
+    const [apiData, setApiData] = useState<API.ApiList[]>([]);
+    const [checkedKeys, setCheckedKeys] = useState<React.Key[]>([]);
+    const [checkedList, setCheckedList] = useState<CheckboxValueType[]>([]);
 
     const onCheck = (keys: any, info: any) => {
         let allKeys = keys.checked;
@@ -42,18 +41,14 @@ const PermsForm: React.FC<PermsFormProps> = (props) => {
         }
     };
 
-    const onCheckChange = (checkedValues: any) => {
-        setCheckedList(checkedValues);
+    const onCheckChange = (checkedValue: CheckboxValueType[]) => {
+        setCheckedList(checkedValue);
     };
 
     useEffect(() => {
-        queryMenus().then((res) => {
-            setMenuData(loopTreeItem(res.data));
-        });
-        queryApis().then((res) => {
-            setApiData(res.data);
-        });
-        getRolePermsByID(values.id).then((res) => {
+        queryMenus().then((res) => setMenuData(loopTreeItem(res.data)));
+        queryApis().then((res) => setApiData(res.data));
+        getRolePermsByID(values?.id).then((res) => {
             setCheckedKeys(res.data.menus_id);
             setCheckedList(res.data.apis_id);
         });
@@ -62,24 +57,20 @@ const PermsForm: React.FC<PermsFormProps> = (props) => {
         <DrawerForm
             //title="设置权限"
             visible={modalVisible}
-            onVisibleChange={onCancel}
-            onFinish={() => {
-                updatePermsRole(values.id, {
+            onVisibleChange={onChange}
+            onFinish={async () => {
+                updatePermsRole({
                     menus_id: checkedKeys,
                     apis_id: checkedList,
-                })
-                    .then((res) => {
-                        if (res.code === 200 && res.status === true) {
-                            message.success(res.message);
-                            if (actionRef.current) {
-                                actionRef.current.reload();
-                            }
+                }, values?.id).then((res) => {
+                    if (res.code === 200 && res.status === true) {
+                        message.success(res.message);
+                        if (actionRef.current) {
+                            actionRef.current.reload();
                         }
-                    })
-                    .then(() => {
-                        onCancel();
-                    });
-                //return true;
+                    }
+                })
+                return true;
             }}
         >
             <h3>菜单权限</h3>
@@ -95,7 +86,7 @@ const PermsForm: React.FC<PermsFormProps> = (props) => {
                 selectable={false}
                 onCheck={onCheck}
                 checkedKeys={checkedKeys}
-                treeData={menuData}
+                treeData={menuData as any}
             />
 
             <Divider />
@@ -107,7 +98,7 @@ const PermsForm: React.FC<PermsFormProps> = (props) => {
                         <div key={index}>
                             <h4>{item.name}</h4>
                             <Row>
-                                {item.children.map((item, index) => {
+                                {item.children?.map((item, index) => {
                                     return (
                                         <Col span={4} key={index}>
                                             <Checkbox value={item.id}>{item.name}</Checkbox>

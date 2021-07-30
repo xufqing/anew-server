@@ -53,10 +53,25 @@ declare namespace API {
   }
 
   type RoleParams = {
-    id: number,
     name: string,
     keyword?: string,
     desc?: string,
+  };
+
+  type ApiParams = {
+    name: string,
+    method?: string,
+    path?: string,
+    perms_tag: string,
+    desc?: string,
+    parent_id?: number,
+  };
+
+  type DictParams = {
+    key: string,
+    value: string,
+    desc?: string,
+    parent_id?: number,
   };
 
   type UserInfo = {
@@ -108,12 +123,33 @@ declare namespace API {
     children?: MenuList[],
   };
 
-
   type RoleList = {
     id: number,
     name: string,
     keyword?: string,
     desc?: string,
     creator?: string,
+  };
+
+  type ApiList = {
+    id: number,
+    name: string,
+    method?: string,
+    path?: string,
+    desc?: string,
+    perms_tag?: string,
+    parent_id?: number,
+    creator?: string,
+    children?: ApiList[],
+  };
+
+  type DictList = {
+    id: number,
+    key: string,
+    value: any,
+    desc?: string,
+    parent_id?: number,
+    creator?: string,
+    children?: DictList[],
   };
 }
