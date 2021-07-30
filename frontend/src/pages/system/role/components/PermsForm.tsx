@@ -27,30 +27,31 @@ const PermsForm: React.FC<PermsFormProps> = (props) => {
     const { actionRef, modalVisible, onChange, values } = props;
     const [menuData, setMenuData] = useState<API.MenuList[]>([]);
     const [apiData, setApiData] = useState<API.ApiList[]>([]);
-    const [checkedKeys, setCheckedKeys] = useState<React.Key[]>([]);
-    const [checkedList, setCheckedList] = useState<CheckboxValueType[]>([]);
+    const [checkedMenu, setCheckedMenu] = useState<React.Key[]>([]);
+    const [checkedApi, setCheckedApi] = useState<CheckboxValueType[]>([]);
 
     const onCheck = (keys: any, info: any) => {
         let allKeys = keys.checked;
         const parentKey = info.node.parent_id;
         if (allKeys.indexOf(parentKey)) {
-            setCheckedKeys(allKeys);
+            setCheckedMenu(allKeys);
         } else {
             allKeys = allKeys.push(parentKey);
-            setCheckedKeys(allKeys);
+            setCheckedMenu(allKeys);
         }
     };
 
     const onCheckChange = (checkedValue: CheckboxValueType[]) => {
-        setCheckedList(checkedValue);
+        //console.log(a.filter(function(v){ return !(b.indexOf(v) > -1) }).concat(b.filter(function(v){ return !(a.indexOf(v) > -1)})))
+        setCheckedApi(checkedValue);
     };
 
     useEffect(() => {
         queryMenus().then((res) => setMenuData(loopTreeItem(res.data)));
         queryApis().then((res) => setApiData(res.data));
         getRolePermsByID(values?.id).then((res) => {
-            setCheckedKeys(res.data.menus_id);
-            setCheckedList(res.data.apis_id);
+            setCheckedMenu(res.data.menus_id);
+            setCheckedApi(res.data.apis_id);
         });
     }, []);
     return (
@@ -60,8 +61,8 @@ const PermsForm: React.FC<PermsFormProps> = (props) => {
             onVisibleChange={onChange}
             onFinish={async () => {
                 updatePermsRole({
-                    menus_id: checkedKeys,
-                    apis_id: checkedList,
+                    menus_id: checkedMenu,
+                    apis_id: checkedApi,
                 }, values?.id).then((res) => {
                     if (res.code === 200 && res.status === true) {
                         message.success(res.message);
@@ -85,14 +86,14 @@ const PermsForm: React.FC<PermsFormProps> = (props) => {
                 autoExpandParent={true}
                 selectable={false}
                 onCheck={onCheck}
-                checkedKeys={checkedKeys}
+                checkedKeys={checkedMenu}
                 treeData={menuData as any}
             />
 
             <Divider />
             <h3>API权限</h3>
             <Divider />
-            <Checkbox.Group style={{ width: '100%' }} value={checkedList} onChange={onCheckChange}>
+            <Checkbox.Group style={{ width: '100%' }} value={checkedApi} onChange={onCheckChange}>
                 {apiData.map((item, index) => {
                     return (
                         <div key={index}>

@@ -91,6 +91,11 @@ export default defineConfig({
           component: './system/dict',
         },
         {
+          path: '/system/operlog',
+          name: '日志管理',
+          component: './system/operlog',
+        },
+        {
           path: '/system',
           redirect: '/system/user',
         },

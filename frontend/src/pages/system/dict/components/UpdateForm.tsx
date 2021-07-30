@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { queryDicts, updateDict } from '@/services/anew/dict';
-import ProForm, { ModalForm, ProFormText } from '@ant-design/pro-form';
+import ProForm, { ModalForm, ProFormText, ProFormDigit } from '@ant-design/pro-form';
 import { message, TreeSelect, Form } from 'antd';
 import type { ActionType } from '@ant-design/pro-table';
 
@@ -8,7 +8,7 @@ import type { ActionType } from '@ant-design/pro-table';
 const loopTreeItem = (tree: API.DictList[]): API.DictList[] =>
     tree.map(({ children, ...item }) => ({
         ...item,
-        title: item.value,
+        title: item.dict_value,
         value: item.id,
         children: children && loopTreeItem(children),
     }));
@@ -25,11 +25,10 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
     const [treeData, setTreeData] = useState<API.DictList[]>([]);
     useEffect(() => {
         queryDicts().then((res) => {
-            const top: API.DictList = { id: 0, value: '暂无所属', key: '' };
+            const top: API.DictList = { id: 0, dict_value: '暂无所属', dict_key: '' };
             res.data.unshift(top)
-            const menus = loopTreeItem(res.data);
-            console.log(menus)
-            setTreeData(menus);
+            const dicts = loopTreeItem(res.data);
+            setTreeData(dicts);
         });
     }, []);
 
@@ -52,19 +51,23 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         >
             <ProForm.Group>
                 <ProFormText
-                    name="key"
-                    label="Key"
+                    name="dict_key"
+                    label="字典标签"
                     width="md"
                     rules={[{ required: true }]}
-                    initialValue={values?.key}
+                    initialValue={values?.dict_key}
                 />
                 <ProFormText
-                    name="value"
-                    label="Value"
+                    name="dict_value"
+                    label="字典键值"
                     width="md"
                     rules={[{ required: true }]}
-                    initialValue={values?.value}
+                    initialValue={values?.dict_value}
                 />
+            </ProForm.Group>
+            <ProForm.Group>
+                <ProFormDigit name="sort" label="排序" width="md" initialValue={values?.sort} fieldProps={{ precision: 0 }} />
+                <ProFormText name="desc" label="说明" initialValue={values?.desc} width="md" />
             </ProForm.Group>
             <ProForm.Group>
                 <Form.Item label="上级字典" name="parent_id" initialValue={values?.parent_id}>
@@ -75,7 +78,6 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
                         placeholder="请选择字典"
                     />
                 </Form.Item>
-                <ProFormText name="desc" label="说明" initialValue={values?.desc} width="md" />
             </ProForm.Group>
         </ModalForm>
     );

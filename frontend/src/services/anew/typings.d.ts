@@ -68,8 +68,9 @@ declare namespace API {
   };
 
   type DictParams = {
-    key: string,
-    value: string,
+    dict_key: string,
+    dict_value: string,
+    sort?: number,
     desc?: string,
     parent_id?: number,
   };
@@ -145,11 +146,29 @@ declare namespace API {
 
   type DictList = {
     id: number,
-    key: string,
-    value: any,
+    dict_key: string,
+    dict_value: any,
+    sort?: number,
     desc?: string,
     parent_id?: number,
     creator?: string,
     children?: DictList[],
   };
+
+  type OperLogList = {
+    id: number,
+    name: string,
+    path: string,
+    method: string,
+    params: string,
+    body: string,
+    data: string,
+    status: number,
+    username: string,
+    ip: string,
+    ip_location: string,
+    latency: string,
+    user_agent: string,
+    created_at: string,
+  }
 }

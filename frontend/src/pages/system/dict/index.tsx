@@ -40,16 +40,21 @@ const DictList: React.FC = () => {
 
     const columns: ProColumns<API.DictList>[] = [
         {
-            title: 'Key',
-            dataIndex: 'key',
+            title: '字典标签',
+            dataIndex: 'dict_key',
         },
         {
-            title: 'Value',
-            dataIndex: 'value',
+            title: '字典键值',
+            dataIndex: 'dict_value',
         },
         {
             title: '详情',
             dataIndex: 'desc',
+            search: false,
+        },
+        {
+            title: '排序',
+            dataIndex: 'sort',
             search: false,
         },
         {
