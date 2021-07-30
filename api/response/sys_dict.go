@@ -5,9 +5,23 @@ package response
 type DictTreeResp struct {
 	Id       uint           `json:"id"`
 	ParentId uint           `json:"parent_id"`
-	Key      string         `json:"key"`
-	Value    string         `json:"value"`
+	DictKey      string         `json:"dict_key"`
+	DictValue    string         `json:"dict_value"`
 	Desc     string         `json:"desc"`
+	Sort     int            `json:"sort"`
 	Creator  string         `json:"creator"`
 	Children []DictTreeResp `json:"children,omitempty"` //tag:omitempty 为空的值不显示
+}
+
+type DictTreeResppList []DictTreeResp
+
+func (hs DictTreeResppList) Len() int {
+	return len(hs)
+}
+func (hs DictTreeResppList) Less(i, j int) bool {
+	return hs[i].Sort < hs[j].Sort // 按Sort从小到大排序
+}
+
+func (hs DictTreeResppList) Swap(i, j int) {
+	hs[i], hs[j] = hs[j], hs[i]
 }

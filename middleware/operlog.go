@@ -112,7 +112,7 @@ func OperationLog(c *gin.Context) {
 			log.Username = "未登录"
 		}
 		// 获取Ip所在地
-		log.IpLocation = utils.GetIpRealLocation(log.Ip)
+		log.IpLocation = utils.GetIpRealLocationPcOnline(log.Ip)
 		// 响应状态码
 		log.Status = c.Writer.Status()
 		// 响应数据
