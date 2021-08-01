@@ -19,16 +19,16 @@ func (s *MysqlService) GetDicts(req *request.DictListReq) []system.SysDict {
 	typeKey := strings.TrimSpace(req.TypeKey)
 	if typeKey != "" {
 		var dist system.SysDict
-		db = db.Order("sort").Preload("Dicts", "status = ?", true).Where("`key` LIKE ?", fmt.Sprintf("%%%s%%", typeKey)).First(&dist)
+		db = db.Order("sort").Preload("Dicts").Where("`dict_key` LIKE ?", fmt.Sprintf("%%%s%%", typeKey)).First(&dist)
 		return dist.Dicts
 	}
 	key := strings.TrimSpace(req.DictKey)
 	if key != "" {
-		db = db.Where("key LIKE ?", fmt.Sprintf("%%%s%%", key))
+		db = db.Where("dict_key LIKE ?", fmt.Sprintf("%%%s%%", key))
 	}
 	value := strings.TrimSpace(req.DictValue)
 	if value != "" {
-		db = db.Where("value LIKE ?", fmt.Sprintf("%%%s%%", value))
+		db = db.Where("dict_value LIKE ?", fmt.Sprintf("%%%s%%", value))
 	}
 	creator := strings.TrimSpace(req.Creator)
 	if creator != "" {
