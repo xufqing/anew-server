@@ -96,12 +96,27 @@ export default defineConfig({
           component: './system/operlog',
         },
         {
-          path: '/system',
-          redirect: '/system/user',
+          path: '/index',
+          redirect: '/index',
         },
       ],
     },
-
+    // asset
+    {
+      path: '/asset',
+      name: 'asset',
+      routes: [
+        {
+          path: '/asset/host',
+          name: '主机管理',
+          component: './asset/host',
+        },
+        {
+          path: '/index',
+          redirect: '/index',
+        },
+      ],
+    },
     {
       component: '404',
     },

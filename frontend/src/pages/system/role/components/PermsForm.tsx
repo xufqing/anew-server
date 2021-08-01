@@ -18,13 +18,13 @@ const loopTreeItem = (tree: API.MenuList[]): API.MenuList[] =>
 
 export type PermsFormProps = {
     modalVisible: boolean;
-    onChange: (modalVisible: boolean) => void;
+    handleChange: (modalVisible: boolean) => void;
     actionRef: React.MutableRefObject<ActionType | undefined>;
     values: API.RoleList | undefined;
 };
 
 const PermsForm: React.FC<PermsFormProps> = (props) => {
-    const { actionRef, modalVisible, onChange, values } = props;
+    const { actionRef, modalVisible, handleChange, values } = props;
     const [menuData, setMenuData] = useState<API.MenuList[]>([]);
     const [apiData, setApiData] = useState<API.ApiList[]>([]);
     const [checkedMenu, setCheckedMenu] = useState<React.Key[]>([]);
@@ -58,7 +58,7 @@ const PermsForm: React.FC<PermsFormProps> = (props) => {
         <DrawerForm
             //title="设置权限"
             visible={modalVisible}
-            onVisibleChange={onChange}
+            onVisibleChange={handleChange}
             onFinish={async () => {
                 updatePermsRole({
                     menus_id: checkedMenu,

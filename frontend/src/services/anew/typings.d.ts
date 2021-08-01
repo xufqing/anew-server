@@ -75,6 +75,20 @@ declare namespace API {
     parent_id?: number,
   };
 
+  type HostParams = {
+    host_name: string,
+    ip_address: string,
+    host_type: string,
+    port: string,
+    auth_type: string,
+    user: string,
+    password: string,
+    privatekey: string,
+    key_passphrase: string,
+  };
+
+  /////////////////////////////
+
   type UserInfo = {
     id: number,
     username: string,
@@ -170,5 +184,39 @@ declare namespace API {
     latency: string,
     user_agent: string,
     created_at: string,
+  }
+
+  type HostInfo = {
+    id: number,
+    host_name: string,
+    ip_address: string,
+    port: string,
+    os_version: string,
+    host_type: string,
+    auth_type: string,
+    user: string,
+    privatekey: string,
+    creator: string,
+  }
+  
+  type HostList = {
+    id: number,
+    host_name: string,
+    ip_address: string,
+    port: string,
+    os_version: string,
+    host_type: string,
+    auth_type: string,
+    user: string,
+    privatekey?: string,
+    creator?: string,
+  }
+
+  type HostGroupList = {
+    id: number,
+    name: string,
+    desc?: string,
+    hosts_id: number[],
+    creator?: string,
   }
 }

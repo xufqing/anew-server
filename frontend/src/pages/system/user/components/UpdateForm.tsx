@@ -17,13 +17,13 @@ const loopTreeItem = (tree: API.DeptList[]): API.DeptList[] =>
 
 export type UpdateFormProps = {
     modalVisible: boolean;
-    onChange: (modalVisible: boolean) => void;
+    handleChange: (modalVisible: boolean) => void;
     actionRef: React.MutableRefObject<ActionType | undefined>;
     values: API.UserList | undefined;
 };
 
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {
-    const { actionRef, modalVisible, onChange, values } = props;
+    const { actionRef, modalVisible, handleChange, values } = props;
     const [treeData, setTreeData] = useState<API.DeptList[]>([]);
     useEffect(() => {
         queryDepts().then((res) => {
@@ -38,7 +38,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         <ModalForm
             title="更新用户"
             visible={modalVisible}
-            onVisibleChange={onChange}
+            onVisibleChange={handleChange}
             onFinish={async (v) => {
                 updateUser(v as any, values?.id).then((res) => {
                     if (res.code === 200 && res.status === true) {

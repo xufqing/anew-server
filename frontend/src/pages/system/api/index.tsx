@@ -155,14 +155,14 @@ const ApiList: React.FC = () => {
             {createVisible && (
                 <CreateForm
                     actionRef={actionRef}
-                    onChange={setCreateVisible}
+                    handleChange={setCreateVisible}
                     modalVisible={createVisible}
                 />
             )}
             {updateVisible && (
                 <UpdateForm
                     actionRef={actionRef}
-                    onChange={setUpdateVisible}
+                    handleChange={setUpdateVisible}
                     modalVisible={updateVisible}
                     values={formValues}
                 />

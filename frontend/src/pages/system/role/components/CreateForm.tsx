@@ -6,18 +6,18 @@ import type { ActionType } from '@ant-design/pro-table';
 
 export type CreateFormProps = {
     modalVisible: boolean;
-    onChange: (modalVisible: boolean) => void;
+    handleChange: (modalVisible: boolean) => void;
     actionRef: React.MutableRefObject<ActionType | undefined>;
 };
 
 const CreateForm: React.FC<CreateFormProps> = (props) => {
-    const { actionRef, modalVisible, onChange } = props;
+    const { actionRef, modalVisible, handleChange } = props;
 
     return (
         <ModalForm
             title="新建角色"
             visible={modalVisible}
-            onVisibleChange={onChange}
+            onVisibleChange={handleChange}
             onFinish={async (v) => {
                 createRole(v as any).then((res) => {
                     if (res.code === 200 && res.status === true) {

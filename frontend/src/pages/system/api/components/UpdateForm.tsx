@@ -15,13 +15,13 @@ const loopTreeItem = (tree: API.ApiList[]): API.ApiList[] =>
 
 export type UpdateFormProps = {
     modalVisible: boolean;
-    onChange: (modalVisible: boolean) => void;
+    handleChange: (modalVisible: boolean) => void;
     actionRef: React.MutableRefObject<ActionType | undefined>;
     values: API.ApiList | undefined;
 };
 
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {
-    const { actionRef, modalVisible, onChange, values } = props;
+    const { actionRef, modalVisible, handleChange, values } = props;
     const [treeData, setTreeData] = useState<API.ApiList[]>([]);
     useEffect(() => {
         queryApis().then((res) => {
@@ -36,7 +36,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         <ModalForm
             title="更新接口"
             visible={modalVisible}
-            onVisibleChange={onChange}
+            onVisibleChange={handleChange}
             onFinish={async (v) => {
                 updateApi(v as any, values?.id).then((res) => {
                     if (res.code === 200 && res.status === true) {

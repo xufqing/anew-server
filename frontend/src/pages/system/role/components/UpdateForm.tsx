@@ -6,19 +6,19 @@ import type { ActionType } from '@ant-design/pro-table';
 
 export type UpdateFormProps = {
     modalVisible: boolean;
-    onChange: (modalVisible: boolean) => void;
+    handleChange: (modalVisible: boolean) => void;
     actionRef: React.MutableRefObject<ActionType | undefined>;
     values: API.RoleList| undefined;
 };
 
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {
-    const { actionRef, modalVisible, onChange, values } = props;
+    const { actionRef, modalVisible, handleChange, values } = props;
 
     return (
         <ModalForm
             title="更新角色"
             visible={modalVisible}
-            onVisibleChange={onChange}
+            onVisibleChange={handleChange}
             onFinish={async (v) => {
                 updateRole(v as any, values?.id).then((res) => {
                     if (res.code === 200 && res.status === true) {

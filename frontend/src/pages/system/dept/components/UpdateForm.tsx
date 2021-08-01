@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { queryDepts, updateDept } from '@/services/anew/dept';
-import ProForm, { ModalForm, ProFormText, ProFormSelect, ProFormDigit } from '@ant-design/pro-form';
+import ProForm, { ModalForm, ProFormText, ProFormDigit } from '@ant-design/pro-form';
 import { message, TreeSelect, Form } from 'antd';
 import type { ActionType } from '@ant-design/pro-table';
 
@@ -15,13 +15,13 @@ const loopTreeItem = (tree: API.DeptList[]): API.DeptList[] =>
 
 export type UpdateFormProps = {
     modalVisible: boolean;
-    onChange: (modalVisible: boolean) => void;
+    handleChange: (modalVisible: boolean) => void;
     actionRef: React.MutableRefObject<ActionType | undefined>;
     values: API.DeptList | undefined;
 };
 
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {
-    const { actionRef, modalVisible, onChange, values } = props;
+    const { actionRef, modalVisible, handleChange, values } = props;
     const [treeData, setTreeData] = useState<API.DeptList[]>([]);
     useEffect(() => {
         queryDepts().then((res) => {
@@ -36,7 +36,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         <ModalForm
             title="更新部门"
             visible={modalVisible}
-            onVisibleChange={onChange}
+            onVisibleChange={handleChange}
             onFinish={async (v) => {
                 updateDept(v as any, values?.id).then((res) => {
                     if (res.code === 200 && res.status === true) {

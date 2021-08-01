@@ -15,12 +15,12 @@ const loopTreeItem = (tree: API.ApiList[]): API.ApiList[] =>
 
 export type CreateFormProps = {
     modalVisible: boolean;
-    onChange: (modalVisible: boolean) => void;
+    handleChange: (modalVisible: boolean) => void;
     actionRef: React.MutableRefObject<ActionType | undefined>;
 };
 
 const CreateForm: React.FC<CreateFormProps> = (props) => {
-    const { actionRef, modalVisible, onChange } = props;
+    const { actionRef, modalVisible, handleChange } = props;
     const [treeData, setTreeData] = useState<API.ApiList[]>([]);
 
     useEffect(() => {
@@ -36,7 +36,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
         <ModalForm
             title="新建接口"
             visible={modalVisible}
-            onVisibleChange={onChange}
+            onVisibleChange={handleChange}
             onFinish={async (v) => {
                 createApi(v as any).then((res) => {
                     if (res.code === 200 && res.status === true) {

@@ -15,13 +15,13 @@ const loopTreeItem = (tree: API.DictList[]): API.DictList[] =>
 
 export type UpdateFormProps = {
     modalVisible: boolean;
-    onChange: (modalVisible: boolean) => void;
+    handleChange: (modalVisible: boolean) => void;
     actionRef: React.MutableRefObject<ActionType | undefined>;
     values: API.DictList | undefined;
 };
 
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {
-    const { actionRef, modalVisible, onChange, values } = props;
+    const { actionRef, modalVisible, handleChange, values } = props;
     const [treeData, setTreeData] = useState<API.DictList[]>([]);
     useEffect(() => {
         queryDicts().then((res) => {
@@ -36,7 +36,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         <ModalForm
             title="更新字典"
             visible={modalVisible}
-            onVisibleChange={onChange}
+            onVisibleChange={handleChange}
             onFinish={async (v) => {
                 updateDict(v as any, values?.id).then((res) => {
                     if (res.code === 200 && res.status === true) {
