@@ -7,10 +7,10 @@ import (
 )
 
 // 获取连接列表
-func GetConnections(c *gin.Context) {
-	var resp []response.ConnectionResp
+func GetSessions(c *gin.Context) {
+	var resp []response.SessionResp
 	for client, _ := range SteamMap.innerMap {
-		var connStruct response.ConnectionResp
+		var connStruct response.SessionResp
 		connStruct.ConnectID = SteamMap.innerMap[client].Meta.ConnectId
 		connStruct.UserName = SteamMap.innerMap[client].Meta.UserName
 		connStruct.HostName = SteamMap.innerMap[client].Meta.HostName
@@ -22,7 +22,7 @@ func GetConnections(c *gin.Context) {
 }
 
 // 注销已登录的连接
-func DeleteConnectionByKey(c *gin.Context) {
+func DeleteSessionByKey(c *gin.Context) {
 	var req request.KeyReq
 	err := c.Bind(&req)
 	if err != nil {

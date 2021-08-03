@@ -27,10 +27,14 @@ func GetDicts(c *gin.Context) {
 		utils.Struct2StructByJson(dicts, &newResp)
 		response.SuccessWithData(newResp)
 	} else {
-		var resp []response.DictTreeResp
-		resp = dao.GenDictTree(nil, dicts)
-		response.SuccessWithData(resp)
+		if req.AllType {
+			resp := dao.GenDictMap(nil, dicts)
+			response.SuccessWithData(resp)
+		}
 	}
+	var resp []response.DictTreeResp
+	resp = dao.GenDictTree(nil, dicts)
+	response.SuccessWithData(resp)
 }
 
 // 创建字典

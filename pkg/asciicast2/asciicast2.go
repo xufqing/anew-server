@@ -21,8 +21,11 @@ type CastV2Header struct {
 func NewCastV2(meta CastV2Header, stream *bytes.Buffer) (*CastV2Header, *bytes.Buffer) {
 	var c CastV2Header
 	c.Version = 2
-	c.Width = meta.Width
-	c.Height = meta.Height
+	//c.Width = meta.Width
+	//c.Height = meta.Height
+	// 固定宽高用于前端展示
+	c.Width = 30
+	c.Height = 120
 	c.Title = meta.Title
 	c.Timestamp = meta.Timestamp
 	c.Duration = c.Duration

@@ -17,7 +17,7 @@ type wsMsg struct {
 	Type  string `json:"type"`
 	Cols  int    `json:"cols"`
 	Rows  int    `json:"rows"`
-	Close bool   `json: "close"`
+	Close bool   `json:"close"`
 }
 
 type wsConn struct {

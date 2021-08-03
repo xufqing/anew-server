@@ -60,6 +60,24 @@ func GenDictTree(parent *response.DictTreeResp, Dicts []system.SysDict) []respon
 	return tree
 }
 
+// 字典MAP
+func GenDictMap(parent *response.DictTreeResp, Dicts []system.SysDict) map[string]response.DictTreeResppList {
+	dictMap := map[string]response.DictTreeResppList{}
+	var resp []response.DictTreeResp
+	utils.Struct2StructByJson(Dicts, &resp)
+	var parentId uint
+	if parent != nil {
+		parentId = parent.Id
+	}
+	for _, Dict := range resp {
+		if Dict.ParentId == parentId {
+			dictMap[Dict.DictKey] = GenDictTree(&Dict, Dicts)
+
+		}
+	}
+	return dictMap
+}
+
 // 创建字典
 func (s *MysqlService) CreateDict(req *request.CreateDictReq) (err error) {
 	var Dict system.SysDict

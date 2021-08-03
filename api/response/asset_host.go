@@ -17,7 +17,7 @@ type HostListResp struct {
 	Creator    string `json:"creator"`
 }
 
-type ConnectionResp struct {
+type SessionResp struct {
 	ConnectID   string           `json:"connect_id"`
 	UserName    string           `json:"user_name"`
 	HostName    string           `json:"host_name"`

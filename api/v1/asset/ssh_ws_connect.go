@@ -77,7 +77,7 @@ func Connect(c *gin.Context) {
 		return
 	}
 	cols, _ := strconv.Atoi(c.DefaultQuery("cols", "120"))
-	rows, _ := strconv.Atoi(c.DefaultQuery("rows", "32"))
+	rows, _ := strconv.Atoi(c.DefaultQuery("rows", "30"))
 
 	// 获取当前登录用户
 	user := system2.GetCurrentUserFromCache(c)
