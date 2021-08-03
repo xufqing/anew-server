@@ -7,6 +7,14 @@ export async function queryDicts(options?: { [key: string]: any }) {
   });
 }
 
+// 查询所有类型的字典
+export async function queryDictsByAllType(options?: { [key: string]: any }) {
+  return request<API.Result>('/api/v1/dict/list?all_type=true', {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
 export async function createDict(body: API.DictParams, options?: { [key: string]: any }) {
   return request<API.Result>('/api/v1/dict/create', {
     method: 'POST',

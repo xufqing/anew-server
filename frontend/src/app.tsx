@@ -7,6 +7,7 @@ import { history } from 'umi';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import { getUserInfo } from './services/anew/user';
+import { queryDictsByAllType } from './services/anew/dict';
 import { GetMenuTree } from './services/anew/menu';
 
 // const isDev = process.env.NODE_ENV === 'development';
@@ -23,7 +24,9 @@ export const initialStateConfig = {
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
   currentUser?: API.UserInfo;
+  DictObj?: any;
   fetchUserInfo?: () => Promise<API.UserInfo | undefined>;
+  fetchDictInfo?: () => Promise<any | undefined>;
 }> {
   const fetchUserInfo = async () => {
     try {
@@ -34,17 +37,30 @@ export async function getInitialState(): Promise<{
     }
     return undefined;
   };
+  // 初始化字典信息
+  const fetchDictInfo = async () => {
+    try {
+      const DictObj: any = (await queryDictsByAllType({ all_type: true })).data
+      return DictObj;
+    } catch (error) {
+      history.push(loginPath);
+    }
+    return undefined;
+  };
   // 如果是登录页面，不执行
   if (history.location.pathname !== loginPath) {
     const currentUser = await fetchUserInfo();
+    const DictObj = await fetchDictInfo();
     return {
       fetchUserInfo,
       currentUser,
+      DictObj,
       settings: {},
     };
   }
   return {
     fetchUserInfo,
+    fetchDictInfo,
     settings: {},
   };
 }
@@ -165,7 +181,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
         userId: initialState?.currentUser?.id,
       },
       request: async (params, defaultMenuData) => {
-        if(!params.userId) return []
+        if (!params.userId) return []
         const menuData = await (await GetMenuTree()).data;
         return menuData;
       },

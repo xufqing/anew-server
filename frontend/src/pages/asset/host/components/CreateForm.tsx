@@ -4,18 +4,25 @@ import ProForm, { ModalForm, ProFormText, ProFormSelect } from '@ant-design/pro-
 import { message } from 'antd';
 import type { ActionType } from '@ant-design/pro-table';
 import type { optionsType } from '../index';
+import { useModel } from 'umi';
 
 
 export type CreateFormProps = {
     modalVisible: boolean;
     handleChange: (modalVisible: boolean) => void;
-    authType: optionsType[];
-    hostType: optionsType[];
     actionRef: React.MutableRefObject<ActionType | undefined>;
 };
 
 const CreateForm: React.FC<CreateFormProps> = (props) => {
-    const { actionRef, modalVisible, handleChange, authType, hostType } = props;
+    const { initialState } = useModel('@@initialState');
+
+    if (!initialState || !initialState.DictObj) {
+        return null;
+    }
+    const authType: optionsType[] = initialState.DictObj.auth_type.map((item: any) => ({ label: item.dict_value, value: item.dict_key }));
+    const hostType: optionsType[] = initialState.DictObj.host_type.map((item: any) => ({ label: item.dict_value, value: item.dict_key }));
+    
+    const { actionRef, modalVisible, handleChange } = props;
     const [isKey, setIsKey] = useState<boolean>(false);
 
     return (

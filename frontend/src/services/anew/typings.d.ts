@@ -198,7 +198,16 @@ declare namespace API {
     privatekey: string,
     creator: string,
   }
-  
+ 
+  type TtyList = {
+    id:string,
+    hostname:string,
+    ipaddr:string,
+    port:string,
+    actKey:string,
+    secKey:string|null,
+  }
+
   type HostList = {
     id: number,
     host_name: string,
@@ -218,5 +227,33 @@ declare namespace API {
     desc?: string,
     hosts_id: number[],
     creator?: string,
+  }
+
+  type RecordList = {
+    id: number,
+    connect_id: string,
+    user_name: string,
+    host_name: string,
+    ip_address: string,
+    connect_time: string,
+    logout_time: string,
+  }
+
+  type SSHFileList = {
+    name: string,
+    path: string,
+    isDir: boolean,
+    mode: string,
+    size: string,
+    mtime: string,
+    isLink: boolean,
+  }
+
+  type SessionList = {
+    connect_id: string,
+    user_name: string,
+    host_name: string,
+    ip_address: string,
+    connect_time: string,
   }
 }

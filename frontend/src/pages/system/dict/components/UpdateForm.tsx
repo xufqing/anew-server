@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { queryDicts, updateDict } from '@/services/anew/dict';
+import { queryDicts, updateDict, queryDictsByAllType } from '@/services/anew/dict';
 import ProForm, { ModalForm, ProFormText, ProFormDigit } from '@ant-design/pro-form';
 import { message, TreeSelect, Form } from 'antd';
 import type { ActionType } from '@ant-design/pro-table';
+import { useModel } from 'umi';
 
 // 处理返回的树数据
 const loopTreeItem = (tree: API.DictList[]): API.DictList[] =>
@@ -23,6 +24,8 @@ export type UpdateFormProps = {
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {
     const { actionRef, modalVisible, handleChange, values } = props;
     const [treeData, setTreeData] = useState<API.DictList[]>([]);
+    const { initialState, setInitialState } = useModel('@@initialState');
+
     useEffect(() => {
         queryDicts().then((res) => {
             const top: API.DictList = { id: 0, dict_value: '暂无所属', dict_key: '' };
@@ -41,6 +44,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
                 updateDict(v as any, values?.id).then((res) => {
                     if (res.code === 200 && res.status === true) {
                         message.success(res.message);
+                        queryDictsByAllType().then((res) => setInitialState({ ...initialState, DictObj: res.data }));
                         if (actionRef.current) {
                             actionRef.current.reload();
                         }

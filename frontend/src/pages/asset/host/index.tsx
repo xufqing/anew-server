@@ -1,31 +1,36 @@
-import { DeleteOutlined, PlusOutlined, CodeTwoTone } from '@ant-design/icons';
-import { Button, Tooltip, Divider, Modal, message, } from 'antd';
+import { DeleteOutlined, PlusOutlined, CodeTwoTone, UsergroupAddOutlined } from '@ant-design/icons';
+import { Button, Divider, Modal, message, Menu, Tooltip } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import React, { useState, useRef, useEffect } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import ProTable, { TableDropdown } from '@ant-design/pro-table';
 import CreateForm from './components/CreateForm';
 import UpdateForm from './components/UpdateForm';
+import RecordModal from './components/RecordModal';
 import { queryHosts, deleteHost, queryHostGroups } from '@/services/anew/host';
-import { queryDicts } from '@/services/anew/dict';
-import { useAccess, Access } from 'umi';
+import { useAccess, Access, useModel } from 'umi';
 
 export type optionsType = {
     label: string,
     value: string,
 }
 const HostList: React.FC = () => {
-
+    const { initialState } = useModel('@@initialState');
+    if (!initialState || !initialState.DictObj) {
+        return null;
+    }
+    const authType: optionsType[] = initialState.DictObj.auth_type.map((item: any) => ({ label: item.dict_value, value: item.dict_key }));
+    const hostType: optionsType[] = initialState.DictObj.host_type.map((item: any) => ({ label: item.dict_value, value: item.dict_key }));
     const [createVisible, setCreateVisible] = useState<boolean>(false);
     const [updateVisible, setUpdateVisible] = useState<boolean>(false);
+    const [recordVisible, setRecordVisible] = useState<boolean>(false);
     const actionRef = useRef<ActionType>();
     const [formValues, setFormValues] = useState<API.HostList>();
-    const [hostType, setHostType] = useState<optionsType[]>([]);
-    const [authType, setAuthType] = useState<optionsType[]>([]);
     const [hostGroup, setHostGroup] = useState<API.HostGroupList[]>([]);
-    const [group_id, setGroup_id] = useState();
-    const [host_id, setHost_id] = useState();
+    const [groupId, setGroupId] = useState<string>();
+    const [hostId, setHostId] = useState<number>();
     const access = useAccess();
+    const { consoleWin, setConsoleWin } = useModel('global');
 
     const handleDelete = (record: API.Ids) => {
         if (!record) return;
@@ -48,30 +53,21 @@ const HostList: React.FC = () => {
         });
     };
 
+    const saveTtys = (val:API.TtyList) => {
+        let hosts = JSON.parse(localStorage.getItem('TABS_TTY_HOSTS') as any)
+        if (hosts) {
+            hosts.push(val)
+        } else {
+            hosts = []
+            hosts.push(val)
+        }
+        localStorage.setItem('TABS_TTY_HOSTS', JSON.stringify(hosts));
+    }
+
     useEffect(() => {
         queryHostGroups({ all: true, not_null: true }).then((res) => {
             if (Array.isArray(res.data.data)) {
                 setHostGroup([{ id: 0, name: '所有主机' }, ...res.data.data]);
-            }
-        });
-        queryDicts({ type_key: 'host_type' }).then((res) => {
-            if (Array.isArray(res.data)) {
-                setHostType(
-                    res.data.map((item) => ({
-                        label: item.value,
-                        value: item.key,
-                    })),
-                );
-            }
-        });
-        queryDicts({ type_key: 'auth_type' }).then((res) => {
-            if (Array.isArray(res.data)) {
-                setAuthType(
-                    res.data.map((item) => ({
-                        label: item.value,
-                        value: item.key,
-                    })),
-                );
             }
         });
     }, []);
@@ -115,29 +111,29 @@ const HostList: React.FC = () => {
             valueType: 'option',
             render: (_, record) => (
                 <>
-                    {/* <Tooltip title="控制台">
-                  <CodeTwoTone
-                    style={{ fontSize: '17px', color: 'blue' }}
-                    onClick={() => {
-                      let actKey = "tty1"
-                      let hosts = JSON.parse(localStorage.getItem('TABS_TTY_HOSTS'))
-                      if (hosts) {
-                        actKey = "tty" + hosts.length.toString()
-                      }
-                      const hostsObj = { hostname: record.host_name, ipaddr: record.ip_address, port: record.port, id: record.id.toString(), actKey: actKey, secKey: null }
-                      setConsoleHosts(hostsObj)
-                      if (consoleWin) {
-                        if (!consoleWin.closed) {
-                          consoleWin.focus();
-                        } else {
-                          handleConsoleWin(window.open('/asset/ssh/console', 'consoleTrm'));
-                        }
-                      } else {
-                        handleConsoleWin(window.open('/asset/ssh/console', 'consoleTrm'));
-                      }
-                    }}
-                  />
-                </Tooltip> */}
+                    <Tooltip title="控制台">
+                        <CodeTwoTone
+                            style={{ fontSize: '17px', color: 'blue' }}
+                            onClick={() => {
+                                let actKey = "tty1"
+                                let hosts = JSON.parse(localStorage.getItem('TABS_TTY_HOSTS') as any)
+                                if (hosts) {
+                                    actKey = "tty" + hosts.length.toString()
+                                }
+                                const hostsObj: API.TtyList = { hostname: record.host_name, ipaddr: record.ip_address, port: record.port, id: record.id.toString(), actKey: actKey, secKey: null }
+                                saveTtys(hostsObj)
+                                if (consoleWin) {
+                                    if (!consoleWin.closed) {
+                                        consoleWin.focus();
+                                    } else {
+                                        setConsoleWin(window.open('/asset/console', 'consoleTrm'));
+                                    }
+                                } else {
+                                    setConsoleWin(window.open('/asset/console', 'consoleTrm'));
+                                }
+                            }}
+                        />
+                    </Tooltip>
 
                     {/* <Divider type="vertical" />
                 <Tooltip title="详情">
@@ -163,9 +159,9 @@ const HostList: React.FC = () => {
                                     setUpdateVisible(true);
                                     break;
                                 case 'record':
-                                // setHost_id(record.id)
-                                // handleRecordModalVisible(true);
-                                // break;
+                                    setHostId(record.id)
+                                    setRecordVisible(true);
+                                    break;
                             }
                         }}
                         menus={[
@@ -218,16 +214,50 @@ const HostList: React.FC = () => {
                     </div>
                 )}
                 request={async (params) => queryHosts({ params }).then((res) => res.data)}
+                params={{ groupId, }}
                 columns={columns}
                 rowSelection={{}}
+                tableRender={(_, dom) => hostGroup.length > 1 ? (
+                    <div style={{ display: 'flex', width: '100%', }}>
+                        <Menu
+                            onSelect={(e) => {
+                                if (e.key === '0') {
+                                    setGroupId('');
+                                } else {
+                                    setGroupId(e.key);
+                                }
+                            }}
+                            style={{ width: 156 }}
+                            defaultSelectedKeys={['0']}
+                            defaultOpenKeys={['sub1']}
+                            mode="inline"
+                        >
+                            <Menu.SubMenu
+                                key="sub1"
+                                title={
+                                    <span>
+                                        <UsergroupAddOutlined />
+                                        <span>主机分组</span>
+                                    </span>
+                                }
+                            >
+                                {hostGroup &&
+                                    hostGroup.map((item) => <Menu.Item key={item.id}>{item.name}</Menu.Item>)}
+                            </Menu.SubMenu>
+                        </Menu>
+                        <div style={{ flex: 1, }}>
+                            {dom}
+                        </div>
+                    </div>
+                ) : <div style={{ flex: 1, }}>
+                    {dom}
+                </div>}
             />}
             {createVisible && (
                 <CreateForm
                     actionRef={actionRef}
                     handleChange={setCreateVisible}
                     modalVisible={createVisible}
-                    authType={authType}
-                    hostType={hostType}
                 />
             )}
             {updateVisible && (
@@ -236,8 +266,13 @@ const HostList: React.FC = () => {
                     handleChange={setUpdateVisible}
                     modalVisible={updateVisible}
                     values={formValues}
-                    authType={authType}
-                    hostType={hostType}
+                />
+            )}
+            {recordVisible && (
+                <RecordModal
+                    handleChange={setRecordVisible}
+                    modalVisible={recordVisible}
+                    hostId={hostId}
                 />
             )}
         </PageHeaderWrapper>

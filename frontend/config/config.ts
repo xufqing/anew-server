@@ -112,6 +112,12 @@ export default defineConfig({
           component: './asset/host',
         },
         {
+          path: '/asset/console',
+          name: '终端管理',
+          layout: false,
+          component: './asset/console',
+        },
+        {
           path: '/index',
           redirect: '/index',
         },
