@@ -7,6 +7,13 @@ export async function queryHosts(options?: { [key: string]: any }) {
   });
 }
 
+export async function queryHostByGroupId(id?: number,options?: { [key: string]: any }) {
+  return request<API.Result>(`/api/v1/host/list?group_id=${id}`, {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
 
 export async function queryHostByID(id?: number, options?: { [key: string]: any }) {
   return request<API.Result>(`/api/v1/host/info/${id}`, {
@@ -72,6 +79,39 @@ export async function deleteRecord(body: API.Ids, options?: { [key: string]: any
 export async function queryHostGroups(options?: { [key: string]: any }) {
   return request<API.Result>('/api/v1/host/group/list', {
     method: 'GET',
+    ...(options || {}),
+  });
+}
+
+export async function createHostGroup(body: API.HostGroupParams, options?: { [key: string]: any }) {
+  return request<API.Result>('/api/v1/host/group/create', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+export async function updateHostGroup(body: API.HostGroupParams, id?: number, options?: { [key: string]: any }) {
+  return request<API.Result>(`/api/v1/host/group/update/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+export async function deleteHostGroup(body: API.Ids, options?: { [key: string]: any }) {
+  return request<API.Result>('/api/v1/host/group/delete', {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
     ...(options || {}),
   });
 }

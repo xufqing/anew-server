@@ -40,7 +40,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
             visible={modalVisible}
             onVisibleChange={handleChange}
             onFinish={async (v) => {
-                createDict(v as any).then((res) => {
+                createDict(v as API.DictParams).then((res) => {
                     if (res.code === 200 && res.status === true) {
                         message.success(res.message);
                         queryDictsByAllType().then((res) => setInitialState({ ...initialState, DictObj: res.data }));

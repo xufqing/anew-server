@@ -41,7 +41,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
             visible={modalVisible}
             onVisibleChange={handleChange}
             onFinish={async (v) => {
-                updateDict(v as any, values?.id).then((res) => {
+                updateDict(v as API.DictParams, values?.id).then((res) => {
                     if (res.code === 200 && res.status === true) {
                         message.success(res.message);
                         queryDictsByAllType().then((res) => setInitialState({ ...initialState, DictObj: res.data }));

@@ -27,7 +27,7 @@ const HostList: React.FC = () => {
     const actionRef = useRef<ActionType>();
     const [formValues, setFormValues] = useState<API.HostList>();
     const [hostGroup, setHostGroup] = useState<API.HostGroupList[]>([]);
-    const [groupId, setGroupId] = useState<string>();
+    const [group_id, setGroupId] = useState<string>();
     const [hostId, setHostId] = useState<number>();
     const access = useAccess();
     const { consoleWin, setConsoleWin } = useModel('global');
@@ -149,7 +149,6 @@ const HostList: React.FC = () => {
                     <TableDropdown
                         key="actionGroup"
                         onSelect={(key) => {
-
                             switch (key) {
                                 case 'delete':
                                     handleDelete({ ids: [record.id] });
@@ -214,7 +213,7 @@ const HostList: React.FC = () => {
                     </div>
                 )}
                 request={async (params) => queryHosts({ params }).then((res) => res.data)}
-                params={{ groupId, }}
+                params={{ group_id, }}
                 columns={columns}
                 rowSelection={{}}
                 tableRender={(_, dom) => hostGroup.length > 1 ? (

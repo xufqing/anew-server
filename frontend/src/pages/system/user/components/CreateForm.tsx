@@ -40,7 +40,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
             visible={modalVisible}
             onVisibleChange={handleChange}
             onFinish={async (v) => {
-                createUser(v as any).then((res) => {
+                createUser(v as API.UserParams).then((res) => {
                     if (res.code === 200 && res.status === true) {
                         message.success(res.message);
                         if (actionRef.current) {

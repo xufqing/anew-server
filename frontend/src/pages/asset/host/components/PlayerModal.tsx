@@ -14,7 +14,7 @@ const PlayerModal: React.FC<RecordModalProps> = (props) => {
 
     const token = `/api/v1/host/record/play?record=${values?.connect_id}&token=${localStorage.getItem('token')}`
     const head = `<head><link rel="stylesheet" type="text/css" href="/asciinema-player.css" /></head>`;
-    const defaultprops = `rows="30" cols="120" preload`
+    const defaultprops = ` preload`
     const body = `<body><asciinema-player src="${token}" ${defaultprops} ></asciinema-player></body>`;
 
     useEffect(() => {
@@ -27,8 +27,8 @@ const PlayerModal: React.FC<RecordModalProps> = (props) => {
             visible={modalVisible}
             onCancel={() => handleChange(false)}
             footer={null}
-            style={{ top: 20 }}
-            width={'60%'}
+            style={{ top: 0 }}
+            width={'88%'}
         >
             <div style={{ flex: 1,  }} dangerouslySetInnerHTML={{ __html: head + body }} />
 

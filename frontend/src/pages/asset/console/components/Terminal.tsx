@@ -70,7 +70,7 @@ const SSHTerminal: React.FC<SSHTerminalProps> = (props) => {
 
                 //监听关闭事件
                 webSocket.onclose = (e: any) => {
-                    setTimeout(() => xterm.write('\r\n?[31mConnection is closed.?[0m\r\n'), 500);
+                    setTimeout(() => xterm.write('\r\nConnection is closed.\r\n'), 500);
                 };
                 //监听窗口大小
                 xterm.onResize((size) => {

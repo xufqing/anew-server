@@ -37,9 +37,6 @@ const Console: React.FC = () => {
             setActiveKey(last.actKey)
         }
     }
-    useEffect(() => {
-        document.title = '控制台管理器'
-    }, []);
 
     //监听事件
     useEffect(() => {

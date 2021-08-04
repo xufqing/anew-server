@@ -31,7 +31,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
             visible={modalVisible}
             onVisibleChange={handleChange}
             onFinish={async (v) => {
-                createHost(v as any).then((res) => {
+                createHost(v as API.HostParams).then((res) => {
                     if (res.code === 200 && res.status === true) {
                         message.success(res.message);
                         if (actionRef.current) {

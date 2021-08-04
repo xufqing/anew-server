@@ -87,6 +87,12 @@ declare namespace API {
     key_passphrase: string,
   };
 
+  type HostGroupParams = {
+    name: string,
+    desc?: string,
+    hosts?: number[],
+  }
+
   /////////////////////////////
 
   type UserInfo = {

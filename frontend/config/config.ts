@@ -118,6 +118,16 @@ export default defineConfig({
           component: './asset/console',
         },
         {
+          path: '/asset/group',
+          name: '主机分组',
+          component: './asset/group',
+        },
+        {
+          path: '/asset/session',
+          name: '会话管理',
+          component: './asset/session',
+        },
+        {
           path: '/index',
           redirect: '/index',
         },

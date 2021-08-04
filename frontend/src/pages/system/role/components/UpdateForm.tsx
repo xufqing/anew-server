@@ -20,7 +20,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
             visible={modalVisible}
             onVisibleChange={handleChange}
             onFinish={async (v) => {
-                updateRole(v as any, values?.id).then((res) => {
+                updateRole(v as API.RoleParams, values?.id).then((res) => {
                     if (res.code === 200 && res.status === true) {
                         message.success(res.message);
                         if (actionRef.current) {

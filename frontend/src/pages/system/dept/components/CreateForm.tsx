@@ -38,7 +38,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
             visible={modalVisible}
             onVisibleChange={handleChange}
             onFinish={async (v) => {
-                createDept(v as any).then((res) => {
+                createDept(v as API.DeptParams).then((res) => {
                     if (res.code === 200 && res.status === true) {
                         message.success(res.message);
                         if (actionRef.current) {

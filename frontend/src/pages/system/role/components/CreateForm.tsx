@@ -19,7 +19,7 @@ const CreateForm: React.FC<CreateFormProps> = (props) => {
             visible={modalVisible}
             onVisibleChange={handleChange}
             onFinish={async (v) => {
-                createRole(v as any).then((res) => {
+                createRole(v as API.RoleParams).then((res) => {
                     if (res.code === 200 && res.status === true) {
                         message.success(res.message);
                         if (actionRef.current) {

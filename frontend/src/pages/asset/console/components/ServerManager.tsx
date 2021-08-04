@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CodeOutlined } from '@ant-design/icons';
 import { Modal, Tabs, Tree, message } from 'antd';
-import { queryHosts, queryHostGroups } from '@/services/anew/host';
+import { queryHosts, queryHostGroups, queryHostByGroupId } from '@/services/anew/host';
 
 
 const { TabPane } = Tabs;
@@ -53,7 +53,7 @@ const ServerManager: React.FC<FileManagerProps> = (props) => {
                 }
                 )
             } else {
-                queryHosts({ group_id: key }).then((res) => {
+                queryHostByGroupId(key).then((res) => {
                     const selectHosts = Array.isArray(res.data.data) ? res.data.data.map((item: any) => ({
                         ...item,
                         title: `${item.host_name} (${item.ip_address}:${item.port})`,
@@ -127,6 +127,8 @@ const ServerManager: React.FC<FileManagerProps> = (props) => {
             visible={modalVisible}
             onCancel={() => handleChange(false)}
             onOk={handleOk}
+            okText="确认"
+            cancelText="取消"
         >
             <Tabs defaultActiveKey="1" onChange={tabcallback} tabPosition="left">
                 <TabPane tab="主机组" key="1">

@@ -31,7 +31,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
             visible={modalVisible}
             onVisibleChange={handleChange}
             onFinish={async (v) => {
-                updateHost(v as any, values?.id).then((res) => {
+                updateHost(v as API.HostParams, values?.id).then((res) => {
                     if (res.code === 200 && res.status === true) {
                         message.success(res.message);
                         if (actionRef.current) {
