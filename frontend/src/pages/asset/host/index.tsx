@@ -53,8 +53,8 @@ const HostList: React.FC = () => {
         });
     };
 
-    const saveTtys = (val:API.TtyList) => {
-        let hosts = JSON.parse(localStorage.getItem('TABS_TTY_HOSTS') as any)
+    const saveTtys = (val: API.TtyList) => {
+        let hosts = JSON.parse(localStorage.getItem('TABS_TTY_HOSTS') as string)
         if (hosts) {
             hosts.push(val)
         } else {
@@ -116,9 +116,9 @@ const HostList: React.FC = () => {
                             style={{ fontSize: '17px', color: 'blue' }}
                             onClick={() => {
                                 let actKey = "tty1"
-                                let hosts = JSON.parse(localStorage.getItem('TABS_TTY_HOSTS') as any)
+                                let hosts = JSON.parse(localStorage.getItem('TABS_TTY_HOSTS') as string) || []
                                 if (hosts) {
-                                    actKey = "tty" + hosts.length.toString()
+                                    actKey = "tty" + (hosts.length + 1).toString()
                                 }
                                 const hostsObj: API.TtyList = { hostname: record.host_name, ipaddr: record.ip_address, port: record.port, id: record.id.toString(), actKey: actKey, secKey: null }
                                 saveTtys(hostsObj)

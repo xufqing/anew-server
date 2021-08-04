@@ -59,7 +59,7 @@ const SSHTerminal: React.FC<SSHTerminalProps> = (props) => {
                     const message = e.data;
                     if (message.indexOf) {
                         if (message.indexOf('Anew-Sec-WebSocket-Key') != -1) {
-                            let val = JSON.parse(localStorage.getItem('TABS_TTY_HOSTS') as any)
+                            let val = JSON.parse(localStorage.getItem('TABS_TTY_HOSTS') as string)
                             let secKey = message.substring(message.lastIndexOf(':') + 1, message.length).replace(/[\r\n]/g, "")
                             val[arrNum].secKey = secKey
                             localStorage.setItem('TABS_TTY_HOSTS', JSON.stringify(val));

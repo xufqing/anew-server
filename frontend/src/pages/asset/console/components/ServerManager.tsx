@@ -20,7 +20,7 @@ const ServerManager: React.FC<FileManagerProps> = (props) => {
     const [treeData, setTreeData] = useState();
     const [loadedKeys, setLoadedKeys] = useState<string[]>([]);
     const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
-    const [addTTY, setAddTTY] = useState<API.TtyList>();
+    const [addTty, setAddTty] = useState<API.TtyList>();
 
     const updateTreeData = (list: any, key: React.Key, children: any): any => {
         return list.map((node: any) => {
@@ -75,7 +75,7 @@ const ServerManager: React.FC<FileManagerProps> = (props) => {
         const key = selectedKeysValue[0].split("-")
         if (key[0] === "key") {
             const hostsObj = { hostname: info.node.host_name, ipaddr: info.node.ip_address, port: info.node.port, id: info.node.id.toString(), actKey: "tty1", secKey: null }
-            setAddTTY(hostsObj)
+            setAddTty(hostsObj)
         }
     };
 
@@ -102,14 +102,16 @@ const ServerManager: React.FC<FileManagerProps> = (props) => {
     const handleOk = () => {
         const key = selectedKeys[0].split("-");
         if (key[0] === "key") {
-            let hosts = JSON.parse(localStorage.getItem('TABS_TTY_HOSTS') as any);
+            let hosts = JSON.parse(localStorage.getItem('TABS_TTY_HOSTS') as string) || [];
             if (hosts) {
-                addTTY && addTTY.actKey === "tty" + (hosts.length + 1).toString();
+                let newAddtty = {};
+                Object.assign(newAddtty, addTty);
+                (newAddtty as API.TtyList).actKey = "tty" + (hosts.length + 1).toString();
+                hosts.push(newAddtty);
+                setTtys(hosts);
+                localStorage.setItem('TABS_TTY_HOSTS', JSON.stringify(hosts));
+                setActiveKey((newAddtty as API.TtyList).actKey);
             }
-            hosts.push(addTTY);
-            setTtys(hosts);
-            localStorage.setItem('TABS_TTY_HOSTS', JSON.stringify(hosts));
-            setActiveKey(addTTY ? addTTY.actKey : '');
             handleChange(false);
         } else {
             message.info("未选择服务器");

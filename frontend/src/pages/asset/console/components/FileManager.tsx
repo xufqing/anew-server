@@ -36,17 +36,16 @@ export type FileManagerProps = {
 const FileManager: React.FC<FileManagerProps> = (props) => {
     const { modalVisible, handleChange, connectId } = props;
     const [columnData, setColumnData] = useState<API.SSHFileList[]>([]);
-    const [showHidden, setShowHidden] = useState(false);
-    const [childrenDrawer, setChildrenDrawer] = useState(false);
+    const [showHidden, setShowHidden] = useState<boolean>(false);
+    const [childrenDrawer, setChildrenDrawer] = useState<boolean>(false);
     const [currentPathArr, setCurrentPathArr] = useState<string[]>([]);
-    const [initPath, setInitPath] = useState<string>();
+    const [initPath, setInitPath] = useState<string>('');
 
     const _dirSort = (item: API.SSHFileList) => {
         return item.isDir;
     };
 
-    const getFileData = (key: string, path: string | undefined) => {
-        if (!path) return;
+    const getFileData = (key: string, path: string) => {
         querySSHFile(key, path).then((res) => {
             const obj = lds.orderBy(res.data, [_dirSort, 'name'], ['desc', 'asc']);
             showHidden ? setColumnData(obj) : setColumnData(obj.filter((x) => !x.name.startsWith('.')));
@@ -131,7 +130,7 @@ const FileManager: React.FC<FileManagerProps> = (props) => {
             //console.log(info);
             if (info.file.status === 'done') {
                 message.success(`${info.file.name} file uploaded successfully`);
-                getFileData(connectId, initPath); // 刷新数据
+                getFileData(connectId, initPath as string); // 刷新数据
             } else if (info.file.status === 'error') {
                 message.error(`${info.file.name} file upload failed.`);
             }
@@ -212,14 +211,9 @@ const FileManager: React.FC<FileManagerProps> = (props) => {
         },
     ];
 
-
-    useEffect(() => {
-        getFileData(connectId, '');
-    }, []);
-
     useEffect(() => {
         // 是否显示隐藏文件
-        getFileData(connectId, initPath); // 刷新数据
+        getFileData(connectId, initPath as string); // 刷新数据
     }, [showHidden]);
 
     const { Dragger } = Upload;

@@ -11,7 +11,7 @@ import ServerManager from './components/ServerManager';
 
 const { TabPane } = Tabs;
 const Console: React.FC = () => {
-    const [Ttys, setTtys] = useState<API.TtyList[]>(JSON.parse(localStorage.getItem('TABS_TTY_HOSTS') as any));
+    const [ttys, setTtys] = useState<API.TtyList[]>(JSON.parse(localStorage.getItem('TABS_TTY_HOSTS') as string));
     const [activeKey, setActiveKey] = useState<string>('tty1');
     const [fileVisible, setFileVisible] = useState(false);
     const [serverVisible, setServerVisible] = useState(false);
@@ -27,7 +27,7 @@ const Console: React.FC = () => {
         //console.log(action, targetKey)
     };
     const remove = (key: React.Key) => {
-        let val = JSON.parse(localStorage.getItem('TABS_TTY_HOSTS') as any)
+        let val = JSON.parse(localStorage.getItem('TABS_TTY_HOSTS') as string)
         const index = val.map((item: API.TtyList) => item.actKey).indexOf(key)
         val.splice(index, 1)
         localStorage.setItem('TABS_TTY_HOSTS', JSON.stringify(val));
@@ -48,7 +48,7 @@ const Console: React.FC = () => {
         }
         const refetch = (e: any) => {
             if (e.key === "TABS_TTY_HOSTS") {
-                let val = JSON.parse(localStorage.getItem('TABS_TTY_HOSTS') as any)
+                let val = JSON.parse(localStorage.getItem('TABS_TTY_HOSTS') as string)
                 setTtys(val)
                 if (val) {
                     let [last] = [...val].reverse()
@@ -60,24 +60,24 @@ const Console: React.FC = () => {
         return () => {
             window.removeEventListener('storage', refetch)
         };
-    }, [Ttys]);
+    }, [ttys]);
     const operations = (
         <div>
             <Button icon={<DesktopOutlined />} onClick={() => {
                 setServerVisible(true)
             }} >我的服务器</Button>
             <Button icon={<FolderOutlined />} onClick={() => {
-                const val = JSON.parse(localStorage.getItem('TABS_TTY_HOSTS') as any)
+                const val = JSON.parse(localStorage.getItem('TABS_TTY_HOSTS') as string)
                 if (val) {
                     const num = val.map((item: API.TtyList) => item.actKey).indexOf(activeKey)
                     if (num !== -1) {
                         setWebSocketKey(val[num].secKey)
                         setFileVisible(true)
                     } else {
-                        message.error("未连接")
+                        message.error("未连接2")
                     }
                 } else {
-                    message.error("未连接")
+                    message.error("未连接1")
                 }
             }}>文件管理器</Button>
         </div>
@@ -94,7 +94,7 @@ const Console: React.FC = () => {
                 onChange={callback}
                 activeKey={activeKey}
                 onEdit={onEdit}>
-                {Ttys && Ttys.map((v, i) => (
+                {ttys && ttys.map((v, i) => (
                     <TabPane forceRender tab={<Tooltip title={v.ipaddr + `:` + v.port}>{v.hostname}</Tooltip>} key={v.actKey}>
                         <Terminal hostId={v.id} arrNum={i} />
                     </TabPane>
