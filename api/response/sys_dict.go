@@ -13,15 +13,15 @@ type DictTreeResp struct {
 	Children []DictTreeResp `json:"children,omitempty"` //tag:omitempty 为空的值不显示
 }
 
-type DictTreeResppList []DictTreeResp
+type DictTreeRespList []DictTreeResp
 
-func (hs DictTreeResppList) Len() int {
+func (hs DictTreeRespList) Len() int {
 	return len(hs)
 }
-func (hs DictTreeResppList) Less(i, j int) bool {
+func (hs DictTreeRespList) Less(i, j int) bool {
 	return hs[i].Sort < hs[j].Sort // 按Sort从小到大排序
 }
 
-func (hs DictTreeResppList) Swap(i, j int) {
+func (hs DictTreeRespList) Swap(i, j int) {
 	hs[i], hs[j] = hs[j], hs[i]
 }

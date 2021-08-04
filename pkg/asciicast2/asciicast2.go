@@ -24,8 +24,8 @@ func NewCastV2(meta CastV2Header, stream *bytes.Buffer) (*CastV2Header, *bytes.B
 	//c.Width = meta.Width
 	//c.Height = meta.Height
 	// 固定宽高用于前端展示
-	c.Width = 30
-	c.Height = 120
+	c.Width = meta.Width
+	c.Height = meta.Height
 	c.Title = meta.Title
 	c.Timestamp = meta.Timestamp
 	c.Duration = c.Duration

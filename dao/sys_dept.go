@@ -31,7 +31,7 @@ func (s *MysqlService) GetDepts(req *request.DeptListReq) []system.SysDept {
 
 // 生成部门树
 func GenDeptTree(parent *response.DeptTreeResp, depts []system.SysDept) []response.DeptTreeResp {
-	tree := make(response.DeptTreeResppList, 0)
+	tree := make(response.DeptTreeRespList, 0)
 	var resp []response.DeptTreeResp
 	utils.Struct2StructByJson(depts, &resp)
 	// parentId默认为0, 表示根菜单

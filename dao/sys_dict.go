@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"gorm.io/gorm"
+	"sort"
 	"strings"
 )
 
@@ -40,7 +41,7 @@ func (s *MysqlService) GetDicts(req *request.DictListReq) []system.SysDict {
 
 // 生成字典树
 func GenDictTree(parent *response.DictTreeResp, Dicts []system.SysDict) []response.DictTreeResp {
-	tree := make([]response.DictTreeResp, 0)
+	tree := make(response.DictTreeRespList, 0)
 	var resp []response.DictTreeResp
 	utils.Struct2StructByJson(Dicts, &resp)
 	// parentId默认为0, 表示根菜单
@@ -57,12 +58,13 @@ func GenDictTree(parent *response.DictTreeResp, Dicts []system.SysDict) []respon
 			tree = append(tree, Dict)
 		}
 	}
+	sort.Sort(tree)
 	return tree
 }
 
 // 字典MAP
-func GenDictMap(parent *response.DictTreeResp, Dicts []system.SysDict) map[string]response.DictTreeResppList {
-	dictMap := map[string]response.DictTreeResppList{}
+func GenDictMap(parent *response.DictTreeResp, Dicts []system.SysDict) map[string]response.DictTreeRespList {
+	dictMap := map[string]response.DictTreeRespList{}
 	var resp []response.DictTreeResp
 	utils.Struct2StructByJson(Dicts, &resp)
 	var parentId uint

@@ -11,6 +11,7 @@ type MenuTreeResp struct {
 	Sort     int            `json:"sort"`
 	Children []MenuTreeResp `json:"children,omitempty"` //tag:omitempty 为空的值不显示
 }
+
 type MenuTreeRespList []MenuTreeResp
 
 func (hs MenuTreeRespList) Len() int {

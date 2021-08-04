@@ -92,6 +92,8 @@ func (r *WebsocketStream) Read(p []byte) (n int, err error) {
 		// 改变终端大小
 		case "resizePty":
 			if msgObj.Cols > 0 && msgObj.Rows > 0 {
+				r.Meta.Width = msgObj.Cols
+				r.Meta.Height = msgObj.Rows
 				if err := r.Terminal.session.WindowChange(msgObj.Rows, msgObj.Cols); err != nil {
 					common.Log.Debugf("ssh pty change windows size failed:\t", err)
 				}

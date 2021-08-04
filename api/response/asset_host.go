@@ -25,6 +25,20 @@ type SessionResp struct {
 	ConnectTime models.LocalTime `json:"connect_time"`
 }
 
+type SessionRespList []SessionResp
+
+func (hs SessionRespList) Len() int {
+	return len(hs)
+}
+func (hs SessionRespList) Less(i, j int) bool {
+
+	return hs[i].ConnectTime.Time.Before(hs[j].ConnectTime.Time) // 按Sort从小到大排序
+}
+
+func (hs SessionRespList) Swap(i, j int) {
+	hs[i], hs[j] = hs[j], hs[i]
+}
+
 type SSHRecordListResp struct {
 	ConnectID   string           `json:"connect_id"`
 	UserName    string           `json:"user_name"`

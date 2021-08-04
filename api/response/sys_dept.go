@@ -10,15 +10,15 @@ type DeptTreeResp struct {
 	Children []DeptTreeResp `json:"children,omitempty"` //tag:omitempty 为空的值不显示
 }
 
-type DeptTreeResppList []DeptTreeResp
+type DeptTreeRespList []DeptTreeResp
 
-func (hs DeptTreeResppList) Len() int {
+func (hs DeptTreeRespList) Len() int {
 	return len(hs)
 }
-func (hs DeptTreeResppList) Less(i, j int) bool {
+func (hs DeptTreeRespList) Less(i, j int) bool {
 	return hs[i].Sort < hs[j].Sort // 按Sort从小到大排序
 }
 
-func (hs DeptTreeResppList) Swap(i, j int) {
+func (hs DeptTreeRespList) Swap(i, j int) {
 	hs[i], hs[j] = hs[j], hs[i]
 }

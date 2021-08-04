@@ -4,11 +4,12 @@ import (
 	"anew-server/api/request"
 	"anew-server/api/response"
 	"github.com/gin-gonic/gin"
+	"sort"
 )
 
 // 获取连接列表
 func GetSessions(c *gin.Context) {
-	var resp []response.SessionResp
+	var resp response.SessionRespList
 	for client, _ := range SteamMap.innerMap {
 		var connStruct response.SessionResp
 		connStruct.ConnectID = SteamMap.innerMap[client].Meta.ConnectId
@@ -17,7 +18,8 @@ func GetSessions(c *gin.Context) {
 		connStruct.ConnectTime = SteamMap.innerMap[client].CreatedAt
 		resp = append(resp, connStruct)
 	}
-
+	// 排序
+	sort.Sort(resp)
 	response.SuccessWithData(resp)
 }
 
