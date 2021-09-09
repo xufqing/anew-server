@@ -10,7 +10,7 @@ golang  运维平台
 
 重构前端：ant pro design V5 typescript 按钮级权限管理
 
-前端地址 https://github.com/xufqing/anew-server/frontend
+前端地址 https://github.com/xufqing/anew-server/tree/master/frontend
 #### 软件架构
 软件架构说明
 
